@@ -1,0 +1,30 @@
+{
+  "name": "closeus-backend",
+  "version": "1.0.0",
+  "description": "CloseUs Backend - Microservices for Couples App",
+  "private": true,
+  "workspaces": [
+    "api-gateway",
+    "services/*",
+    "shared/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:gateway\" \"npm run dev:auth\" \"npm run dev:user\" \"npm run dev:couple\" \"npm run dev:chat\" \"npm run dev:questions\" \"npm run dev:games\" \"npm run dev:media\"",
+    "dev:gateway": "cd api-gateway && npm run dev",
+    "dev:auth": "cd services/auth-service && npm run dev",
+    "dev:user": "cd services/user-service && npm run dev",
+    "dev:couple": "cd services/couple-service && npm run dev",
+    "dev:chat": "cd services/chat-service && npm run dev",
+    "dev:questions": "cd services/questions-service && npm run dev",
+    "dev:games": "cd services/games-service && npm run dev",
+    "dev:media": "cd services/media-service && npm run dev",
+    "install:all": "npm install && npm install --workspaces"
+  },
+  "keywords": ["couples", "microservices", "nodejs", "express"],
+  "author": "CloseUs Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.2"
+  }
+}
