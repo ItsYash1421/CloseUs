@@ -21,13 +21,16 @@ npm run install:all
 ```
 
 2. Set environment variables:
-Create `.env` file in each service directory with:
+
+Copy `.env.example` to `.env` and fill in your credentials:
+```bash
+cp .env.example .env
 ```
-MONGODB_URI=mongodb+srv://yashamanmeena1:J5emIcPwHS25hLhd@stayfinder-admin.qtfwbs2.mongodb.net/closeus
-JWT_SECRET=your-secret-key
-GOOGLE_CLIENT_ID=your-client-id
-GOOGLE_CLIENT_SECRET=your-client-secret
-```
+
+Then edit `.env` with your actual values:
+- MongoDB connection string
+- JWT secrets
+- Google OAuth credentials
 
 3. Run all services:
 ```bash
