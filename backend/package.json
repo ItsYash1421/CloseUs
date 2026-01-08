@@ -1,30 +1,29 @@
 {
   "name": "closeus-backend",
   "version": "1.0.0",
-  "description": "CloseUs Backend - Microservices for Couples App",
-  "private": true,
-  "workspaces": [
-    "api-gateway",
-    "services/*",
-    "shared/*"
-  ],
+  "description": "CloseUs Backend API",
+  "main": "src/index.js",
   "scripts": {
-    "dev": "concurrently \"npm run dev:gateway\" \"npm run dev:auth\" \"npm run dev:user\" \"npm run dev:couple\" \"npm run dev:chat\" \"npm run dev:questions\" \"npm run dev:games\" \"npm run dev:media\"",
-    "dev:gateway": "cd api-gateway && npm run dev",
-    "dev:auth": "cd services/auth-service && npm run dev",
-    "dev:user": "cd services/user-service && npm run dev",
-    "dev:couple": "cd services/couple-service && npm run dev",
-    "dev:chat": "cd services/chat-service && npm run dev",
-    "dev:questions": "cd services/questions-service && npm run dev",
-    "dev:games": "cd services/games-service && npm run dev",
-    "dev:media": "cd services/media-service && npm run dev",
-    "install:all": "npm install && npm install --workspaces"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "seed:admin": "node scripts/seedAdmin.js"
   },
-  "keywords": ["couples", "microservices", "nodejs", "express"],
-  "author": "CloseUs Team",
-  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "firebase-admin": "^13.6.0",
+    "google-auth-library": "^10.5.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.3",
+    "multer": "^1.4.5-lts.1",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "socket.io": "^4.7.2"
+  },
   "devDependencies": {
-    "concurrently": "^8.2.2",
     "nodemon": "^3.0.2"
   }
 }
