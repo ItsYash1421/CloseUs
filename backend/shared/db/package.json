@@ -1,9 +1,0 @@
-{
-    "name": "@closeus/db",
-    "version": "1.0.0",
-    "description": "Shared database connection",
-    "main": "connection.js",
-    "dependencies": {
-        "mongoose": "^8.0.3"
-    }
-}
