@@ -2,10 +2,18 @@ import apiClient from './apiClient';
 import { Couple, CoupleStats, ApiResponse } from '../types';
 
 class CoupleService {
-    async createPairingKey(): Promise<{ pairingKey: string; expiresAt: Date }> {
-        const response = await apiClient.post<ApiResponse<{ pairingKey: string; expiresAt: Date }>>(
-            '/api/couples/create-key',
-        );
+    async createPairingKey(): Promise<{ pairingKey: string; pairingKeyExpires: Date }> {
+        const response = await apiClient.post<ApiResponse<{ pairingKey: string; pairingKeyExpires: Date }>>('/api/couples/create-key');
+        return response.data!;
+    }
+
+    async refreshPairingKey(): Promise<{ pairingKey: string; pairingKeyExpires: Date }> {
+        const response = await apiClient.post<ApiResponse<{ pairingKey: string; pairingKeyExpires: Date }>>('/api/couples/refresh-key');
+        return response.data!;
+    }
+
+    async checkPairingStatus(): Promise<{ isPaired: boolean; couple?: Couple }> {
+        const response = await apiClient.get<ApiResponse<{ isPaired: boolean; couple?: Couple }>>('/api/couples/check-pairing-status');
         return response.data!;
     }
 

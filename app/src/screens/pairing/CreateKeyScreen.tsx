@@ -1,20 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Clipboard, Image, BackHandler, Alert, Share, Linking } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { GradientBackground } from '../../components/common';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
 import { useCoupleStore } from '../../store/coupleStore';
 import { useAuthStore } from '../../store/authStore';
 import Toast from 'react-native-toast-message';
+// SVG support temporarily disabled due to bundler issues
 
 export const CreateKeyScreen = ({ navigation }: any) => {
-    const { pairingKey, createPairingKey, refreshPairingKey, pairingAttempts } = useCoupleStore();
+    const { pairingKey, createPairingKey, refreshPairingKey, checkPairingStatus, pairingAttempts } = useCoupleStore();
     const user = useAuthStore(state => state.user);
+    const pollingIntervalRef = useRef<number | null>(null);
 
     useEffect(() => {
         if (!pairingKey) {
             createPairingKey();
         }
+    }, []);
+
+    // Polling: Check pairing status every 10 seconds
+    useEffect(() => {
+        // Prevent multiple intervals
+        if (pollingIntervalRef.current) {
+            return;
+        }
+
+        pollingIntervalRef.current = setInterval(async () => {
+            console.log('Polling pairing status...');
+            const isPaired = await checkPairingStatus();
+            if (isPaired) {
+                if (pollingIntervalRef.current) {
+                    clearInterval(pollingIntervalRef.current);
+                    pollingIntervalRef.current = null;
+                }
+                Toast.show({
+                    type: 'success',
+                    text1: 'Paired!',
+                    text2: 'Successfully paired with your partner',
+                    position: 'top',
+                });
+                setTimeout(() => {
+                    navigation.replace('PairingSuccess');
+                }, 1000);
+            }
+        }, 10000); // 10 seconds
+
+        return () => {
+            if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+                pollingIntervalRef.current = null;
+            }
+        };
     }, []);
 
     // Handle back button
@@ -124,10 +162,10 @@ export const CreateKeyScreen = ({ navigation }: any) => {
 
                     {/* GIF Image */}
                     <View style={styles.gifContainer}>
-                        <Image
+                        <FastImage
                             source={require('../../assets/gifs/CreateKey.gif')}
                             style={styles.gif}
-                            resizeMode="contain"
+                            resizeMode={FastImage.resizeMode.contain}
                         />
                     </View>
 

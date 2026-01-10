@@ -1,14 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Alert, BackHandler } from 'react-native';
-import { GradientBackground, Button, Input } from '../../components/common';
-import { COLORS } from '../../constants/colors';
-import THEME from '../../constants/theme';
+import {
+    View,
+    Text,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    BackHandler,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    Keyboard,
+    TouchableWithoutFeedback
+} from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { useCoupleStore } from '../../store/coupleStore';
+import { useAuthStore } from '../../store/authStore';
+import Toast from 'react-native-toast-message';
+import THEME from '../../constants/theme';
+import { COLORS } from '../../constants/colors';
 
 export const EnterKeyScreen = ({ navigation }: any) => {
     const [key, setKey] = useState('');
-    const [loading, setLoading] = useState(false);
-    const pairWithPartner = useCoupleStore(state => state.pairWithPartner);
+    const [isLoading, setIsLoading] = useState(false);
+    const { pairWithPartner } = useCoupleStore();
+    const user = useAuthStore(state => state.user);
 
     // Handle back button
     useEffect(() => {
@@ -27,147 +42,255 @@ export const EnterKeyScreen = ({ navigation }: any) => {
                     }
                 ]
             );
-            return true; // Prevent default back behavior
+            return true;
         });
 
         return () => backHandler.remove();
     }, []);
 
-    const handlePair = async () => {
+    const handleSubmit = async () => {
         if (key.length !== 6) {
-            Alert.alert('Invalid Key', 'Pairing key must be 6 characters');
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Key',
+                text2: 'Please enter a 6-character code',
+                position: 'top',
+            });
             return;
         }
 
         try {
-            setLoading(true);
+            setIsLoading(true);
             await pairWithPartner(key.toUpperCase());
-            navigation.navigate('PairingSuccess');
+            Toast.show({
+                type: 'success',
+                text1: 'Success!',
+                text2: 'Successfully paired with your partner',
+                position: 'top',
+            });
+            setTimeout(() => {
+                navigation.replace('PairingSuccess');
+            }, 1000);
         } catch (error: any) {
-            setLoading(false);
-            Alert.alert('Pairing Failed', error.message || 'Invalid or expired key');
+            Toast.show({
+                type: 'error',
+                text1: 'Pairing Failed',
+                text2: error.message || 'Invalid or expired key',
+                position: 'top',
+            });
+        } finally {
+            setIsLoading(false);
         }
+    };
+
+    const handleClose = () => {
+        navigation.navigate('CreateKey');
     };
 
     const handleDevPair = async () => {
         try {
-            setLoading(true);
+            setIsLoading(true);
             await useCoupleStore.getState().devPair();
-            // Navigate directly to MainTabs with reset
             navigation.reset({
                 index: 0,
                 routes: [{ name: 'MainTabs' }],
             });
         } catch (error: any) {
-            setLoading(false);
-            Alert.alert('Dev Pairing Failed', error.message);
+            Toast.show({
+                type: 'error',
+                text1: 'Dev Pairing Failed',
+                text2: error.message,
+                position: 'top',
+            });
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <GradientBackground variant="background">
-            <View style={styles.container}>
-                <View style={styles.header}>
-                    <Text style={styles.title}>Enter Pairing Key</Text>
-                    <Text style={styles.subtitle}>Got a key from your partner?</Text>
-                </View>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <KeyboardAvoidingView
+                style={styles.container}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            >
+                <View style={styles.container}>
+                    {/* Top Section with GIF */}
+                    <View style={styles.topSection}>
+                        <FastImage
+                            source={require('../../assets/gifs/EnterKey.gif')}
+                            style={styles.gifImage}
+                            resizeMode={FastImage.resizeMode.cover}
+                        />
 
-                <View style={styles.content}>
-                    <View style={styles.iconContainer}>
-                        <Text style={styles.icon}>🔐</Text>
+                        {/* Close Button */}
+                        <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
+                            <Text style={styles.closeIcon}>✕</Text>
+                        </TouchableOpacity>
                     </View>
 
-                    <Input
-                        label="Pairing Key"
-                        placeholder="XXXXXX"
-                        value={key}
-                        onChangeText={text => setKey(text.toUpperCase())}
-                        maxLength={6}
-                        autoCapitalize="characters"
-                        style={styles.input}
-                    />
+                    <Toast />
 
-                    <Text style={styles.hint}>
-                        💡 Ask your partner to create a pairing key and share it with you
-                    </Text>
-                </View>
+                    {/* Content Card */}
+                    <View style={styles.contentCard}>
+                        {/* Title */}
+                        <Text style={styles.title}>
+                            Unlock your <Text style={styles.titleHighlight}>private</Text> space 💖
+                        </Text>
 
-                <View style={styles.footer}>
-                    <Button
-                        title="Pair Now"
-                        onPress={handlePair}
-                        variant="primary"
-                        size="large"
-                        fullWidth
-                        loading={loading}
-                        disabled={key.length !== 6}
-                    />
-                    <Button
-                        title="Create Key Instead"
-                        onPress={() => navigation.navigate('CreateKey')}
-                        variant="outline"
-                        size="medium"
-                        fullWidth
-                    />
-                    {/* Dev Mode Only */}
-                    <Button
-                        title="[DEV] Pair with Dummy Partner"
-                        onPress={handleDevPair}
-                        variant="secondary"
-                        size="small"
-                        fullWidth
-                        loading={loading}
-                    />
+                        {/* Subtitle */}
+                        <Text style={styles.subtitle}>
+                            Enter {user?.partnerName || 'partner'}'s key
+                        </Text>
+
+                        {/* Input Field */}
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.keyEmoji}>🔑</Text>
+                            <TextInput
+                                style={styles.input}
+                                value={key}
+                                onChangeText={(text) => setKey(text.toUpperCase())}
+                                placeholder="Enter 6-char code"
+                                placeholderTextColor="#B0B0B0"
+                                maxLength={6}
+                                autoCapitalize="characters"
+                                autoCorrect={false}
+                                autoFocus={true}
+                            />
+                        </View>
+
+                        {/* Unlock Button */}
+                        <TouchableOpacity
+                            style={[styles.unlockButton, isLoading && styles.unlockButtonDisabled]}
+                            onPress={handleSubmit}
+                            disabled={isLoading}
+                        >
+                            <Text style={styles.unlockButtonText}>
+                                {isLoading ? 'Unlocking...' : 'Unlock Now'}
+                            </Text>
+                        </TouchableOpacity>
+
+                        {/* Dev Mode Button */}
+                        <TouchableOpacity
+                            style={styles.devButton}
+                            onPress={handleDevPair}
+                            disabled={isLoading}
+                        >
+                            <Text style={styles.devButtonText}>
+                                [DEV] Pair with Dummy Partner
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-            </View>
-        </GradientBackground>
+            </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: THEME.spacing.xl,
+        backgroundColor: '#FFFFFF',
     },
-    header: {
-        marginTop: THEME.spacing.xxl,
-        marginBottom: THEME.spacing.xl,
+    topSection: {
+        height: '45%',
+        width: '100%',
+        position: 'relative',
+        backgroundColor: '#FFFFFF', // White background for GIF
+    },
+    gifImage: {
+        width: '100%',
+        height: '100%',
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 5,
+        right: 5,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dark semi-transparent for visibility
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    closeIcon: {
+        fontSize: 24,
+        color: '#FFFFFF', // White X on dark button
+        fontWeight: '600',
+    },
+    contentCard: {
+        flex: 1,
+        backgroundColor: '#1A0E2E', // Dark purple from theme
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
+        paddingHorizontal: THEME.spacing.xl,
+        paddingTop: 40,
+        paddingBottom: 50,
+        marginTop: -32, // Overlap with top section for seamless look
     },
     title: {
-        fontSize: THEME.fontSizes.xxxl,
-        fontWeight: THEME.fontWeights.bold,
-        color: COLORS.white,
+        fontSize: 28,
+        fontWeight: '800',
+        color: '#FFFFFF', // White text on dark background
+        textAlign: 'center',
         marginBottom: THEME.spacing.sm,
+    },
+    titleHighlight: {
+        color: '#FF6B9D',
     },
     subtitle: {
         fontSize: THEME.fontSizes.md,
-        color: COLORS.textSecondary,
-    },
-    content: {
-        flex: 1,
-    },
-    iconContainer: {
-        alignSelf: 'center',
+        color: '#B8B8D1', 
+        textAlign: 'center',
         marginBottom: THEME.spacing.xl,
     },
-    icon: {
-        fontSize: 80,
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+        paddingHorizontal: 20,
+        paddingVertical: 18,
+        marginBottom: THEME.spacing.xl * 2,
+    },
+    keyEmoji: {
+        fontSize: 24,
+        marginRight: 12,
     },
     input: {
-        textAlign: 'center',
-        fontSize: THEME.fontSizes.xxl,
-        letterSpacing: 8,
-        fontWeight: THEME.fontWeights.bold,
+        flex: 1,
+        fontSize: THEME.fontSizes.lg,
+        color: '#FFFFFF', 
+        fontWeight: '600',
+        letterSpacing: 2,
     },
-    hint: {
+    unlockButton: {
+        backgroundColor: '#FFFFFF', 
+        borderRadius: 28,
+        paddingVertical: 18,
+        alignItems: 'center',
+    },
+    unlockButtonDisabled: {
+        opacity: 0.6,
+    },
+    unlockButtonText: {
+        fontSize: THEME.fontSizes.md,
+        fontWeight: '600',
+        color: '#000000', 
+    },
+    devButton: {
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        borderRadius: 28,
+        paddingVertical: 14,
+        alignItems: 'center',
+        marginTop: THEME.spacing.md,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+    },
+    devButtonText: {
         fontSize: THEME.fontSizes.sm,
-        color: COLORS.textSecondary,
-        textAlign: 'center',
-        marginTop: THEME.spacing.lg,
-        lineHeight: 20,
-    },
-    footer: {
-        paddingBottom: THEME.spacing.lg,
-        gap: THEME.spacing.sm,
+        fontWeight: '500',
+        color: '#B8B8D1',
     },
 });

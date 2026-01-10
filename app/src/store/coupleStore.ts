@@ -19,6 +19,7 @@ interface CoupleState {
     setPartner: (partner: User | null) => void;
     createPairingKey: () => Promise<string>;
     refreshPairingKey: () => Promise<string>;
+    checkPairingStatus: () => Promise<boolean>;
     pairWithPartner: (key: string) => Promise<void>;
     devPair: () => Promise<void>;
     fetchCoupleInfo: () => Promise<void>;
@@ -63,10 +64,10 @@ export const useCoupleStore = create<CoupleState>()(
             refreshPairingKey: async () => {
                 try {
                     set({ isLoading: true, error: null });
-                    const { pairingKey, expiresAt } = await coupleService.createPairingKey();
+                    const { pairingKey, pairingKeyExpires } = await coupleService.refreshPairingKey();
                     set({
                         pairingKey,
-                        pairingKeyExpires: new Date(expiresAt),
+                        pairingKeyExpires: new Date(pairingKeyExpires),
                         pairingAttempts: 0,
                         isLoading: false,
                     });
@@ -74,6 +75,19 @@ export const useCoupleStore = create<CoupleState>()(
                 } catch (error: any) {
                     set({ error: error.message, isLoading: false });
                     throw error;
+                }
+            },
+
+            checkPairingStatus: async () => {
+                try {
+                    const { isPaired, couple } = await coupleService.checkPairingStatus();
+                    if (isPaired && couple) {
+                        set({ couple, pairingKey: null, pairingKeyExpires: null });
+                    }
+                    return isPaired;
+                } catch (error: any) {
+                    console.error('Check pairing status error:', error);
+                    return false;
                 }
             },
 
