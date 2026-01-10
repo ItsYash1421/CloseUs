@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "679581555584",
+    "project_id": "closeus-cdeef",
+    "storage_bucket": "closeus-cdeef.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:679581555584:android:e04cb45442b92b60f13f65",
+        "android_client_info": {
+          "package_name": "com.closeus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "679581555584-ldfp6iudkd3dticc61cfdeljsrfvqajm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.closeus",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "679581555584-5b3cqif6kg6th684lm2ijnp330c7950k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgC9mvRo8t37Xk1UapCaMLdH3GWYDPcuc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "679581555584-5b3cqif6kg6th684lm2ijnp330c7950k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
