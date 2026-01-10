@@ -4,6 +4,7 @@ import { GradientBackground, Button } from '../../components/common';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
 import { useAuthStore } from '../../store/authStore';
+import { getErrorMessage } from '../../utils/errorHandler';
 
 export const LoginScreen = ({ navigation }: any) => {
     const [loading, setLoading] = useState(false);
@@ -31,7 +32,7 @@ export const LoginScreen = ({ navigation }: any) => {
             }
         } catch (error: any) {
             setLoading(false);
-            Alert.alert('Login Failed', error.message || 'Please try again');
+            Alert.alert('Login Failed', getErrorMessage(error));
         }
     };
 

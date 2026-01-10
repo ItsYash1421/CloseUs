@@ -42,8 +42,32 @@ export const AppNavigator = () => {
                 <Stack.Screen name="RelationshipStatus" component={RelationshipStatusScreen} />
                 <Stack.Screen name="LivingStyle" component={LivingStyleScreen} />
                 <Stack.Screen name="Anniversary" component={AnniversaryScreen} />
-                <Stack.Screen name="CreateKey" component={CreateKeyScreen} />
-                <Stack.Screen name="EnterKey" component={EnterKeyScreen} />
+                <Stack.Screen
+                    name="CreateKey"
+                    component={CreateKeyScreen}
+                    options={{
+                        animationEnabled: true,
+                        detachPreviousScreen: false,
+                        cardStyleInterpolator: ({ current: { progress } }) => ({
+                            cardStyle: {
+                                opacity: progress,
+                            },
+                        }),
+                    }}
+                />
+                <Stack.Screen
+                    name="EnterKey"
+                    component={EnterKeyScreen}
+                    options={{
+                        animationEnabled: true,
+                        detachPreviousScreen: false,
+                        cardStyleInterpolator: ({ current: { progress } }) => ({
+                            cardStyle: {
+                                opacity: progress,
+                            },
+                        }),
+                    }}
+                />
                 <Stack.Screen name="PairingSuccess" component={PairingSuccessScreen} />
                 <Stack.Screen name="MainTabs" component={TabNavigator} />
             </Stack.Navigator>

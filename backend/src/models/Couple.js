@@ -15,7 +15,8 @@ const coupleSchema = new mongoose.Schema(
         // Pairing
         pairingKey: {
             type: String,
-            unique: true
+            unique: true,
+            sparse: true 
         },
         pairingKeyExpires: Date,
         isPaired: {

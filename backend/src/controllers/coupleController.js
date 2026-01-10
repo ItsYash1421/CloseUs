@@ -297,15 +297,13 @@ const devPair = async (req, res) => {
         if (!dummyPartner) {
             // Create dummy partner
             dummyPartner = await User.create({
-                email: 'dummy@closeus.app',
+                email: `dummy_${Date.now()}@closeus.dev`,
                 googleId: 'DUMMY_PARTNER_' + Date.now(),
                 name: 'Dummy Partner',
-                photoUrl: '',
-                isOnboardingComplete: true,
                 gender: 'female', // assuming opposite gender for variety
                 dob: new Date('2000-01-01'),
                 relationshipStatus: 'dating',
-                livingStyle: 'together',
+                livingStyle: 'living_together',
                 anniversary: new Date()
             });
         }
@@ -331,11 +329,24 @@ const devPair = async (req, res) => {
 
         // 5. Create new couple
         const currentUser = await User.findById(userId);
-        const coupleTag = generateCoupleTag(currentUser.name, dummyPartner.name);
+
+        const newDummyPartner = await User.create({
+            email: `devpartner_${Date.now()}@closeus.dev`,
+            googleId: 'DEV_PARTNER_' + Date.now(),
+            name: 'Dev Partner',
+            gender: currentUser.gender === 'male' ? 'female' : 'male',
+            relationshipStatus: 'dating',
+            livingStyle: 'living_together',
+            partnerName: currentUser.name,
+            anniversary: currentUser.anniversary || new Date(),
+            isOnboarded: true
+        });
+
+        const coupleTag = generateCoupleTag(currentUser.name, newDummyPartner.name);
 
         const newCouple = await Couple.create({
             partner1Id: userId,
-            partner2Id: dummyPartner._id,
+            partner2Id: newDummyPartner._id,
             isPaired: true,
             coupleTag: coupleTag,
             startDate: currentUser.anniversary || new Date()
@@ -343,7 +354,7 @@ const devPair = async (req, res) => {
 
         // 6. Update both users
         await User.findByIdAndUpdate(userId, { coupleId: newCouple._id });
-        await User.findByIdAndUpdate(dummyPartner._id, { coupleId: newCouple._id });
+        await User.findByIdAndUpdate(newDummyPartner._id, { coupleId: newCouple._id });
 
         res.json(successResponse({ couple: newCouple }, 'Dev pair successful'));
     } catch (error) {

@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, AuthTokens } from '../types';
 import authService from '../services/authService';
+import { getErrorMessage } from '../utils/errorHandler';
 
 interface AuthState {
     user: User | null;
@@ -35,7 +36,7 @@ export const useAuthStore = create<AuthState>()(
                     const { user, tokens } = await authService.googleSignIn();
                     set({ user, isAuthenticated: true, isLoading: false });
                 } catch (error: any) {
-                    set({ error: error.message, isLoading: false });
+                    set({ isLoading: false, error: getErrorMessage(error) });
                     throw error;
                 }
             },

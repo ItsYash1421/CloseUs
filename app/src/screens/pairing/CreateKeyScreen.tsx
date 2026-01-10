@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Clipboard, Image, BackHandler, Alert, Share, Linking } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Clipboard, Image, BackHandler, Alert, Share, Linking, InteractionManager } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { GradientBackground } from '../../components/common';
 import { COLORS } from '../../constants/colors';
@@ -15,9 +15,14 @@ export const CreateKeyScreen = ({ navigation }: any) => {
     const pollingIntervalRef = useRef<number | null>(null);
 
     useEffect(() => {
-        if (!pairingKey) {
-            createPairingKey();
-        }
+        // Use InteractionManager to wait for screen transition to complete
+        const task = InteractionManager.runAfterInteractions(() => {
+            if (!pairingKey) {
+                createPairingKey();
+            }
+        });
+
+        return () => task.cancel();
     }, []);
 
     // Polling: Check pairing status every 10 seconds

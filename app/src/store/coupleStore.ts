@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Couple, CoupleStats, User } from '../types';
-import coupleService from '../services/coupleService';
+import { coupleService } from '../services/coupleService';
+import { getErrorMessage } from '../utils/errorHandler';
 
 interface CoupleState {
     couple: Couple | null;
@@ -73,7 +74,7 @@ export const useCoupleStore = create<CoupleState>()(
                     });
                     return pairingKey;
                 } catch (error: any) {
-                    set({ error: error.message, isLoading: false });
+                    set({ error: getErrorMessage(error), isLoading: false });
                     throw error;
                 }
             },
@@ -97,7 +98,7 @@ export const useCoupleStore = create<CoupleState>()(
                     const couple = await coupleService.pairWithPartner(key);
                     set({ couple, isLoading: false, pairingKey: null });
                 } catch (error: any) {
-                    set({ error: error.message, isLoading: false });
+                    set({ error: getErrorMessage(error), isLoading: false });
                     throw error;
                 }
             },
@@ -108,7 +109,7 @@ export const useCoupleStore = create<CoupleState>()(
                     const couple = await coupleService.devPair();
                     set({ couple, isLoading: false, pairingKey: null });
                 } catch (error: any) {
-                    set({ error: error.message, isLoading: false });
+                    set({ error: getErrorMessage(error), isLoading: false });
                     throw error;
                 }
             },
@@ -119,7 +120,7 @@ export const useCoupleStore = create<CoupleState>()(
                     const couple = await coupleService.getCoupleInfo();
                     set({ couple, isLoading: false });
                 } catch (error: any) {
-                    set({ error: error.message, isLoading: false });
+                    set({ error: getErrorMessage(error), isLoading: false });
                 }
             },
 

@@ -24,6 +24,7 @@
     "date-fns": "^4.1.0",
     "react": "19.2.0",
     "react-native": "0.83.1",
+    "react-native-exit-app": "^2.0.0",
     "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "^2.30.0",
     "react-native-haptic-feedback": "^2.3.3",
