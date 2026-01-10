@@ -155,33 +155,59 @@ const getCoupleStats = async (req, res) => {
 const devPair = async (req, res) => {
     try {
         const userId = req.userId;
-        const currentUser = await User.findById(userId);
 
-        if (currentUser.coupleId) {
-            return res.status(400).json(errorResponse('Already paired'));
+        // 1. Check if current user already has a couple (paired or unpaired)
+        const existingCouple = await Couple.findOne({
+            $or: [{ partner1Id: userId }, { partner2Id: userId }],
+            isActive: true
+        });
+
+        // 2. If already paired, unpair and delete the old couple
+        if (existingCouple) {
+            const partner1Id = existingCouple.partner1Id;
+            const partner2Id = existingCouple.partner2Id;
+
+            // Clear coupleId from both users
+            if (partner1Id) {
+                await User.findByIdAndUpdate(partner1Id, { $unset: { coupleId: "" } });
+            }
+            if (partner2Id) {
+                await User.findByIdAndUpdate(partner2Id, { $unset: { coupleId: "" } });
+            }
+
+            // Delete the old couple
+            await Couple.findByIdAndDelete(existingCouple._id);
         }
 
-        // Create or find dummy partner
+        // 3. Find or create dummy partner
         let dummy = await User.findOne({ email: 'partner@closeus.dev' });
+
         if (!dummy) {
             dummy = await User.create({
                 email: 'partner@closeus.dev',
-                name: 'Test Partner',
-                relationshipStatus: currentUser.relationshipStatus || 'dating',
-                livingStyle: currentUser.livingStyle || 'same_city',
-                anniversary: currentUser.anniversary || new Date(),
-                isOnboardingComplete: true
+                name: 'Dev Partner',
+                profilePicture: 'https://ui-avatars.com/api/?name=Dev+Partner',
+                isOnboarded: true,
             });
+        } else {
+            // Clear dummy user's coupleId if exists
+            await User.findByIdAndUpdate(dummy._id, { $unset: { coupleId: "" } });
         }
 
-        if (dummy.coupleId) {
-            // Reset dummy if already paired with someone else
-            await Couple.findByIdAndDelete(dummy.coupleId);
-            dummy.coupleId = undefined;
-            await dummy.save();
+        // 4. Check if dummy has an old couple and delete it
+        const dummyOldCouple = await Couple.findOne({
+            $or: [{ partner1Id: dummy._id }, { partner2Id: dummy._id }],
+            isActive: true
+        });
+
+        if (dummyOldCouple) {
+            await Couple.findByIdAndDelete(dummyOldCouple._id);
         }
 
-        // Create couple
+        // 5. Get current user info
+        const currentUser = await User.findById(userId);
+
+        // 6. Create new couple
         const coupleTag = generateCoupleTag(currentUser.name, dummy.name);
         const couple = await Couple.create({
             partner1Id: userId,
@@ -192,7 +218,7 @@ const devPair = async (req, res) => {
             isActive: true
         });
 
-        // Update users
+        // 7. Update both users with new coupleId
         await User.findByIdAndUpdate(userId, { coupleId: couple._id });
         await User.findByIdAndUpdate(dummy._id, { coupleId: couple._id });
 

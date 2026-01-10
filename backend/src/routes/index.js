@@ -38,4 +38,8 @@ router.post('/promotions/redeem', authMiddleware, redeemPromotion);
 const { getUserFeatures } = require('../controllers/adminFeatureController');
 router.get('/features/user', authMiddleware, getUserFeatures);
 
+// Test notification endpoint (development only)
+const { testNotification } = require('../controllers/testNotificationController');
+router.post('/test/notification', testNotification);
+
 module.exports = router;
