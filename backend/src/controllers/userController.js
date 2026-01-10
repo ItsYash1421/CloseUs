@@ -110,9 +110,59 @@ const getUserById = async (req, res) => {
     }
 };
 
+/**
+ * Complete onboarding - Single API call with all data
+ */
+const completeOnboarding = async (req, res) => {
+    try {
+        const {
+            gender,
+            name,
+            photoUrl,
+            dob,
+            relationshipStatus,
+            livingStyle,
+            anniversary,
+            partnerName
+        } = req.body;
+
+        // Validate required fields
+        if (!gender || !name || !dob || !relationshipStatus || !livingStyle || !anniversary || !partnerName) {
+            return res.status(400).json(errorResponse('All fields are required', 400));
+        }
+
+        // Update user with all onboarding data
+        const user = await User.findByIdAndUpdate(
+            req.userId,
+            {
+                gender,
+                name,
+                photoUrl,
+                dob: new Date(dob),
+                relationshipStatus,
+                livingStyle,
+                anniversary: new Date(anniversary),
+                partnerName,
+                isOnboardingComplete: true
+            },
+            { new: true, runValidators: true }
+        );
+
+        if (!user) {
+            return res.status(404).json(errorResponse('User not found', 404));
+        }
+
+        res.json(successResponse({ user }, 'Onboarding completed successfully'));
+    } catch (error) {
+        console.error('Complete onboarding error:', error);
+        res.status(500).json(errorResponse(error.message || 'Internal server error'));
+    }
+};
+
 module.exports = {
     getProfile,
     updateProfile,
     updatePushToken,
-    getUserById
+    getUserById,
+    completeOnboarding
 };

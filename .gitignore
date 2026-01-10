@@ -49,3 +49,4 @@ backend/services/*/node_modules/
 mobile/node_modules/
 mobile/ios/Pods/
 mobile/android/build/
+/Private Files/

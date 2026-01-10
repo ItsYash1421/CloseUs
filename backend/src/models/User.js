@@ -20,7 +20,10 @@ const userSchema = new mongoose.Schema(
         },
         photoUrl: String,
 
-        // Onboarding fields
+        gender: {
+            type: String,
+            enum: ['male', 'female']
+        },
         dob: Date,
         relationshipStatus: {
             type: String,
