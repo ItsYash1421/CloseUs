@@ -72,7 +72,7 @@ npm run install:all
 
 3. Configure environment variables (in each service):
 ```
-MONGODB_URI=mongodb+srv://yashamanmeena1:J5emIcPwHS25hLhd@stayfinder-admin.qtfwbs2.mongodb.net/closeus
+MONGODB_URI=mongodb+srv://yashamanmeena1:
 JWT_SECRET=your-secret-key
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
