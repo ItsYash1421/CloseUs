@@ -6,6 +6,7 @@ import THEME from '../../constants/theme';
 import { useAuthStore } from '../../store/authStore';
 import { useCoupleStore } from '../../store/coupleStore';
 import { differenceInDays, differenceInMonths, differenceInYears } from 'date-fns';
+import { BOTTOM_CONTENT_INSET } from '../../constants/layout';
 
 export const HomeScreen = ({ navigation }: any) => {
     const user = useAuthStore(state => state.user);
@@ -63,6 +64,7 @@ export const HomeScreen = ({ navigation }: any) => {
         <GradientBackground variant="background">
             <ScrollView
                 style={styles.container}
+                contentContainerStyle={{ paddingBottom: BOTTOM_CONTENT_INSET }}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
                     <RefreshControl

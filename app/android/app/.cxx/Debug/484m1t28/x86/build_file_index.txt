@@ -1,4 +1,5 @@
 /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-async-storage/async-storage/android/build/generated/source/codegen/jni/CMakeLists.txt
+/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/blur/android/build/generated/source/codegen/jni/CMakeLists.txt
 /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/datetimepicker/android/build/generated/source/codegen/jni/CMakeLists.txt
 /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-google-signin/google-signin/android/build/generated/source/codegen/jni/CMakeLists.txt
 /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@shopify/react-native-skia/android/build/generated/source/codegen/jni/CMakeLists.txt

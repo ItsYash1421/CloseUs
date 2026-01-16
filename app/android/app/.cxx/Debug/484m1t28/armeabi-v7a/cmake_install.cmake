@@ -45,6 +45,7 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/rnasyncstorage_autolinked_build/cmake_install.cmake")
+  include("/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/rnblurview_autolinked_build/cmake_install.cmake")
   include("/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/RNDateTimePickerCGen_autolinked_build/cmake_install.cmake")
   include("/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/RNGoogleSignInCGen_autolinked_build/cmake_install.cmake")
   include("/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/rnskia_autolinked_build/cmake_install.cmake")
