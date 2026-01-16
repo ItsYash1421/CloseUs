@@ -21,8 +21,11 @@ import { CreateKeyScreen } from '../screens/pairing/CreateKeyScreen';
 import { EnterKeyScreen } from '../screens/pairing/EnterKeyScreen';
 import { PairingSuccessScreen } from '../screens/pairing/PairingSuccessScreen';
 
-// Main App (to be created)
+import { JourneyScreen } from '../screens/home/JourneyScreen';
+import { ChatScreen } from '../screens/chat/ChatScreen';
+import { QuestionsScreen } from '../screens/questions/QuestionsScreen';
 import { TabNavigator } from './TabNavigator';
+
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -69,8 +72,13 @@ export const AppNavigator = () => {
                         }),
                     }}
                 />
+
+
                 <Stack.Screen name="PairingSuccess" component={PairingSuccessScreen} />
                 <Stack.Screen name="MainTabs" component={TabNavigator} />
+                <Stack.Screen name="Journey" component={JourneyScreen} />
+                <Stack.Screen name="Chat" component={ChatScreen} />
+                <Stack.Screen name="Questions" component={QuestionsScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     );

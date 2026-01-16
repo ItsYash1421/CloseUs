@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { GradientBackground, Card } from '../../components/common';
+import { GradientBackground, Card, Header } from '../../components/common';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
 
@@ -16,10 +16,10 @@ const CATEGORIES = [
 export const QuestionsScreen = ({ navigation }: any) => {
     return (
         <GradientBackground variant="background">
+            <Header title="Daily Questions" />
             <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
                 {/* Header */}
                 <View style={styles.header}>
-                    <Text style={styles.title}>Daily Questions</Text>
                     <Text style={styles.subtitle}>
                         Answer questions together and learn more about each other
                     </Text>

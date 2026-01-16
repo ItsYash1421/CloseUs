@@ -4,6 +4,7 @@ const {
     generatePairingKey,
     generateCoupleTag,
     calculateTimeTogether,
+    getNextMilestone,
     successResponse,
     errorResponse
 } = require('../utils');
@@ -219,9 +220,6 @@ const getCoupleInfo = async (req, res) => {
     }
 };
 
-/**
- * Get couple stats
- */
 const getCoupleStats = async (req, res) => {
     try {
         const userId = req.userId;
@@ -233,12 +231,32 @@ const getCoupleStats = async (req, res) => {
             return res.status(404).json(errorResponse('Not paired yet', 404));
         }
 
+        // Get partner info to regenerate tag if needed
+        const partnerId = couple.partner1Id.toString() === userId ? couple.partner2Id : couple.partner1Id;
+        const partner = await User.findById(partnerId);
+        const currentUser = await User.findById(userId);
+
+        // Check if coupleTag needs regeneration (old format or missing)
+        const expectedTag = generateCoupleTag(currentUser.name, partner.name);
+        if (!couple.coupleTag || couple.coupleTag !== expectedTag) {
+            couple.coupleTag = expectedTag;
+            await couple.save();
+        }
+
         const timeTogether = calculateTimeTogether(couple.startDate);
+        const currentDays = timeTogether.days;
+        const nextMilestone = getNextMilestone(currentDays);
+        const progressPercentage = Math.floor((currentDays / nextMilestone) * 100);
 
         res.json(successResponse({
             ...timeTogether,
             startDate: couple.startDate,
-            coupleTag: couple.coupleTag
+            coupleTag: couple.coupleTag,
+            milestone: {
+                current: currentDays,
+                next: nextMilestone,
+                progress: progressPercentage
+            }
         }));
     } catch (error) {
         console.error('Stats error:', error);

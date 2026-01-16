@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, Animated } from 'react-native';
 import { GradientBackground, Card, Avatar } from '../../components/common';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
@@ -7,11 +7,13 @@ import { useAuthStore } from '../../store/authStore';
 import { useCoupleStore } from '../../store/coupleStore';
 import { differenceInDays, differenceInMonths, differenceInYears } from 'date-fns';
 import { BOTTOM_CONTENT_INSET } from '../../constants/layout';
+import { CoupleHeader, StickyHeader, OurJourney, ChatSection } from '../../components/home';
 
 export const HomeScreen = ({ navigation }: any) => {
     const user = useAuthStore(state => state.user);
     const { couple, partner, stats, isLoading, fetchCoupleInfo, fetchCoupleStats } = useCoupleStore();
     const [refreshing, setRefreshing] = useState(false);
+    const scrollY = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         loadData();
@@ -62,10 +64,20 @@ export const HomeScreen = ({ navigation }: any) => {
 
     return (
         <GradientBackground variant="background">
-            <ScrollView
-                style={styles.container}
+            {/* Sticky Header */}
+            <StickyHeader
+                hashtag={couple?.coupleTag}
+                scrollY={scrollY}
+            />
+
+            <Animated.ScrollView
                 contentContainerStyle={{ paddingBottom: BOTTOM_CONTENT_INSET }}
                 showsVerticalScrollIndicator={false}
+                scrollEventThrottle={16}
+                onScroll={Animated.event(
+                    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                    { useNativeDriver: true }
+                )}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
@@ -74,79 +86,94 @@ export const HomeScreen = ({ navigation }: any) => {
                     />
                 }
             >
-                {/* Header */}
-                <View style={styles.header}>
-                    <View style={styles.coupleHeader}>
-                        <Avatar uri={user?.photoUrl} name={user?.name} size={60} />
-                        <View style={styles.heartContainer}>
-                            <Text style={styles.heart}>❤️</Text>
+                {/* New Couple Header */}
+                <CoupleHeader
+                    userName={user?.name}
+                    partnerName={partner?.name}
+                    coupleHashtag={couple?.coupleTag}
+                    userAvatar={user?.photoUrl}
+                    partnerAvatar={partner?.photoUrl}
+                    isOnline={true}
+                />
+
+                {/* Content with padding */}
+                <View style={[styles.contentPadding, { gap: THEME.spacing.xl, marginTop: THEME.spacing.xl }]}>
+                    {/* Chat Section - New */}
+                    <ChatSection
+                        onOpenChat={() => navigation.navigate('Chat')}
+                    />
+
+                    {/* Our Journey */}
+                    <View>
+                        <OurJourney
+                            currentDays={stats?.milestone?.current || time.days}
+                            nextMilestone={stats?.milestone?.next || 100}
+                            progress={stats?.milestone?.progress || 0}
+                            onViewHistory={() => {
+                                navigation.navigate('Journey');
+                            }}
+                        />
+                    </View>
+
+                    {/* Quick Stats */}
+                    <View style={styles.statsGrid}>
+                        <StatCard
+                            icon="💬"
+                            value={stats?.totalMessages || 0}
+                            label="Messages"
+                        />
+                        <StatCard
+                            icon="❓"
+                            value={stats?.questionsAnswered || 0}
+                            label="Questions"
+                        />
+                        <StatCard
+                            icon="🎮"
+                            value={stats?.gamesPlayed || 0}
+                            label="Games"
+                        />
+                        <StatCard
+                            icon="🎉"
+                            value={stats?.daysUntilAnniversary || 0}
+                            label="Days to Anniversary"
+                        />
+                        <StatCard
+                            icon="📸"
+                            value={stats?.memoriesCreated || 0}
+                            label="Memories"
+                        />
+                    </View>
+
+                    {/* Quick Actions */}
+                    <View>
+                        <Text style={styles.sectionTitle}>Quick Actions</Text>
+                        <View style={styles.actionsGrid}>
+                            <TouchableOpacity onPress={() => navigation.navigate('Questions')}>
+                                <Card variant="glass" style={styles.actionCard}>
+                                    <Text style={styles.actionIcon}>❓</Text>
+                                    <Text style={styles.actionTitle}>Daily Question</Text>
+                                </Card>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => navigation.navigate('Games')}>
+                                <Card variant="glass" style={styles.actionCard}>
+                                    <Text style={styles.actionIcon}>🎮</Text>
+                                    <Text style={styles.actionTitle}>Play Game</Text>
+                                </Card>
+                            </TouchableOpacity>
+                            <ActionCard
+                                icon="💬"
+                                title="Chat"
+                                onPress={() => navigation.navigate('Chat')}
+                            />
+                            <ActionCard
+                                icon="👤"
+                                title="Profile"
+                                onPress={() => navigation.navigate('Profile')}
+                            />
                         </View>
-                        <Avatar uri={partner?.photoUrl} name={partner?.name} size={60} />
                     </View>
-                    {couple?.coupleTag && (
-                        <Text style={styles.coupleTag}>{couple.coupleTag}</Text>
-                    )}
                 </View>
-
-                {/* Time Together */}
-                <Card variant="glass" padding="large" style={styles.timeCard}>
-                    <Text style={styles.cardTitle}>Time Together</Text>
-                    <View style={styles.timeContainer}>
-                        <TimeBlock value={time.years} label="Years" />
-                        <TimeBlock value={time.months} label="Months" />
-                        <TimeBlock value={time.days} label="Days" />
-                    </View>
-                </Card>
-
-                {/* Quick Stats */}
-                <View style={styles.statsGrid}>
-                    <StatCard
-                        icon="💬"
-                        value={stats?.totalMessages || 0}
-                        label="Messages"
-                    />
-                    <StatCard
-                        icon="❓"
-                        value={stats?.questionsAnswered || 0}
-                        label="Questions"
-                    />
-                    <StatCard
-                        icon="🎮"
-                        value={stats?.gamesPlayed || 0}
-                        label="Games"
-                    />
-                    <StatCard
-                        icon="📅"
-                        value={stats?.daysUntilAnniversary || 0}
-                        label="Days to Anniversary"
-                    />
-                </View>
-
-                {/* Quick Actions */}
-                <Text style={styles.sectionTitle}>Quick Actions</Text>
-                <View style={styles.actionsGrid}>
-                    <ActionCard
-                        icon="💬"
-                        title="Chat"
-                        onPress={() => navigation.navigate('Chat')}
-                    />
-                    <ActionCard
-                        icon="❓"
-                        title="Questions"
-                        onPress={() => navigation.navigate('Questions')}
-                    />
-                    <ActionCard
-                        icon="🎮"
-                        title="Games"
-                        onPress={() => navigation.navigate('Games')}
-                    />
-                    <ActionCard
-                        icon="👤"
-                        title="Profile"
-                        onPress={() => navigation.navigate('Profile')}
-                    />
-                </View>
-            </ScrollView>
+            </Animated.ScrollView>
         </GradientBackground>
     );
 };
@@ -189,6 +216,9 @@ const styles = StyleSheet.create({
         color: COLORS.white,
         fontSize: THEME.fontSizes.md,
         marginTop: THEME.spacing.md,
+    },
+    contentPadding: {
+        paddingHorizontal: THEME.spacing.lg,
     },
     header: {
         alignItems: 'center',
@@ -246,7 +276,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: THEME.spacing.md,
-        marginBottom: THEME.spacing.lg,
     },
     statCard: {
         flex: 1,

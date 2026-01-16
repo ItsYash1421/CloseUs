@@ -48,7 +48,7 @@ export const NetworkLoggerButton: React.FC = () => {
 const styles = StyleSheet.create({
     floatingButton: {
         position: 'absolute',
-        top: 20,
+        top: 100,
         right: 2,
         width: 50,
         height: 50,
