@@ -4,6 +4,7 @@ import { BlurView } from '@react-native-community/blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
+import { BLUR_CONFIG } from '../../constants/blur';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const TAB_BAR_HEIGHT = 70;
@@ -94,9 +95,9 @@ export const CustomTabBar: React.FC<TabBarProps> = ({ state, descriptors, naviga
                 {/* Glass Background - Use BlurView for both iOS and Android */}
                 <BlurView
                     style={StyleSheet.absoluteFill}
-                    blurType={Platform.OS === 'ios' ? 'dark' : 'dark'}
-                    blurAmount={Platform.OS === 'ios' ? 20 : 15}
-                    reducedTransparencyFallbackColor="rgba(10, 10, 15, 0.9)"
+                    blurType={BLUR_CONFIG.blurType}
+                    blurAmount={BLUR_CONFIG.blurAmount}
+                    reducedTransparencyFallbackColor={BLUR_CONFIG.fallbackColor}
                 />
 
                 {/* Dark tint overlay for better contrast */}
@@ -174,7 +175,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(36, 35, 35, 0)', // Very light transparent tint
+        backgroundColor: BLUR_CONFIG.tints.none,
         pointerEvents: 'none',
     },
     borderOverlay: {
@@ -184,8 +185,7 @@ const styles = StyleSheet.create({
         right: 0,
         bottom: 0,
         borderRadius: 35,
-        borderWidth: 1.5,
-        borderColor: 'rgba(255, 255, 255, 0.15)',
+        ...BLUR_CONFIG.borders.medium,
         pointerEvents: 'none',
     },
     tabsContainer: {
@@ -221,11 +221,11 @@ const styles = StyleSheet.create({
     tabLabel: {
         fontSize: THEME.fontSizes.sm,
         fontWeight: THEME.fontWeights.semibold,
-        color: COLORS.textMuted,
+        color: 'rgba(255,255,255,255)',
     },
     activeTabLabel: {
         fontWeight: THEME.fontWeights.bold,
-        color: COLORS.textPrimary, // White color for active tab
+        color: COLORS.textPrimary, 
         textShadowColor: 'rgba(255, 255, 255, 0.3)',
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 6,
