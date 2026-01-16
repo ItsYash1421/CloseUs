@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
 import { GradientBackground, Card, Avatar } from '../../components/common';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
@@ -9,29 +9,69 @@ import { differenceInDays, differenceInMonths, differenceInYears } from 'date-fn
 
 export const HomeScreen = ({ navigation }: any) => {
     const user = useAuthStore(state => state.user);
-    const { couple, partner, stats, fetchCoupleInfo, fetchCoupleStats } = useCoupleStore();
+    const { couple, partner, stats, isLoading, fetchCoupleInfo, fetchCoupleStats } = useCoupleStore();
+    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
-        fetchCoupleInfo();
-        fetchCoupleStats();
+        loadData();
     }, []);
+
+    const loadData = async () => {
+        await Promise.all([
+            fetchCoupleInfo(),
+            fetchCoupleStats()
+        ]);
+    };
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await loadData();
+        setRefreshing(false);
+    };
 
     const getTimeTogether = () => {
         if (!couple?.startDate) return { years: 0, months: 0, days: 0 };
         const start = new Date(couple.startDate);
         const now = new Date();
+
+        const years = differenceInYears(now, start);
+        const totalMonths = differenceInMonths(now, start);
+        const months = totalMonths % 12;
+        const totalDays = differenceInDays(now, start);
+
         return {
-            years: differenceInYears(now, start),
-            months: differenceInMonths(now, start) % 12,
-            days: differenceInDays(now, start),
+            years,
+            months,
+            days: totalDays,
         };
     };
 
     const time = getTimeTogether();
 
+    if (isLoading && !couple) {
+        return (
+            <GradientBackground variant="background">
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color={COLORS.primary} />
+                    <Text style={styles.loadingText}>Loading...</Text>
+                </View>
+            </GradientBackground>
+        );
+    }
+
     return (
         <GradientBackground variant="background">
-            <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+            <ScrollView
+                style={styles.container}
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        tintColor={COLORS.primary}
+                    />
+                }
+            >
                 {/* Header */}
                 <View style={styles.header}>
                     <View style={styles.coupleHeader}>
@@ -137,6 +177,16 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: THEME.spacing.lg,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingText: {
+        color: COLORS.white,
+        fontSize: THEME.fontSizes.md,
+        marginTop: THEME.spacing.md,
     },
     header: {
         alignItems: 'center',

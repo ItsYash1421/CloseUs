@@ -10,6 +10,12 @@
 /Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir
 /Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/RNGoogleSignInCGen_autolinked_build/CMakeFiles/edit_cache.dir
 /Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/RNGoogleSignInCGen_autolinked_build/CMakeFiles/rebuild_cache.dir
+/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/rnskia_autolinked_build/CMakeFiles/react_codegen_rnskia.dir
+/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/rnskia_autolinked_build/CMakeFiles/edit_cache.dir
+/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/rnskia_autolinked_build/CMakeFiles/rebuild_cache.dir
+/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/RNExitAppSpec_autolinked_build/CMakeFiles/react_codegen_RNExitAppSpec.dir
+/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/RNExitAppSpec_autolinked_build/CMakeFiles/edit_cache.dir
+/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/RNExitAppSpec_autolinked_build/CMakeFiles/rebuild_cache.dir
 /Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/rngesturehandler_codegen_autolinked_build/CMakeFiles/react_codegen_rngesturehandler_codegen.dir
 /Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/rngesturehandler_codegen_autolinked_build/CMakeFiles/edit_cache.dir
 /Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/rngesturehandler_codegen_autolinked_build/CMakeFiles/rebuild_cache.dir

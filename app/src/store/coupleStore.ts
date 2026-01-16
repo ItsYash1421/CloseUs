@@ -117,8 +117,13 @@ export const useCoupleStore = create<CoupleState>()(
             fetchCoupleInfo: async () => {
                 try {
                     set({ isLoading: true, error: null });
-                    const couple = await coupleService.getCoupleInfo();
-                    set({ couple, isLoading: false });
+                    const response: any = await coupleService.getCoupleInfo();
+                    // Response contains { couple, partner }
+                    set({
+                        couple: response.couple || response,
+                        partner: response.partner || null,
+                        isLoading: false
+                    });
                 } catch (error: any) {
                     set({ error: getErrorMessage(error), isLoading: false });
                 }

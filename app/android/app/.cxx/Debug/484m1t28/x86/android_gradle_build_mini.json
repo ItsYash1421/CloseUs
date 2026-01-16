@@ -3,6 +3,8 @@
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-async-storage/async-storage/android/build/generated/source/codegen/jni/CMakeLists.txt",
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/datetimepicker/android/build/generated/source/codegen/jni/CMakeLists.txt",
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-google-signin/google-signin/android/build/generated/source/codegen/jni/CMakeLists.txt",
+    "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@shopify/react-native-skia/android/build/generated/source/codegen/jni/CMakeLists.txt",
+    "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-exit-app/android/build/generated/source/codegen/jni/CMakeLists.txt",
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-gesture-handler/android/build/generated/source/codegen/jni/CMakeLists.txt",
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-haptic-feedback/android/build/generated/source/codegen/jni/CMakeLists.txt",
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-image-picker/android/build/generated/source/codegen/jni/CMakeLists.txt",
@@ -53,21 +55,6 @@
       "abi": "x86",
       "runtimeFiles": []
     },
-    "react_codegen_RNImagePickerSpec::@f66ee9a2efecfb28bee4": {
-      "artifactName": "react_codegen_RNImagePickerSpec",
-      "abi": "x86",
-      "runtimeFiles": []
-    },
-    "react_codegen_rnscreens::@25bcbd507e98d3a854ad": {
-      "artifactName": "react_codegen_rnscreens",
-      "abi": "x86",
-      "output": "/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/build/intermediates/cxx/Debug/484m1t28/obj/x86/libreact_codegen_rnscreens.so",
-      "runtimeFiles": [
-        "/Users/yashkumarmeena/.gradle/caches/9.0.0/transforms/7ea84db5beb48d0e40563410ea5e2f79/transformed/react-android-0.83.1-debug/prefab/modules/reactnative/libs/android.x86/libreactnative.so",
-        "/Users/yashkumarmeena/.gradle/caches/9.0.0/transforms/7ea84db5beb48d0e40563410ea5e2f79/transformed/react-android-0.83.1-debug/prefab/modules/jsi/libs/android.x86/libjsi.so",
-        "/Users/yashkumarmeena/.gradle/caches/9.0.0/transforms/cda0e1e31099e31fafe505dd251ef83a/transformed/fbjni-0.7.0/prefab/modules/fbjni/libs/android.x86/libfbjni.so"
-      ]
-    },
     "react_codegen_RNDateTimePickerCGen::@59b70ddc31ba2f8ef1d2": {
       "artifactName": "react_codegen_RNDateTimePickerCGen",
       "abi": "x86",
@@ -91,6 +78,11 @@
       "abi": "x86",
       "runtimeFiles": []
     },
+    "react_codegen_rnskia::@376d8504f62839611b97": {
+      "artifactName": "react_codegen_rnskia",
+      "abi": "x86",
+      "runtimeFiles": []
+    },
     "react_codegen_rnsvg::@4f40eb209d0c0b4a3b65": {
       "artifactName": "react_codegen_rnsvg",
       "abi": "x86",
@@ -108,6 +100,26 @@
     },
     "react_codegen_rnasyncstorage::@1596841e19ec5b9eeffe": {
       "artifactName": "react_codegen_rnasyncstorage",
+      "abi": "x86",
+      "runtimeFiles": []
+    },
+    "react_codegen_RNImagePickerSpec::@f66ee9a2efecfb28bee4": {
+      "artifactName": "react_codegen_RNImagePickerSpec",
+      "abi": "x86",
+      "runtimeFiles": []
+    },
+    "react_codegen_rnscreens::@25bcbd507e98d3a854ad": {
+      "artifactName": "react_codegen_rnscreens",
+      "abi": "x86",
+      "output": "/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/build/intermediates/cxx/Debug/484m1t28/obj/x86/libreact_codegen_rnscreens.so",
+      "runtimeFiles": [
+        "/Users/yashkumarmeena/.gradle/caches/9.0.0/transforms/7ea84db5beb48d0e40563410ea5e2f79/transformed/react-android-0.83.1-debug/prefab/modules/reactnative/libs/android.x86/libreactnative.so",
+        "/Users/yashkumarmeena/.gradle/caches/9.0.0/transforms/7ea84db5beb48d0e40563410ea5e2f79/transformed/react-android-0.83.1-debug/prefab/modules/jsi/libs/android.x86/libjsi.so",
+        "/Users/yashkumarmeena/.gradle/caches/9.0.0/transforms/cda0e1e31099e31fafe505dd251ef83a/transformed/fbjni-0.7.0/prefab/modules/fbjni/libs/android.x86/libfbjni.so"
+      ]
+    },
+    "react_codegen_RNExitAppSpec::@48aa2865e0da6c97fe2b": {
+      "artifactName": "react_codegen_RNExitAppSpec",
       "abi": "x86",
       "runtimeFiles": []
     }

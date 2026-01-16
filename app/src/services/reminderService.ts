@@ -26,56 +26,64 @@ class ReminderService {
         anniversary: Date,
         partnerName: string,
     ) {
-        // Schedule birthday reminders
-        await this.scheduleBirthdayReminders(partnerBirthday, partnerName);
+        try {
+            // Schedule birthday reminders
+            await this.scheduleBirthdayReminders(partnerBirthday, partnerName);
 
-        // Schedule anniversary reminders
-        await this.scheduleAnniversaryReminders(anniversary);
+            // Schedule anniversary reminders
+            await this.scheduleAnniversaryReminders(anniversary);
 
-        // Schedule special occasion reminders
-        await this.scheduleSpecialOccasions();
+            // Schedule special occasion reminders
+            await this.scheduleSpecialOccasions();
 
-        // Schedule daily engagement reminders
-        await this.scheduleDailyReminders();
+            // Schedule daily engagement reminders
+            await this.scheduleDailyReminders();
+        } catch (error) {
+            console.error('Error scheduling all reminders:', error);
+        }
     }
 
     async scheduleBirthdayReminders(birthday: Date, partnerName: string) {
-        const now = new Date();
-        const thisYearBirthday = new Date(
-            now.getFullYear(),
-            birthday.getMonth(),
-            birthday.getDate(),
-        );
+        try {
+            const now = new Date();
+            const thisYearBirthday = new Date(
+                now.getFullYear(),
+                birthday.getMonth(),
+                birthday.getDate(),
+            );
 
-        // If birthday already passed this year, schedule for next year
-        const targetBirthday = thisYearBirthday < now
-            ? new Date(now.getFullYear() + 1, birthday.getMonth(), birthday.getDate())
-            : thisYearBirthday;
+            // If birthday already passed this year, schedule for next year
+            const targetBirthday = thisYearBirthday < now
+                ? new Date(now.getFullYear() + 1, birthday.getMonth(), birthday.getDate())
+                : thisYearBirthday;
 
-        // Schedule reminders: 5 days, 3 days, 1 day, and on the day
-        const reminderDays = [5, 3, 1, 0];
+            // Schedule reminders: 5 days, 3 days, 1 day, and on the day
+            const reminderDays = [5, 3, 1, 0];
 
-        for (const days of reminderDays) {
-            const reminderDate = addDays(targetBirthday, -days);
-            const notificationTime = setMinutes(setHours(reminderDate, 9), 0); // 9 AM
+            for (const days of reminderDays) {
+                const reminderDate = addDays(targetBirthday, -days);
+                const notificationTime = setMinutes(setHours(reminderDate, 9), 0); // 9 AM
 
-            if (notificationTime > now) {
-                const title = days === 0
-                    ? `🎂 ${partnerName}'s Birthday Today!`
-                    : `🎂 ${partnerName}'s Birthday in ${days} days`;
+                if (notificationTime > now) {
+                    const title = days === 0
+                        ? `🎂 ${partnerName}'s Birthday Today!`
+                        : `🎂 ${partnerName}'s Birthday in ${days} days`;
 
-                const body = days === 0
-                    ? `Don't forget to wish ${partnerName} a happy birthday! 🎉`
-                    : `${partnerName}'s birthday is coming up. Plan something special! 💝`;
+                    const body = days === 0
+                        ? `Don't forget to wish ${partnerName} a happy birthday! 🎉`
+                        : `${partnerName}'s birthday is coming up. Plan something special! 💝`;
 
-                await notificationService.scheduleNotification(
-                    `birthday-${days}`,
-                    title,
-                    body,
-                    notificationTime,
-                    { type: 'birthday', screen: 'Profile' },
-                );
+                    await notificationService.scheduleNotification(
+                        `birthday-${days}`,
+                        title,
+                        body,
+                        notificationTime,
+                        { type: 'birthday', screen: 'Profile' },
+                    );
+                }
             }
+        } catch (error) {
+            console.error('Error scheduling birthday reminders:', error);
         }
     }
 

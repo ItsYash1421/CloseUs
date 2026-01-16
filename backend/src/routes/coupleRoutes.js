@@ -12,6 +12,7 @@ router.get('/check-pairing-status', coupleController.checkPairingStatus);
 router.post('/pair', coupleController.pairWithPartner);
 router.get('/me', coupleController.getCoupleInfo);
 router.get('/stats', coupleController.getCoupleStats);
+router.get('/time-together', coupleController.getTimeTogether);
 
 // Dev Only
 router.post('/dev-pair', coupleController.devPair);

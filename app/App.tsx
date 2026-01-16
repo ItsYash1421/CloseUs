@@ -3,7 +3,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { BackHandler, Alert } from 'react-native';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import notificationService from './src/services/notificationService';
+import userStateNotificationService from './src/services/userStateNotificationService';
 import reminderService from './src/services/reminderService';
+import dailyNotificationScheduler from './src/services/dailyNotificationScheduler';
 import { useAuthStore } from './src/store/authStore';
 import { useCoupleStore } from './src/store/coupleStore';
 import apiClient from './src/services/apiClient';
@@ -13,6 +15,26 @@ function App() {
   const user = useAuthStore(state => state.user);
   const couple = useCoupleStore(state => state.couple);
   const partner = useCoupleStore(state => state.partner);
+
+  // Handle notification that opened the app (cold start)
+  useEffect(() => {
+    const handleInitialNotification = async () => {
+      // Wait a bit for navigation to be ready
+      setTimeout(async () => {
+        const initialData = await notificationService.getInitialNotification();
+
+        if (initialData && initialData.screen) {
+          console.log('Navigating to screen from initial notification:', initialData.screen);
+
+          // Import navigation service and navigate
+          const { navigate } = await import('./src/services/navigationService');
+          navigate(initialData.screen, initialData.params);
+        }
+      }, 1000); // Wait 1 second for app to be ready
+    };
+
+    handleInitialNotification();
+  }, []);
 
   useEffect(() => {
     // Initialize notification system
@@ -32,11 +54,23 @@ function App() {
           }
         }
 
-        // Schedule reminders if user is paired
-        if (user?.coupleId && couple && partner) {
-          console.log('Scheduling reminders for paired couple');
+        // Schedule notifications based on user state
+        if (!user) {
+          // Not logged in - send login reminders
+          console.log('User not logged in - scheduling login reminders');
+          await userStateNotificationService.scheduleForNotLoggedIn();
+        } else if (!couple) {
+          // Logged in but not paired - send pairing reminders
+          console.log('User not paired - scheduling pairing reminders');
+          await userStateNotificationService.scheduleForNotPaired();
+        } else if (partner) {
+          // Paired - send engagement reminders + special occasions
+          console.log('User paired - scheduling all reminders');
 
-          // Get partner birthday and anniversary
+          // Daily engagement reminders
+          await userStateNotificationService.scheduleForPaired(partner.name || 'Partner');
+
+          // Special occasion reminders (birthday, anniversary, etc.)
           const partnerBirthday = partner.dob ? new Date(partner.dob) : new Date();
           const anniversary = couple.startDate ? new Date(couple.startDate) : new Date();
 
@@ -54,6 +88,14 @@ function App() {
     };
 
     initNotifications();
+
+    // Start daily notification scheduler
+    dailyNotificationScheduler.start();
+
+    return () => {
+      // Cleanup on unmount
+      dailyNotificationScheduler.stop();
+    };
   }, [user, couple, partner]);
 
   // Clear badge when app is opened

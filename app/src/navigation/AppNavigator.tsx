@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
 import { screenTransitionConfig } from '../utils/screenTransitions';
+import { navigationRef } from '../services/navigationService';
 
 // Auth Screens
 import { SplashScreen } from '../screens/auth/SplashScreen';
@@ -27,7 +28,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 export const AppNavigator = () => {
     return (
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef}>
             <Stack.Navigator
                 screenOptions={{
                     ...screenTransitionConfig,
