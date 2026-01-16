@@ -53,12 +53,26 @@ const generatePairingKey = () => {
 };
 
 /**
- * Calculate time together from start date
+ * Calculate time together from start date (IST timezone)
  */
 const calculateTimeTogether = (startDate) => {
-    const now = new Date();
-    const start = new Date(startDate);
-    const diffMs = now - start;
+    // IST is UTC+5:30
+    const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
+    // Get current time in IST
+    const nowUTC = new Date();
+    const nowIST = new Date(nowUTC.getTime() + IST_OFFSET_MS);
+
+    // Get start date in IST
+    const startUTC = new Date(startDate);
+    const startIST = new Date(startUTC.getTime() + IST_OFFSET_MS);
+
+    // Reset both to midnight IST for accurate day counting
+    const nowISTMidnight = new Date(nowIST.getFullYear(), nowIST.getMonth(), nowIST.getDate());
+    const startISTMidnight = new Date(startIST.getFullYear(), startIST.getMonth(), startIST.getDate());
+
+    // Calculate difference in days
+    const diffMs = nowISTMidnight - startISTMidnight;
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     const diffMonths = Math.floor(diffDays / 30);
     const diffYears = Math.floor(diffDays / 365);
@@ -89,12 +103,25 @@ const getNextMilestone = (days) => {
 };
 
 /**
- * Calculate days together
+ * Calculate days together (IST timezone)
  */
 const calculateDaysTogether = (anniversary) => {
-    const now = new Date();
-    const start = new Date(anniversary);
-    const diffTime = Math.abs(now - start);
+    // IST is UTC+5:30
+    const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
+    // Get current time in IST
+    const nowUTC = new Date();
+    const nowIST = new Date(nowUTC.getTime() + IST_OFFSET_MS);
+
+    // Get start date in IST
+    const startUTC = new Date(anniversary);
+    const startIST = new Date(startUTC.getTime() + IST_OFFSET_MS);
+
+    // Reset both to midnight IST for accurate day counting
+    const nowISTMidnight = new Date(nowIST.getFullYear(), nowIST.getMonth(), nowIST.getDate());
+    const startISTMidnight = new Date(startIST.getFullYear(), startIST.getMonth(), startIST.getDate());
+
+    const diffTime = Math.abs(nowISTMidnight - startISTMidnight);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
 };

@@ -1,41 +1,64 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
 
 interface ChatSectionProps {
     onOpenChat: () => void;
+    partnerName?: string;
+    isOnline?: boolean;
+    userGender?: 'male' | 'female';
 }
 
-export const ChatSection: React.FC<ChatSectionProps> = ({ onOpenChat }) => {
+export const ChatSection: React.FC<ChatSectionProps> = ({
+    onOpenChat,
+    partnerName = 'Partner',
+    isOnline = true,
+    userGender = 'male'
+}) => {
+    // Male users see female logo, female users see male logo
+    const mascotImage = userGender === 'male'
+        ? require('../../assets/images/Logo-Female-2-bgless.png')
+        : require('../../assets/images/Logo-Male-2-bgless.png');
+
     return (
         <View style={styles.container}>
-            {/* Header */}
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>Stay Connected</Text>
-            </View>
 
-            {/* Card */}
-            <View style={styles.card}>
-                <View style={styles.cardContent}>
-                    {/* Icon */}
-                    <View style={styles.iconContainer}>
-                        <Text style={styles.icon}>💬</Text>
+            <View style={styles.content}>
+                {/* Left Content */}
+                <View style={styles.leftContent}>
+                    {/* Online/Offline Status Badge */}
+                    <View style={[styles.onlineBadge, !isOnline && styles.offlineBadge]}>
+                        <View style={[styles.pulseDot, !isOnline && styles.offlineDot]} />
+                        <Text style={styles.onlineText}>
+                            {isOnline ? 'PARTNER ONLINE' : 'PARTNER OFFLINE'}
+                        </Text>
                     </View>
 
-                    {/* Description */}
-                    <Text style={styles.description}>
-                        Share your thoughts, feelings, and daily moments with your partner in a private space just for you two.
-                    </Text>
+                    {/* Title & Subtitle */}
+                    <View style={styles.textContainer}>
+                        <Text style={styles.title}>Need a Sweet Talk?</Text>
+                        <Text style={styles.subtitle}>{partnerName} is waiting for you...</Text>
+                    </View>
 
-                    {/* Button */}
+                    {/* Chat Now Button */}
                     <TouchableOpacity
                         style={styles.chatButton}
                         onPress={onOpenChat}
-                        activeOpacity={0.8}
+                        activeOpacity={0.85}
                     >
-                        <Text style={styles.chatButtonText}>Open Chat</Text>
+                        <Text style={styles.chatButtonText}>Chat Now</Text>
                     </TouchableOpacity>
+                </View>
+
+                {/* Right Image */}
+                <View style={styles.imageContainer}>
+                    <Image
+                        source={mascotImage}
+                        style={styles.mascotImage}
+                        resizeMode="contain"
+                    />
                 </View>
             </View>
         </View>
@@ -44,62 +67,102 @@ export const ChatSection: React.FC<ChatSectionProps> = ({ onOpenChat }) => {
 
 const styles = StyleSheet.create({
     container: {
-        gap: THEME.spacing.sm,
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    headerTitle: {
-        fontSize: THEME.fontSizes.lg,
-        fontWeight: THEME.fontWeights.bold,
-        color: COLORS.textPrimary,
-    },
-    card: {
+        position: 'relative',
         backgroundColor: 'rgba(255, 255, 255, 0.03)',
         borderRadius: 16,
+        padding: 20,
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.1)',
-        padding: THEME.spacing.lg,
         overflow: 'hidden',
     },
-    cardContent: {
-        gap: THEME.spacing.md,
+
+    content: {
+        flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 16,
+        zIndex: 10,
     },
-    iconContainer: {
-        width: 64,
-        height: 64,
-        borderRadius: 32,
-        backgroundColor: 'rgba(255, 107, 157, 0.1)',
+    leftContent: {
+        flex: 1,
+        gap: 12,
+    },
+    onlineBadge: {
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: THEME.spacing.xs,
+        gap: 6,
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        alignSelf: 'flex-start',
     },
-    icon: {
-        fontSize: 32,
+    offlineBadge: {
+        backgroundColor: 'rgba(128, 128, 128, 0.2)',
     },
-    description: {
-        fontSize: THEME.fontSizes.sm,
-        color: COLORS.textMuted,
-        textAlign: 'center',
-        lineHeight: 20,
-        marginBottom: THEME.spacing.sm,
+    pulseDot: {
+        width: 6,
+        height: 6,
+        backgroundColor: '#4ADE80',
+        borderRadius: 3,
+        shadowColor: '#4ADE80',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.6,
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    offlineDot: {
+        backgroundColor: '#9CA3AF',
+        shadowColor: '#9CA3AF',
+    },
+    onlineText: {
+        fontSize: 10,
+        fontWeight: '800',
+        color: COLORS.white,
+        letterSpacing: 1.2,
+    },
+    textContainer: {
+        gap: 4,
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: '800',
+        color: COLORS.white,
+        lineHeight: 26,
+    },
+    subtitle: {
+        fontSize: 12,
+        fontWeight: '500',
+        color: 'rgba(255, 255, 255, 0.6)',
+        marginTop: 2,
     },
     chatButton: {
         backgroundColor: COLORS.white,
-        paddingVertical: THEME.spacing.sm,
-        paddingHorizontal: THEME.spacing.xl,
-        borderRadius: THEME.borderRadius.lg,
-        height: 48,
-        minWidth: 200,
+        height: 40,
+        paddingHorizontal: 20,
+        borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'center',
     },
     chatButtonText: {
-        fontSize: THEME.fontSizes.md,
-        fontWeight: THEME.fontWeights.semibold,
+        fontSize: 14,
+        fontWeight: '700',
         color: '#1F1F1F',
+    },
+    imageContainer: {
+        position: 'relative',
+        width: 128,
+        height: 128,
+        flexShrink: 0,
+        backgroundColor: 'rgba(128, 128, 128, 0.15)',
+        borderRadius: 64,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    mascotImage: {
+        width: '100%',
+        height: '100%',
     },
 });

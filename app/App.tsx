@@ -6,6 +6,8 @@ import notificationService from './src/services/notificationService';
 import userStateNotificationService from './src/services/userStateNotificationService';
 import reminderService from './src/services/reminderService';
 import dailyNotificationScheduler from './src/services/dailyNotificationScheduler';
+import heartbeatService from './src/services/heartbeatService';
+import partnerStatusService from './src/services/partnerStatusService';
 import { useAuthStore } from './src/store/authStore';
 import { useCoupleStore } from './src/store/coupleStore';
 import apiClient from './src/services/apiClient';
@@ -92,9 +94,20 @@ function App() {
     // Start daily notification scheduler
     dailyNotificationScheduler.start();
 
+    // Start heartbeat and partner status services if user is logged in
+    if (user) {
+      heartbeatService.start();
+
+      if (couple) {
+        partnerStatusService.start();
+      }
+    }
+
     return () => {
       // Cleanup on unmount
       dailyNotificationScheduler.stop();
+      heartbeatService.stop();
+      partnerStatusService.stop();
     };
   }, [user, couple, partner]);
 

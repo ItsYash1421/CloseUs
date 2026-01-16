@@ -6,6 +6,7 @@ const app = require('./app');
 const { verifyToken } = require('./utils');
 const Message = require('./models/Message');
 const Couple = require('./models/Couple');
+const User = require('./models/User');
 
 const PORT = process.env.PORT || 3000;
 
@@ -73,6 +74,47 @@ io.on('connection', async (socket) => {
 
             const populatedMessage = await Message.findById(message._id).populate('senderId', 'name photoUrl');
             io.to(`couple_${socket.coupleId}`).emit('receive_message', populatedMessage);
+
+            // AUTO-REPLY LOGIC FOR DEV PARTNER
+            try {
+                // Find the couple again to be sure of partners (or use cached if reliable, but safe to fetch or check IDs)
+                const coupleForReply = await Couple.findById(socket.coupleId);
+                if (coupleForReply) {
+                    const partnerId = coupleForReply.partner1Id.toString() === socket.userId
+                        ? coupleForReply.partner2Id
+                        : coupleForReply.partner1Id;
+
+                    const partner = await User.findById(partnerId);
+
+                    if (partner && partner.name === 'Dev Partner') {
+                        // Check if online (0-5, 10-15, etc.)
+                        const currentMinute = new Date().getMinutes();
+                        const isOnline = Math.floor(currentMinute / 5) % 2 === 0;
+
+                        if (isOnline) {
+                            // Send reply
+                            setTimeout(async () => {
+                                try {
+                                    const reply = await Message.create({
+                                        coupleId: socket.coupleId,
+                                        senderId: partner._id,
+                                        type: 'text',
+                                        content: 'Working',
+                                        metadata: {}
+                                    });
+                                    const populatedReply = await Message.findById(reply._id).populate('senderId', 'name photoUrl');
+                                    io.to(`couple_${socket.coupleId}`).emit('receive_message', populatedReply);
+                                    console.log('Sent auto-reply from Dev Partner');
+                                } catch (err) {
+                                    console.error('Auto-reply error:', err);
+                                }
+                            }, 1000);
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error('Check dev partner error:', err);
+            }
         } catch (error) {
             console.error('Socket message error:', error);
         }

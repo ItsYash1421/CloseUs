@@ -55,9 +55,18 @@ const userSchema = new mongoose.Schema(
         }
     },
     {
-        timestamps: true
+        timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
     }
 );
+
+// Virtual field: isOnline (true if lastActive within 5 minutes)
+userSchema.virtual('isOnline').get(function () {
+    if (!this.lastActive) return false;
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    return this.lastActive > fiveMinutesAgo;
+});
 
 // Indexes
 userSchema.index({ coupleId: 1 });

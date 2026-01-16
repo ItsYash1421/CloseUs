@@ -357,7 +357,8 @@ const devPair = async (req, res) => {
             livingStyle: 'living_together',
             partnerName: currentUser.name,
             anniversary: currentUser.anniversary || new Date(),
-            isOnboarded: true
+            isOnboarded: true,
+            lastActive: new Date() // Set as online
         });
 
         const coupleTag = generateCoupleTag(currentUser.name, newDummyPartner.name);

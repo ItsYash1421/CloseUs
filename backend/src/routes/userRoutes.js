@@ -10,6 +10,8 @@ router.get('/me', userController.getProfile);
 router.put('/me', userController.updateProfile);
 router.post('/update-push-token', userController.updatePushToken);
 router.post('/complete-onboarding', userController.completeOnboarding);
+router.post('/heartbeat', userController.heartbeat);
+router.get('/partner-status', userController.getPartnerStatus);
 router.get('/:id', userController.getUserById);
 
 module.exports = router;

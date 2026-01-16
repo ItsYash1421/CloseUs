@@ -132,6 +132,30 @@ if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   file(TOUCH_NOCREATE "/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/CMakeFiles/cmake.verify_globs")
 endif()
 
+# react_codegen_SRCS at /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/CMakeLists.txt:9 (file)
+file(GLOB NEW_GLOB LIST_DIRECTORIES true "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/*.cpp")
+set(OLD_GLOB
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/lottiereactnative-generated.cpp"
+  )
+if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
+  message("-- GLOB mismatch!")
+  file(TOUCH_NOCREATE "/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/CMakeFiles/cmake.verify_globs")
+endif()
+
+# react_codegen_SRCS at /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/CMakeLists.txt:9 (file)
+file(GLOB NEW_GLOB LIST_DIRECTORIES true "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/react/renderer/components/lottiereactnative/*.cpp")
+set(OLD_GLOB
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/react/renderer/components/lottiereactnative/ComponentDescriptors.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/react/renderer/components/lottiereactnative/EventEmitters.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/react/renderer/components/lottiereactnative/Props.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/react/renderer/components/lottiereactnative/ShadowNodes.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/react/renderer/components/lottiereactnative/States.cpp"
+  )
+if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
+  message("-- GLOB mismatch!")
+  file(TOUCH_NOCREATE "/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/armeabi-v7a/CMakeFiles/cmake.verify_globs")
+endif()
+
 # react_codegen_SRCS at /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-exit-app/android/build/generated/source/codegen/jni/CMakeLists.txt:9 (file)
 file(GLOB NEW_GLOB LIST_DIRECTORIES true "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-exit-app/android/build/generated/source/codegen/jni/*.cpp")
 set(OLD_GLOB

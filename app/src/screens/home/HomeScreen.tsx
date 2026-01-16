@@ -11,9 +11,11 @@ import { CoupleHeader, StickyHeader, OurJourney, ChatSection } from '../../compo
 
 export const HomeScreen = ({ navigation }: any) => {
     const user = useAuthStore(state => state.user);
-    const { couple, partner, stats, isLoading, fetchCoupleInfo, fetchCoupleStats } = useCoupleStore();
+    const { couple, partner, stats, isLoading, partnerIsOnline, fetchCoupleInfo, fetchCoupleStats } = useCoupleStore();
     const [refreshing, setRefreshing] = useState(false);
     const scrollY = useRef(new Animated.Value(0)).current;
+
+    console.log('HomeScreen - partnerIsOnline:', partnerIsOnline);
 
     useEffect(() => {
         loadData();
@@ -101,6 +103,9 @@ export const HomeScreen = ({ navigation }: any) => {
                     {/* Chat Section - New */}
                     <ChatSection
                         onOpenChat={() => navigation.navigate('Chat')}
+                        partnerName={partner?.name || 'Partner'}
+                        isOnline={partnerIsOnline}
+                        userGender={user?.gender}
                     />
 
                     {/* Our Journey */}

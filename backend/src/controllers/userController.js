@@ -159,10 +159,82 @@ const completeOnboarding = async (req, res) => {
     }
 };
 
+/**
+ * Update user's lastActive timestamp (heartbeat)
+ */
+const heartbeat = async (req, res) => {
+    try {
+        await User.findByIdAndUpdate(
+            req.userId,
+            { lastActive: new Date() },
+            { new: true }
+        );
+
+        res.json(successResponse(null, 'Heartbeat updated'));
+    } catch (error) {
+        console.error('Heartbeat error:', error);
+        res.status(500).json(errorResponse('Internal server error'));
+    }
+};
+
+/**
+ * Get partner's online status
+ */
+const getPartnerStatus = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId).populate('coupleId');
+
+        if (!user || !user.coupleId) {
+            return res.status(404).json(errorResponse('Not paired yet', 404));
+        }
+
+        const couple = user.coupleId;
+        const partnerId = couple.partner1Id.toString() === req.userId
+            ? couple.partner2Id
+            : couple.partner1Id;
+
+        const partner = await User.findById(partnerId).select('name photoUrl lastActive');
+
+        if (!partner) {
+            return res.status(404).json(errorResponse('Partner not found', 404));
+        }
+
+        let isOnline = partner.isOnline;
+        let lastActive = partner.lastActive;
+
+        // Special logic for Dev Partner: Toggle online/offline every 5 minutes
+        // 0-5: Online, 5-10: Offline, 10-15: Online, etc.
+        if (partner.name === 'Dev Partner') {
+            const currentMinute = new Date().getMinutes();
+            const isOnlineInterval = Math.floor(currentMinute / 5) % 2 === 0;
+
+            if (isOnlineInterval) {
+                isOnline = true;
+                lastActive = new Date();
+            } else {
+                isOnline = false;
+                lastActive = new Date(Date.now() - 15 * 60 * 1000); // 15 mins ago
+            }
+        }
+
+        res.json(successResponse({
+            name: partner.name,
+            photoUrl: partner.photoUrl,
+            isOnline: isOnline,
+            lastActive: lastActive
+        }));
+    } catch (error) {
+        console.error('Get partner status error:', error);
+        res.status(500).json(errorResponse('Internal server error'));
+    }
+};
+
 module.exports = {
     getProfile,
     updateProfile,
     updatePushToken,
     getUserById,
-    completeOnboarding
+    completeOnboarding,
+    heartbeat,
+    getPartnerStatus
 };

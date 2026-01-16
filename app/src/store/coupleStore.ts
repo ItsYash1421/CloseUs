@@ -14,10 +14,13 @@ interface CoupleState {
     pairingAttempts: number;
     isLoading: boolean;
     error: string | null;
+    partnerIsOnline: boolean;
+    partnerLastActive: Date | null;
 
     // Actions
     setCouple: (couple: Couple | null) => void;
     setPartner: (partner: User | null) => void;
+    setPartnerStatus: (status: { isOnline: boolean; lastActive: Date | null }) => void;
     createPairingKey: () => Promise<string>;
     refreshPairingKey: () => Promise<string>;
     checkPairingStatus: () => Promise<boolean>;
@@ -40,10 +43,17 @@ export const useCoupleStore = create<CoupleState>()(
             pairingAttempts: 0,
             isLoading: false,
             error: null,
+            partnerIsOnline: false, // Default to offline
+            partnerLastActive: null,
 
             setCouple: (couple) => set({ couple }),
 
             setPartner: (partner) => set({ partner }),
+
+            setPartnerStatus: (status) => set({
+                partnerIsOnline: status.isOnline,
+                partnerLastActive: status.lastActive,
+            }),
 
             createPairingKey: async () => {
                 try {

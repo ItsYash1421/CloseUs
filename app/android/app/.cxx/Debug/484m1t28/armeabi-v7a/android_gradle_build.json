@@ -5,6 +5,7 @@
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/datetimepicker/android/build/generated/source/codegen/jni/CMakeLists.txt",
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-google-signin/google-signin/android/build/generated/source/codegen/jni/CMakeLists.txt",
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@shopify/react-native-skia/android/build/generated/source/codegen/jni/CMakeLists.txt",
+    "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/CMakeLists.txt",
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-exit-app/android/build/generated/source/codegen/jni/CMakeLists.txt",
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-gesture-handler/android/build/generated/source/codegen/jni/CMakeLists.txt",
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-haptic-feedback/android/build/generated/source/codegen/jni/CMakeLists.txt",
@@ -79,6 +80,11 @@
       "toolchain": "toolchain",
       "abi": "armeabi-v7a",
       "artifactName": "react_codegen_RNVectorIconsSpec"
+    },
+    "react_codegen_lottiereactnative::@0fa4dc904d7e359a99fb": {
+      "toolchain": "toolchain",
+      "abi": "armeabi-v7a",
+      "artifactName": "react_codegen_lottiereactnative"
     },
     "react_codegen_rnasyncstorage::@1596841e19ec5b9eeffe": {
       "toolchain": "toolchain",
