@@ -152,5 +152,9 @@ module.exports = {
     sendDailyQuestionNotification,
     sendGameInvitation,
     sendAnswerNotification,
+    sendAnswerNotification,
     sendBulkNotifications,
 };
+
+const aiService = require('./aiService');
+module.exports.aiService = aiService;

@@ -9,7 +9,7 @@ import {
     KeyboardAvoidingView,
     Platform,
 } from 'react-native';
-import { GradientBackground, Avatar } from '../../components/common';
+import { GradientBackground, Avatar, Header } from '../../components/common';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
 import { useChatStore } from '../../store/chatStore';
@@ -66,24 +66,22 @@ export const ChatScreen = () => {
 
     return (
         <GradientBackground variant="background">
+            <Header title="Chat" showChat={false} />
             <KeyboardAvoidingView
                 style={styles.container}
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                keyboardVerticalOffset={90}>
-                {/* Header */}
-                <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Chat</Text>
-                    <View style={styles.connectionStatus}>
-                        <View
-                            style={[
-                                styles.statusDot,
-                                { backgroundColor: isConnected ? COLORS.success : COLORS.error },
-                            ]}
-                        />
-                        <Text style={styles.statusText}>
-                            {isConnected ? 'Connected' : 'Connecting...'}
-                        </Text>
-                    </View>
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}>
+                {/* Connection Status */}
+                <View style={[styles.connectionStatus, { padding: THEME.spacing.sm, justifyContent: 'center' }]}>
+                    <View
+                        style={[
+                            styles.statusDot,
+                            { backgroundColor: isConnected ? COLORS.success : COLORS.error },
+                        ]}
+                    />
+                    <Text style={styles.statusText}>
+                        {isConnected ? 'Connected' : 'Connecting...'}
+                    </Text>
                 </View>
 
                 {/* Messages */}

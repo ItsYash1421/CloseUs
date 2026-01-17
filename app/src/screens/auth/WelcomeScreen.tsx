@@ -1,39 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { GradientBackground, Button } from '../../components/common';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
 import { useAuthStore } from '../../store/authStore';
-
-// Helper to get user-friendly error messages
-const getUserFriendlyError = (error: any): string => {
-    // Check for specific error messages
-    if (error?.response?.data?.message) {
-        return error.response.data.message;
-    }
-
-    // Check for network errors
-    if (error?.message?.includes('Network')) {
-        return 'Please check your internet connection';
-    }
-
-    // Check for timeout
-    if (error?.message?.includes('timeout')) {
-        return 'Request timed out. Please try again';
-    }
-
-    // Check for status codes
-    const status = error?.response?.status;
-    if (status === 400) return 'Invalid request. Please check your input';
-    if (status === 401) return 'Authentication failed. Please try again';
-    if (status === 403) return 'Access denied';
-    if (status === 404) return 'Service not found';
-    if (status === 500) return 'Server error. Please try again later';
-
-    // Default message
-    return 'Something went wrong. Please try again';
-};
+import { getErrorMessage } from '../../utils/errorHandler';
 
 // Custom Toast Config
 const toastConfig = {
@@ -83,15 +55,8 @@ export const WelcomeScreen = ({ navigation }: any) => {
             }
         } catch (error: any) {
             setLoading(false);
-            const friendlyMessage = getUserFriendlyError(error);
-
-            Toast.show({
-                type: 'error',
-                text1: 'Login Failed',
-                text2: friendlyMessage,
-                position: 'top',
-                visibilityTime: 4000,
-            });
+            console.error('Google Sign-In Error:', error);
+            Alert.alert('Sign-In Failed', getErrorMessage(error));
         }
     };
 

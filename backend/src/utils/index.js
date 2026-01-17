@@ -30,9 +30,14 @@ const verifyToken = (token) => {
  * Example: "Yash" + "Khushi" = "#Yaskhu"
  */
 const generateCoupleTag = (name1, name2) => {
-    const part1 = name1.substring(0, Math.min(3, name1.length));
-    const part2 = name2.substring(0, Math.min(4, name2.length));
-    return `#${part1}${part2}`.toLowerCase();
+    // Get first name only and capitalize first letter
+    const firstName1 = name1.split(' ')[0];
+    const firstName2 = name2.split(' ')[0];
+
+    const capitalizedName1 = firstName1.charAt(0).toUpperCase() + firstName1.slice(1).toLowerCase();
+    const capitalizedName2 = firstName2.charAt(0).toUpperCase() + firstName2.slice(1).toLowerCase();
+
+    return `#${capitalizedName1}${capitalizedName2}`;
 };
 
 /**
@@ -48,27 +53,80 @@ const generatePairingKey = () => {
 };
 
 /**
- * Calculate days together
+ * Calculate time together from start date (IST timezone)
+ */
+const calculateTimeTogether = (startDate) => {
+    // IST is UTC+5:30
+    const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
+    // Get current time in IST
+    const nowUTC = new Date();
+    const nowIST = new Date(nowUTC.getTime() + IST_OFFSET_MS);
+
+    // Get start date in IST
+    const startUTC = new Date(startDate);
+    const startIST = new Date(startUTC.getTime() + IST_OFFSET_MS);
+
+    // Reset both to midnight IST for accurate day counting
+    const nowISTMidnight = new Date(nowIST.getFullYear(), nowIST.getMonth(), nowIST.getDate());
+    const startISTMidnight = new Date(startIST.getFullYear(), startIST.getMonth(), startIST.getDate());
+
+    // Calculate difference in days
+    const diffMs = nowISTMidnight - startISTMidnight;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffMonths = Math.floor(diffDays / 30);
+    const diffYears = Math.floor(diffDays / 365);
+
+    return {
+        days: diffDays,
+        months: diffMonths,
+        years: diffYears
+    };
+};
+
+/**
+ * Get next milestone based on current days with progressive gaps
+ * Early phase → small wins (10 days)
+ * Medium phase → 25 days
+ * Long phase → 50 days
+ * Very long → 100 days
+ */
+const getNextMilestone = (days) => {
+    let step;
+
+    if (days < 100) step = 10;
+    else if (days < 300) step = 25;
+    else if (days < 700) step = 50;
+    else step = 100;
+
+    return Math.ceil(days / step) * step;
+};
+
+/**
+ * Calculate days together (IST timezone)
  */
 const calculateDaysTogether = (anniversary) => {
-    const now = new Date();
-    const start = new Date(anniversary);
-    const diffTime = Math.abs(now - start);
+    // IST is UTC+5:30
+    const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
+    // Get current time in IST
+    const nowUTC = new Date();
+    const nowIST = new Date(nowUTC.getTime() + IST_OFFSET_MS);
+
+    // Get start date in IST
+    const startUTC = new Date(anniversary);
+    const startIST = new Date(startUTC.getTime() + IST_OFFSET_MS);
+
+    // Reset both to midnight IST for accurate day counting
+    const nowISTMidnight = new Date(nowIST.getFullYear(), nowIST.getMonth(), nowIST.getDate());
+    const startISTMidnight = new Date(startIST.getFullYear(), startIST.getMonth(), startIST.getDate());
+
+    const diffTime = Math.abs(nowISTMidnight - startISTMidnight);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
 };
 
 /**
- * Calculate years, months, days together
- */
-const calculateTimeTogether = (anniversary) => {
-    const now = new Date();
-    const start = new Date(anniversary);
-
-    let years = now.getFullYear() - start.getFullYear();
-    let months = now.getMonth() - start.getMonth();
-    let days = now.getDate() - start.getDate();
-
     if (days < 0) {
         months--;
         const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
@@ -113,6 +171,7 @@ module.exports = {
     generatePairingKey,
     calculateDaysTogether,
     calculateTimeTogether,
+    getNextMilestone,
     successResponse,
     errorResponse
 };

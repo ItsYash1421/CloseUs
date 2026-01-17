@@ -46,6 +46,12 @@ export interface CoupleStats {
     totalMessages: number;
     questionsAnswered: number;
     gamesPlayed: number;
+    memoriesCreated?: number;
+    milestone?: {
+        current: number;
+        next: number;
+        progress: number;
+    };
 }
 
 // Message Types

@@ -13,11 +13,13 @@ import {
     TouchableWithoutFeedback
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import { Spinner } from '../../components/common';
 import { useCoupleStore } from '../../store/coupleStore';
 import { useAuthStore } from '../../store/authStore';
 import Toast from 'react-native-toast-message';
 import THEME from '../../constants/theme';
 import { COLORS } from '../../constants/colors';
+import { getErrorMessage } from '../../utils/errorHandler';
 
 export const EnterKeyScreen = ({ navigation }: any) => {
     const [key, setKey] = useState('');
@@ -75,7 +77,7 @@ export const EnterKeyScreen = ({ navigation }: any) => {
             Toast.show({
                 type: 'error',
                 text1: 'Pairing Failed',
-                text2: error.message || 'Invalid or expired key',
+                text2: getErrorMessage(error),
                 position: 'top',
             });
         } finally {
@@ -99,7 +101,7 @@ export const EnterKeyScreen = ({ navigation }: any) => {
             Toast.show({
                 type: 'error',
                 text1: 'Dev Pairing Failed',
-                text2: error.message,
+                text2: getErrorMessage(error),
                 position: 'top',
             });
         } finally {
@@ -154,7 +156,6 @@ export const EnterKeyScreen = ({ navigation }: any) => {
                                 maxLength={6}
                                 autoCapitalize="characters"
                                 autoCorrect={false}
-                                autoFocus={true}
                             />
                         </View>
 
@@ -164,9 +165,13 @@ export const EnterKeyScreen = ({ navigation }: any) => {
                             onPress={handleSubmit}
                             disabled={isLoading}
                         >
-                            <Text style={styles.unlockButtonText}>
-                                {isLoading ? 'Unlocking...' : 'Unlock Now'}
-                            </Text>
+                            {isLoading ? (
+                                <Spinner size="small" color="#000000" />
+                            ) : (
+                                <Text style={styles.unlockButtonText}>
+                                    Unlock Now
+                                </Text>
+                            )}
                         </TouchableOpacity>
 
                         {/* Dev Mode Button */}
@@ -239,14 +244,14 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: THEME.fontSizes.md,
-        color: '#B8B8D1', 
+        color: '#B8B8D1',
         textAlign: 'center',
         marginBottom: THEME.spacing.xl,
     },
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
         borderRadius: 16,
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.2)',
@@ -261,12 +266,12 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         fontSize: THEME.fontSizes.lg,
-        color: '#FFFFFF', 
+        color: '#FFFFFF',
         fontWeight: '600',
         letterSpacing: 2,
     },
     unlockButton: {
-        backgroundColor: '#FFFFFF', 
+        backgroundColor: '#FFFFFF',
         borderRadius: 28,
         paddingVertical: 18,
         alignItems: 'center',
@@ -277,7 +282,7 @@ const styles = StyleSheet.create({
     unlockButtonText: {
         fontSize: THEME.fontSizes.md,
         fontWeight: '600',
-        color: '#000000', 
+        color: '#000000',
     },
     devButton: {
         backgroundColor: 'rgba(255, 255, 255, 0.1)',

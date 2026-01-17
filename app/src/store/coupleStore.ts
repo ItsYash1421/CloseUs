@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Couple, CoupleStats, User } from '../types';
-import coupleService from '../services/coupleService';
+import { coupleService } from '../services/coupleService';
+import { getErrorMessage } from '../utils/errorHandler';
 
 interface CoupleState {
     couple: Couple | null;
@@ -13,10 +14,13 @@ interface CoupleState {
     pairingAttempts: number;
     isLoading: boolean;
     error: string | null;
+    partnerIsOnline: boolean;
+    partnerLastActive: Date | null;
 
     // Actions
     setCouple: (couple: Couple | null) => void;
     setPartner: (partner: User | null) => void;
+    setPartnerStatus: (status: { isOnline: boolean; lastActive: Date | null }) => void;
     createPairingKey: () => Promise<string>;
     refreshPairingKey: () => Promise<string>;
     checkPairingStatus: () => Promise<boolean>;
@@ -39,10 +43,17 @@ export const useCoupleStore = create<CoupleState>()(
             pairingAttempts: 0,
             isLoading: false,
             error: null,
+            partnerIsOnline: false, // Default to offline
+            partnerLastActive: null,
 
             setCouple: (couple) => set({ couple }),
 
             setPartner: (partner) => set({ partner }),
+
+            setPartnerStatus: (status) => set({
+                partnerIsOnline: status.isOnline,
+                partnerLastActive: status.lastActive,
+            }),
 
             createPairingKey: async () => {
                 try {
@@ -73,7 +84,7 @@ export const useCoupleStore = create<CoupleState>()(
                     });
                     return pairingKey;
                 } catch (error: any) {
-                    set({ error: error.message, isLoading: false });
+                    set({ error: getErrorMessage(error), isLoading: false });
                     throw error;
                 }
             },
@@ -97,7 +108,7 @@ export const useCoupleStore = create<CoupleState>()(
                     const couple = await coupleService.pairWithPartner(key);
                     set({ couple, isLoading: false, pairingKey: null });
                 } catch (error: any) {
-                    set({ error: error.message, isLoading: false });
+                    set({ error: getErrorMessage(error), isLoading: false });
                     throw error;
                 }
             },
@@ -108,7 +119,7 @@ export const useCoupleStore = create<CoupleState>()(
                     const couple = await coupleService.devPair();
                     set({ couple, isLoading: false, pairingKey: null });
                 } catch (error: any) {
-                    set({ error: error.message, isLoading: false });
+                    set({ error: getErrorMessage(error), isLoading: false });
                     throw error;
                 }
             },
@@ -116,10 +127,15 @@ export const useCoupleStore = create<CoupleState>()(
             fetchCoupleInfo: async () => {
                 try {
                     set({ isLoading: true, error: null });
-                    const couple = await coupleService.getCoupleInfo();
-                    set({ couple, isLoading: false });
+                    const response: any = await coupleService.getCoupleInfo();
+                    // Response contains { couple, partner }
+                    set({
+                        couple: response.couple || response,
+                        partner: response.partner || null,
+                        isLoading: false
+                    });
                 } catch (error: any) {
-                    set({ error: error.message, isLoading: false });
+                    set({ error: getErrorMessage(error), isLoading: false });
                 }
             },
 

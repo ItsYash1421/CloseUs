@@ -36,6 +36,30 @@ if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   file(TOUCH_NOCREATE "/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/x86_64/CMakeFiles/cmake.verify_globs")
 endif()
 
+# react_codegen_SRCS at /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/blur/android/build/generated/source/codegen/jni/CMakeLists.txt:9 (file)
+file(GLOB NEW_GLOB LIST_DIRECTORIES true "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/blur/android/build/generated/source/codegen/jni/*.cpp")
+set(OLD_GLOB
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/blur/android/build/generated/source/codegen/jni/rnblurview-generated.cpp"
+  )
+if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
+  message("-- GLOB mismatch!")
+  file(TOUCH_NOCREATE "/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/x86_64/CMakeFiles/cmake.verify_globs")
+endif()
+
+# react_codegen_SRCS at /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/blur/android/build/generated/source/codegen/jni/CMakeLists.txt:9 (file)
+file(GLOB NEW_GLOB LIST_DIRECTORIES true "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/blur/android/build/generated/source/codegen/jni/react/renderer/components/rnblurview/*.cpp")
+set(OLD_GLOB
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/blur/android/build/generated/source/codegen/jni/react/renderer/components/rnblurview/ComponentDescriptors.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/blur/android/build/generated/source/codegen/jni/react/renderer/components/rnblurview/EventEmitters.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/blur/android/build/generated/source/codegen/jni/react/renderer/components/rnblurview/Props.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/blur/android/build/generated/source/codegen/jni/react/renderer/components/rnblurview/ShadowNodes.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/blur/android/build/generated/source/codegen/jni/react/renderer/components/rnblurview/States.cpp"
+  )
+if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
+  message("-- GLOB mismatch!")
+  file(TOUCH_NOCREATE "/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/x86_64/CMakeFiles/cmake.verify_globs")
+endif()
+
 # react_codegen_SRCS at /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/datetimepicker/android/build/generated/source/codegen/jni/CMakeLists.txt:9 (file)
 file(GLOB NEW_GLOB LIST_DIRECTORIES true "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/datetimepicker/android/build/generated/source/codegen/jni/*.cpp")
 set(OLD_GLOB
@@ -78,6 +102,78 @@ set(OLD_GLOB
   "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-google-signin/google-signin/android/build/generated/source/codegen/jni/react/renderer/components/RNGoogleSignInCGen/Props.cpp"
   "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-google-signin/google-signin/android/build/generated/source/codegen/jni/react/renderer/components/RNGoogleSignInCGen/ShadowNodes.cpp"
   "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-google-signin/google-signin/android/build/generated/source/codegen/jni/react/renderer/components/RNGoogleSignInCGen/States.cpp"
+  )
+if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
+  message("-- GLOB mismatch!")
+  file(TOUCH_NOCREATE "/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/x86_64/CMakeFiles/cmake.verify_globs")
+endif()
+
+# react_codegen_SRCS at /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@shopify/react-native-skia/android/build/generated/source/codegen/jni/CMakeLists.txt:9 (file)
+file(GLOB NEW_GLOB LIST_DIRECTORIES true "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@shopify/react-native-skia/android/build/generated/source/codegen/jni/*.cpp")
+set(OLD_GLOB
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@shopify/react-native-skia/android/build/generated/source/codegen/jni/rnskia-generated.cpp"
+  )
+if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
+  message("-- GLOB mismatch!")
+  file(TOUCH_NOCREATE "/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/x86_64/CMakeFiles/cmake.verify_globs")
+endif()
+
+# react_codegen_SRCS at /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@shopify/react-native-skia/android/build/generated/source/codegen/jni/CMakeLists.txt:9 (file)
+file(GLOB NEW_GLOB LIST_DIRECTORIES true "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@shopify/react-native-skia/android/build/generated/source/codegen/jni/react/renderer/components/rnskia/*.cpp")
+set(OLD_GLOB
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@shopify/react-native-skia/android/build/generated/source/codegen/jni/react/renderer/components/rnskia/ComponentDescriptors.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@shopify/react-native-skia/android/build/generated/source/codegen/jni/react/renderer/components/rnskia/EventEmitters.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@shopify/react-native-skia/android/build/generated/source/codegen/jni/react/renderer/components/rnskia/Props.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@shopify/react-native-skia/android/build/generated/source/codegen/jni/react/renderer/components/rnskia/ShadowNodes.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@shopify/react-native-skia/android/build/generated/source/codegen/jni/react/renderer/components/rnskia/States.cpp"
+  )
+if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
+  message("-- GLOB mismatch!")
+  file(TOUCH_NOCREATE "/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/x86_64/CMakeFiles/cmake.verify_globs")
+endif()
+
+# react_codegen_SRCS at /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/CMakeLists.txt:9 (file)
+file(GLOB NEW_GLOB LIST_DIRECTORIES true "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/*.cpp")
+set(OLD_GLOB
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/lottiereactnative-generated.cpp"
+  )
+if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
+  message("-- GLOB mismatch!")
+  file(TOUCH_NOCREATE "/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/x86_64/CMakeFiles/cmake.verify_globs")
+endif()
+
+# react_codegen_SRCS at /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/CMakeLists.txt:9 (file)
+file(GLOB NEW_GLOB LIST_DIRECTORIES true "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/react/renderer/components/lottiereactnative/*.cpp")
+set(OLD_GLOB
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/react/renderer/components/lottiereactnative/ComponentDescriptors.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/react/renderer/components/lottiereactnative/EventEmitters.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/react/renderer/components/lottiereactnative/Props.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/react/renderer/components/lottiereactnative/ShadowNodes.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/react/renderer/components/lottiereactnative/States.cpp"
+  )
+if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
+  message("-- GLOB mismatch!")
+  file(TOUCH_NOCREATE "/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/x86_64/CMakeFiles/cmake.verify_globs")
+endif()
+
+# react_codegen_SRCS at /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-exit-app/android/build/generated/source/codegen/jni/CMakeLists.txt:9 (file)
+file(GLOB NEW_GLOB LIST_DIRECTORIES true "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-exit-app/android/build/generated/source/codegen/jni/*.cpp")
+set(OLD_GLOB
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-exit-app/android/build/generated/source/codegen/jni/RNExitAppSpec-generated.cpp"
+  )
+if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
+  message("-- GLOB mismatch!")
+  file(TOUCH_NOCREATE "/Users/yashkumarmeena/Desktop/CloseUs/app/android/app/.cxx/Debug/484m1t28/x86_64/CMakeFiles/cmake.verify_globs")
+endif()
+
+# react_codegen_SRCS at /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-exit-app/android/build/generated/source/codegen/jni/CMakeLists.txt:9 (file)
+file(GLOB NEW_GLOB LIST_DIRECTORIES true "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-exit-app/android/build/generated/source/codegen/jni/react/renderer/components/RNExitAppSpec/*.cpp")
+set(OLD_GLOB
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-exit-app/android/build/generated/source/codegen/jni/react/renderer/components/RNExitAppSpec/ComponentDescriptors.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-exit-app/android/build/generated/source/codegen/jni/react/renderer/components/RNExitAppSpec/EventEmitters.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-exit-app/android/build/generated/source/codegen/jni/react/renderer/components/RNExitAppSpec/Props.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-exit-app/android/build/generated/source/codegen/jni/react/renderer/components/RNExitAppSpec/ShadowNodes.cpp"
+  "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-exit-app/android/build/generated/source/codegen/jni/react/renderer/components/RNExitAppSpec/States.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")

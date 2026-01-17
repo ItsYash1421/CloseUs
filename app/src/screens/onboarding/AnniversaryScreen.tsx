@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TextInput, KeyboardAvoidingView, Platform, Keyboard, Animated, Image } from 'react-native';
 import { TouchableOpacity } from 'react-native';
-import { GradientBackground } from '../../components/common';
+import { GradientBackground, Spinner } from '../../components/common';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
 import { useOnboardingStore } from '../../store/onboardingStore';
 import { useAuthStore } from '../../store/authStore';
 import Toast from 'react-native-toast-message';
 import apiClient from '../../services/apiClient';
+import { getErrorMessage } from '../../utils/errorHandler';
 
 export const AnniversaryScreen = ({ navigation }: any) => {
     const getAllData = useOnboardingStore(state => state.getAllData);
@@ -291,9 +292,9 @@ export const AnniversaryScreen = ({ navigation }: any) => {
             Toast.show({
                 type: 'error',
                 text1: 'Setup Failed',
-                text2: error.response?.data?.message || 'Could not complete setup. Please try again.',
+                text2: getErrorMessage(error),
                 position: 'top',
-                visibilityTime: 4000,
+                visibilityTime: 3000,
             });
         }
     };
@@ -417,14 +418,21 @@ export const AnniversaryScreen = ({ navigation }: any) => {
                 {/* Footer - Hidden immediately when any input focused */}
                 {!focusedInput && !isKeyboardVisible && (
                     <View style={styles.footer}>
+                        {/* Submit Button */}
                         <TouchableOpacity
-                            style={[styles.nextButton, (!day || !month || !year || !partnerName) && styles.nextButtonDisabled]}
+                            style={[
+                                styles.nextButton,
+                                (!day || !month || !year || !partnerName || loading) && styles.nextButtonDisabled
+                            ]}
                             onPress={handleContinue}
                             disabled={!day || !month || !year || !partnerName || loading}
-                            activeOpacity={0.8}>
-                            <Text style={styles.nextButtonText}>
-                                {loading ? 'Completing...' : 'Complete Setup'}
-                            </Text>
+                            activeOpacity={0.8}
+                        >
+                            {loading ? (
+                                <Spinner size="small" color="#FFFFFF" />
+                            ) : (
+                                <Text style={styles.nextButtonText}>Complete Setup</Text>
+                            )}
                         </TouchableOpacity>
                     </View>
                 )}

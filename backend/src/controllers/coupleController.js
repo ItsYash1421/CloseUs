@@ -4,6 +4,7 @@ const {
     generatePairingKey,
     generateCoupleTag,
     calculateTimeTogether,
+    getNextMilestone,
     successResponse,
     errorResponse
 } = require('../utils');
@@ -219,9 +220,6 @@ const getCoupleInfo = async (req, res) => {
     }
 };
 
-/**
- * Get couple stats
- */
 const getCoupleStats = async (req, res) => {
     try {
         const userId = req.userId;
@@ -233,12 +231,32 @@ const getCoupleStats = async (req, res) => {
             return res.status(404).json(errorResponse('Not paired yet', 404));
         }
 
+        // Get partner info to regenerate tag if needed
+        const partnerId = couple.partner1Id.toString() === userId ? couple.partner2Id : couple.partner1Id;
+        const partner = await User.findById(partnerId);
+        const currentUser = await User.findById(userId);
+
+        // Check if coupleTag needs regeneration (old format or missing)
+        const expectedTag = generateCoupleTag(currentUser.name, partner.name);
+        if (!couple.coupleTag || couple.coupleTag !== expectedTag) {
+            couple.coupleTag = expectedTag;
+            await couple.save();
+        }
+
         const timeTogether = calculateTimeTogether(couple.startDate);
+        const currentDays = timeTogether.days;
+        const nextMilestone = getNextMilestone(currentDays);
+        const progressPercentage = Math.floor((currentDays / nextMilestone) * 100);
 
         res.json(successResponse({
             ...timeTogether,
             startDate: couple.startDate,
-            coupleTag: couple.coupleTag
+            coupleTag: couple.coupleTag,
+            milestone: {
+                current: currentDays,
+                next: nextMilestone,
+                progress: progressPercentage
+            }
         }));
     } catch (error) {
         console.error('Stats error:', error);
@@ -265,6 +283,9 @@ const getTimeTogether = async (req, res) => {
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
+
+
+//----------------------------------------------------//DEV//----------------------------------------------------//
 
 const devPair = async (req, res) => {
     try {
@@ -297,15 +318,13 @@ const devPair = async (req, res) => {
         if (!dummyPartner) {
             // Create dummy partner
             dummyPartner = await User.create({
-                email: 'dummy@closeus.app',
+                email: `dummy_${Date.now()}@closeus.dev`,
                 googleId: 'DUMMY_PARTNER_' + Date.now(),
                 name: 'Dummy Partner',
-                photoUrl: '',
-                isOnboardingComplete: true,
                 gender: 'female', // assuming opposite gender for variety
                 dob: new Date('2000-01-01'),
                 relationshipStatus: 'dating',
-                livingStyle: 'together',
+                livingStyle: 'living_together',
                 anniversary: new Date()
             });
         }
@@ -331,23 +350,69 @@ const devPair = async (req, res) => {
 
         // 5. Create new couple
         const currentUser = await User.findById(userId);
-        const coupleTag = generateCoupleTag(currentUser.name, dummyPartner.name);
+
+        const newDummyPartner = await User.create({
+            email: `devpartner_${Date.now()}@closeus.dev`,
+            googleId: 'DEV_PARTNER_' + Date.now(),
+            name: 'Dev Partner',
+            gender: currentUser.gender === 'male' ? 'female' : 'male',
+            relationshipStatus: 'dating',
+            livingStyle: 'living_together',
+            partnerName: currentUser.name,
+            anniversary: currentUser.anniversary || new Date(),
+            isOnboarded: true,
+            lastActive: new Date() // Set as online
+        });
+
+        const coupleTag = generateCoupleTag(currentUser.name, newDummyPartner.name);
 
         const newCouple = await Couple.create({
             partner1Id: userId,
-            partner2Id: dummyPartner._id,
+            partner2Id: newDummyPartner._id,
             isPaired: true,
             coupleTag: coupleTag,
-            startDate: currentUser.anniversary || new Date()
+            startDate: currentUser.anniversary || new Date(),
+            isDevPartner: true // Mark as dev partnership
         });
 
         // 6. Update both users
         await User.findByIdAndUpdate(userId, { coupleId: newCouple._id });
-        await User.findByIdAndUpdate(dummyPartner._id, { coupleId: newCouple._id });
+        await User.findByIdAndUpdate(newDummyPartner._id, { coupleId: newCouple._id });
 
         res.json(successResponse({ couple: newCouple }, 'Dev pair successful'));
     } catch (error) {
         console.error('Dev pair error:', error);
+        res.status(500).json(errorResponse('Internal server error'));
+    }
+};
+
+/**
+ * Enable Dev Mode for existing couple
+ */
+const enableDevMode = async (req, res) => {
+    try {
+        const userId = req.userId;
+
+        // Find user's couple
+        const user = await User.findById(userId);
+        if (!user || !user.coupleId) {
+            return res.status(404).json(errorResponse('No couple found', 404));
+        }
+
+        // Update couple to enable dev mode
+        const couple = await Couple.findByIdAndUpdate(
+            user.coupleId,
+            { isDevPartner: true },
+            { new: true }
+        );
+
+        if (!couple) {
+            return res.status(404).json(errorResponse('Couple not found', 404));
+        }
+
+        res.json(successResponse({ couple }, 'Dev mode enabled for this couple'));
+    } catch (error) {
+        console.error('Enable dev mode error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
@@ -360,5 +425,6 @@ module.exports = {
     getCoupleInfo,
     getCoupleStats,
     getTimeTogether,
-    devPair
+    devPair,
+    enableDevMode
 };

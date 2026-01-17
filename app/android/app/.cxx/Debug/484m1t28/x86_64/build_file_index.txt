@@ -1,6 +1,10 @@
 /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-async-storage/async-storage/android/build/generated/source/codegen/jni/CMakeLists.txt
+/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/blur/android/build/generated/source/codegen/jni/CMakeLists.txt
 /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/datetimepicker/android/build/generated/source/codegen/jni/CMakeLists.txt
 /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-google-signin/google-signin/android/build/generated/source/codegen/jni/CMakeLists.txt
+/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@shopify/react-native-skia/android/build/generated/source/codegen/jni/CMakeLists.txt
+/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/CMakeLists.txt
+/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-exit-app/android/build/generated/source/codegen/jni/CMakeLists.txt
 /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-gesture-handler/android/build/generated/source/codegen/jni/CMakeLists.txt
 /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-haptic-feedback/android/build/generated/source/codegen/jni/CMakeLists.txt
 /Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-image-picker/android/build/generated/source/codegen/jni/CMakeLists.txt

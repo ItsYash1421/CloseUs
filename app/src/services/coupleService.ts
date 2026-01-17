@@ -38,6 +38,11 @@ class CoupleService {
         const response = await apiClient.get<ApiResponse<CoupleStats>>('/api/couples/stats');
         return response.data!;
     }
+
+    async getTimeTogether(): Promise<{ years: number; months: number; days: number }> {
+        const response = await apiClient.get<ApiResponse<{ years: number; months: number; days: number }>>('/api/couples/time-together');
+        return response.data!;
+    }
 }
 
 export const coupleService = new CoupleService();

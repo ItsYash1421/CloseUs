@@ -3,10 +3,21 @@ import { Message, ApiResponse, PaginatedResponse } from '../types';
 
 class ChatService {
     async getMessages(page: number = 1, limit: number = 50): Promise<PaginatedResponse<Message>> {
-        const response = await apiClient.get<ApiResponse<PaginatedResponse<Message>>>(
-            `/api/chat/messages?page=${page}&limit=${limit}`,
+        const response = await apiClient.get<ApiResponse<{ messages: Message[] }>>(
+            `/api/chat/messages?limit=${limit}${page > 1 ? `&before=${new Date().toISOString()}` : ''}`,
+            // Note: Pagination needs cursor, passing simplified for now
         );
-        return response.data!;
+
+        const messages = (response.data as any).messages || [];
+
+        // Construct PaginatedResponse
+        return {
+            data: messages,
+            page: page,
+            limit: limit,
+            total: 0, // Not returned by backend
+            hasMore: messages.length === limit
+        };
     }
 
     async sendMessage(

@@ -1,8 +1,12 @@
 {
   "buildFiles": [
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-async-storage/async-storage/android/build/generated/source/codegen/jni/CMakeLists.txt",
+    "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/blur/android/build/generated/source/codegen/jni/CMakeLists.txt",
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-community/datetimepicker/android/build/generated/source/codegen/jni/CMakeLists.txt",
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@react-native-google-signin/google-signin/android/build/generated/source/codegen/jni/CMakeLists.txt",
+    "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/@shopify/react-native-skia/android/build/generated/source/codegen/jni/CMakeLists.txt",
+    "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/lottie-react-native/android/build/generated/source/codegen/jni/CMakeLists.txt",
+    "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-exit-app/android/build/generated/source/codegen/jni/CMakeLists.txt",
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-gesture-handler/android/build/generated/source/codegen/jni/CMakeLists.txt",
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-haptic-feedback/android/build/generated/source/codegen/jni/CMakeLists.txt",
     "/Users/yashkumarmeena/Desktop/CloseUs/app/node_modules/react-native-image-picker/android/build/generated/source/codegen/jni/CMakeLists.txt",
@@ -47,6 +51,11 @@
       "abi": "arm64-v8a",
       "artifactName": "react_codegen_RNDateTimePickerCGen"
     },
+    "react_codegen_RNExitAppSpec::@48aa2865e0da6c97fe2b": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "react_codegen_RNExitAppSpec"
+    },
     "react_codegen_RNGoogleSignInCGen::@337b7b353bd94a4215c0": {
       "toolchain": "toolchain",
       "abi": "arm64-v8a",
@@ -72,10 +81,20 @@
       "abi": "arm64-v8a",
       "artifactName": "react_codegen_RNVectorIconsSpec"
     },
+    "react_codegen_lottiereactnative::@0fa4dc904d7e359a99fb": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "react_codegen_lottiereactnative"
+    },
     "react_codegen_rnasyncstorage::@1596841e19ec5b9eeffe": {
       "toolchain": "toolchain",
       "abi": "arm64-v8a",
       "artifactName": "react_codegen_rnasyncstorage"
+    },
+    "react_codegen_rnblurview::@9a34ffec6e39b5c9049e": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "react_codegen_rnblurview"
     },
     "react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec": {
       "toolchain": "toolchain",
@@ -92,6 +111,11 @@
         "/Users/yashkumarmeena/.gradle/caches/9.0.0/transforms/7ea84db5beb48d0e40563410ea5e2f79/transformed/react-android-0.83.1-debug/prefab/modules/jsi/libs/android.arm64-v8a/libjsi.so",
         "/Users/yashkumarmeena/.gradle/caches/9.0.0/transforms/cda0e1e31099e31fafe505dd251ef83a/transformed/fbjni-0.7.0/prefab/modules/fbjni/libs/android.arm64-v8a/libfbjni.so"
       ]
+    },
+    "react_codegen_rnskia::@376d8504f62839611b97": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "react_codegen_rnskia"
     },
     "react_codegen_rnsvg::@4f40eb209d0c0b4a3b65": {
       "toolchain": "toolchain",

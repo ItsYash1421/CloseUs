@@ -1,5 +1,5 @@
 import messaging from '@react-native-firebase/messaging';
-import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
+import notifee, { AndroidImportance, EventType, TriggerType, TimestampTrigger } from '@notifee/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
@@ -89,14 +89,15 @@ class NotificationService {
     }
 
     setupNotificationHandler() {
+        // Handle foreground notification press
         notifee.onForegroundEvent(({ type, detail }) => {
             if (type === EventType.PRESS) {
                 console.log('Notification pressed:', detail.notification);
-                // Handle navigation based on notification data
                 this.handleNotificationPress(detail.notification?.data);
             }
         });
 
+        // Handle background notification press
         notifee.onBackgroundEvent(async ({ type, detail }) => {
             if (type === EventType.PRESS) {
                 console.log('Background notification pressed:', detail.notification);
@@ -105,8 +106,50 @@ class NotificationService {
         });
     }
 
+    // Get notification that opened the app (cold start)
+    async getInitialNotification() {
+        try {
+            // Check if app was opened by notification
+            const initialNotification = await notifee.getInitialNotification();
+
+            if (initialNotification) {
+                console.log('App opened from notification:', initialNotification);
+                return initialNotification.notification?.data;
+            }
+
+            // Also check FCM initial notification
+            const fcmInitial = await messaging().getInitialNotification();
+            if (fcmInitial) {
+                console.log('App opened from FCM notification:', fcmInitial);
+                return fcmInitial.data;
+            }
+
+            return null;
+        } catch (error) {
+            console.error('Error getting initial notification:', error);
+            return null;
+        }
+    }
+
     async displayNotification(title: string, body: string, data?: any) {
+        // Generate unique ID based on title, body, and timestamp
+        const notificationId = `${title}-${body}-${Date.now()}`;
+
+        // Check if this notification was recently shown (within last 5 seconds)
+        const lastShownKey = `last_notification_${title}_${body}`;
+        const lastShown = await AsyncStorage.getItem(lastShownKey);
+        const now = Date.now();
+
+        if (lastShown && (now - parseInt(lastShown)) < 5000) {
+            console.log('Duplicate notification blocked:', title);
+            return; // Skip duplicate
+        }
+
+        // Store timestamp
+        await AsyncStorage.setItem(lastShownKey, now.toString());
+
         await notifee.displayNotification({
+            id: notificationId,
             title,
             body,
             data,
@@ -135,9 +178,32 @@ class NotificationService {
 
         const { type, screen, params } = data;
 
-        // Navigation will be handled by the app
-        // Store the navigation intent
-        AsyncStorage.setItem('pendingNavigation', JSON.stringify({ screen, params }));
+        console.log('Handling notification press:', { type, screen, params });
+
+        // Import navigation service dynamically to avoid circular dependency
+        import('./navigationService').then(({ navigate }) => {
+            if (screen) {
+                // Tab screens need to navigate to MainTabs first
+                const tabScreens = ['Home', 'Chat', 'Questions', 'Games', 'Profile'];
+
+                if (tabScreens.includes(screen)) {
+                    // Navigate to MainTabs with nested screen
+                    navigate('MainTabs', {
+                        screen: screen,
+                        params: params
+                    });
+                    console.log(`Navigated to MainTabs -> ${screen}`);
+                } else {
+                    // Direct navigation for non-tab screens
+                    navigate(screen, params);
+                    console.log(`Navigated to ${screen}`);
+                }
+            }
+        }).catch(error => {
+            console.error('Navigation error:', error);
+            // Fallback: Store for later
+            AsyncStorage.setItem('pendingNavigation', JSON.stringify({ screen, params }));
+        });
     }
 
     // Schedule local notifications
@@ -148,6 +214,11 @@ class NotificationService {
         date: Date,
         data?: any,
     ) {
+        const trigger: TimestampTrigger = {
+            type: TriggerType.TIMESTAMP,
+            timestamp: date.getTime(),
+        };
+
         await notifee.createTriggerNotification(
             {
                 id,
@@ -158,18 +229,36 @@ class NotificationService {
                     channelId: this.channelId,
                     importance: AndroidImportance.HIGH,
                     pressAction: { id: 'default' },
-                    smallIcon: 'ic_launcher', // Use default launcher icon
+                    smallIcon: 'ic_launcher',
                     color: '#FF6B9D',
                 },
                 ios: {
                     sound: 'default',
                 },
             },
-            {
-                type: 'timestamp' as any,
-                timestamp: date.getTime(),
-            },
+            trigger,
         );
+    }
+
+    // Schedule daily repeating notification
+    async scheduleDailyRepeatingNotification(
+        id: string,
+        title: string,
+        body: string,
+        hour: number,
+        minute: number,
+        data?: any,
+    ) {
+        const now = new Date();
+        const triggerDate = new Date();
+        triggerDate.setHours(hour, minute, 0, 0);
+
+        // If time has passed today, schedule for tomorrow
+        if (triggerDate <= now) {
+            triggerDate.setDate(triggerDate.getDate() + 1);
+        }
+
+        await this.scheduleNotification(id, title, body, triggerDate, data);
     }
 
     async cancelNotification(id: string) {
