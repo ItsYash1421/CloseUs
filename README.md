@@ -1,6 +1,6 @@
 # CloseUs
 
-![CloseUs](https://via.placeholder.com/1200x400?text=CloseUs:+Closer+Than+Ever)
+![CloseUs](app/src/assets/images/Logo-Main.png)
 
 > **Closer than ever.**  
 > A private, dedicated digital space designed purely for two.
