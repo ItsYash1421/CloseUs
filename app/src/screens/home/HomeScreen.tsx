@@ -139,7 +139,6 @@ export const HomeScreen = ({ navigation }: any) => {
 
                     {/* Daily Question */}
                     <View>
-                        <Text style={styles.sectionTitle}>Daily Question</Text>
                         <DailyQuestionCard
                             data={questionData}
                             loading={questionLoading}
@@ -148,56 +147,12 @@ export const HomeScreen = ({ navigation }: any) => {
                         />
                     </View>
 
-                    {/* Quick Stats */}
-                    <View style={styles.statsGrid}>
-                        <StatCard
-                            icon="💬"
-                            value={stats?.totalMessages || 0}
-                            label="Messages"
-                        />
-                        <StatCard
-                            icon="❓"
-                            value={stats?.questionsAnswered || 0}
-                            label="Questions"
-                        />
-                        <StatCard
-                            icon="🎮"
-                            value={stats?.gamesPlayed || 0}
-                            label="Games"
-                        />
-                        <StatCard
-                            icon="🎉"
-                            value={stats?.daysUntilAnniversary || 0}
-                            label="Days to Anniversary"
-                        />
-                        <StatCard
-                            icon="📸"
-                            value={stats?.memoriesCreated || 0}
-                            label="Memories"
-                        />
-                    </View>
-
-                    {/* Quick Actions */}
-                    <View>
-                        <Text style={styles.sectionTitle}>Quick Actions</Text>
-                        <View style={styles.actionsGrid}>
-                            <TouchableOpacity onPress={() => navigation.navigate('Games')}>
-                                <Card variant="glass" style={styles.actionCard}>
-                                    <Text style={styles.actionIcon}>🎮</Text>
-                                    <Text style={styles.actionTitle}>Play Game</Text>
-                                </Card>
-                            </TouchableOpacity>
-                            <ActionCard
-                                icon="💬"
-                                title="Chat"
-                                onPress={() => navigation.navigate('Chat')}
-                            />
-                            <ActionCard
-                                icon="👤"
-                                title="Profile"
-                                onPress={() => navigation.navigate('Profile')}
-                            />
-                        </View>
+                    {/* Inspirational Quote */}
+                    <View style={styles.quoteContainer}>
+                        <Text style={styles.quoteText}>
+                            "Every moment with you is a beautiful memory in the making.
+                            Love isn't just about being together, it's about growing together."
+                        </Text>
                     </View>
                 </View>
             </Animated.ScrollView>
@@ -349,5 +304,18 @@ const styles = StyleSheet.create({
         fontSize: THEME.fontSizes.md,
         fontWeight: THEME.fontWeights.semibold,
         color: COLORS.white,
+    },
+    quoteContainer: {
+        marginVertical:0,
+        paddingHorizontal: THEME.spacing.md,
+    },
+    quoteText: {
+        fontSize: 15,
+        lineHeight: 24,
+        color: COLORS.textSecondary,
+        textAlign: 'center',
+        fontStyle: 'italic',
+        fontWeight: '400',
+        letterSpacing: 0.3,
     },
 });
