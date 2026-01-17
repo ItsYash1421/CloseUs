@@ -1,8 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { GradientBackground, Card, Header } from '../../components/common';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
+import questionService, { DailyQuestionResponse } from '../../services/questionService';
 
 const CATEGORIES = [
     { id: '1', name: 'Getting to Know You', emoji: '👋', count: 50 },
@@ -14,6 +15,47 @@ const CATEGORIES = [
 ];
 
 export const QuestionsScreen = ({ navigation }: any) => {
+    const [loading, setLoading] = useState(true);
+    const [dailyData, setDailyData] = useState<DailyQuestionResponse | null>(null);
+    const [answering, setAnswering] = useState(false);
+    const [answerText, setAnswerText] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+
+    useEffect(() => {
+        fetchDailyQuestion();
+    }, []);
+
+    const fetchDailyQuestion = async () => {
+        try {
+            setLoading(true);
+            const data = await questionService.getDailyQuestion();
+            setDailyData(data);
+        } catch (error) {
+            console.error('Fetch daily question error:', error);
+            // Fallback or error state could be handled here
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSubmitAnswer = async () => {
+        if (!answerText.trim() || !dailyData?.question?.id) return;
+
+        try {
+            setSubmitting(true);
+            await questionService.answerQuestion(dailyData.question.id, answerText);
+            setAnswerText('');
+            setAnswering(false);
+            // Refresh to see updated state
+            await fetchDailyQuestion();
+            Alert.alert('Success', 'Answer submitted!');
+        } catch (error) {
+            Alert.alert('Error', 'Failed to submit answer');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
     return (
         <GradientBackground variant="background">
             <Header title="Daily Questions" />
@@ -30,12 +72,74 @@ export const QuestionsScreen = ({ navigation }: any) => {
                     <View style={styles.dailyBadge}>
                         <Text style={styles.dailyBadgeText}>Today's Question</Text>
                     </View>
-                    <Text style={styles.dailyQuestion}>
-                        What's one thing you've always wanted to try together?
-                    </Text>
-                    <TouchableOpacity style={styles.answerButton}>
-                        <Text style={styles.answerButtonText}>Answer Now →</Text>
-                    </TouchableOpacity>
+
+                    {loading ? (
+                        <ActivityIndicator color={COLORS.primary} style={{ marginVertical: 20 }} />
+                    ) : dailyData ? (
+                        <>
+                            <Text style={styles.dailyQuestion}>
+                                {dailyData.question.text}
+                            </Text>
+
+                            {/* Logic: 
+                                1. If I answered -> Show my answer
+                                2. If I haven't -> Show Answer Button (or Input)
+                             */}
+
+                            {dailyData.myAnswer ? (
+                                <View style={styles.answerContainer}>
+                                    <Text style={styles.answerLabel}>Your Answer:</Text>
+                                    <Text style={styles.answerText}>{dailyData.myAnswer.text}</Text>
+
+                                    <View style={[styles.statDivider, { marginVertical: 10 }]} />
+
+                                    {dailyData.partnerAnswer ? (
+                                        <View>
+                                            <Text style={styles.answerLabel}>Partner's Answer:</Text>
+                                            <Text style={styles.answerText}>{dailyData.partnerAnswer.text}</Text>
+                                        </View>
+                                    ) : (
+                                        <Text style={styles.waitingText}>Waiting for partner to answer...</Text>
+                                    )}
+                                </View>
+                            ) : answering ? (
+                                <View style={styles.inputContainer}>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Type your answer..."
+                                        placeholderTextColor={COLORS.textSecondary}
+                                        multiline
+                                        value={answerText}
+                                        onChangeText={setAnswerText}
+                                    />
+                                    <View style={styles.buttonRow}>
+                                        <TouchableOpacity
+                                            onPress={() => setAnswering(false)}
+                                            style={[styles.actionButton, styles.cancelButton]}
+                                        >
+                                            <Text style={styles.buttonText}>Cancel</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            onPress={handleSubmitAnswer}
+                                            disabled={submitting || !answerText.trim()}
+                                            style={[styles.actionButton, styles.submitButton]}
+                                        >
+                                            <Text style={styles.buttonText}>{submitting ? 'Sending...' : 'Send'}</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            ) : (
+                                <TouchableOpacity
+                                    style={styles.answerButton}
+                                    onPress={() => setAnswering(true)}
+                                >
+                                    <Text style={styles.answerButtonText}>Answer Now →</Text>
+                                </TouchableOpacity>
+                            )}
+                        </>
+                    ) : (
+                        <Text style={styles.errorText}>Could not load today's question.</Text>
+                    )}
                 </Card>
 
                 {/* Categories */}
@@ -99,37 +203,7 @@ const styles = StyleSheet.create({
     dailyCard: {
         marginBottom: THEME.spacing.xl,
     },
-    dailyBadge: {
-        backgroundColor: COLORS.primary,
-        paddingHorizontal: THEME.spacing.md,
-        paddingVertical: THEME.spacing.xs,
-        borderRadius: THEME.borderRadius.full,
-        alignSelf: 'flex-start',
-        marginBottom: THEME.spacing.md,
-    },
-    dailyBadgeText: {
-        fontSize: THEME.fontSizes.xs,
-        fontWeight: THEME.fontWeights.semibold,
-        color: COLORS.white,
-    },
-    dailyQuestion: {
-        fontSize: THEME.fontSizes.lg,
-        fontWeight: THEME.fontWeights.semibold,
-        color: COLORS.white,
-        lineHeight: 28,
-        marginBottom: THEME.spacing.lg,
-    },
-    answerButton: {
-        backgroundColor: COLORS.primary,
-        paddingVertical: THEME.spacing.md,
-        borderRadius: THEME.borderRadius.md,
-        alignItems: 'center',
-    },
-    answerButtonText: {
-        fontSize: THEME.fontSizes.md,
-        fontWeight: THEME.fontWeights.semibold,
-        color: COLORS.white,
-    },
+    // Styles for categories...
     sectionTitle: {
         fontSize: THEME.fontSizes.lg,
         fontWeight: THEME.fontWeights.semibold,

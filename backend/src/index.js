@@ -138,6 +138,11 @@ io.on('connection', async (socket) => {
 const startServer = async () => {
     try {
         await connectDB();
+
+        // Initialize Scheduler
+        const initCronJobs = require('./questionScheduler');
+        initCronJobs();
+
         server.listen(PORT, () => {
             console.log(`🚀 Server running on port ${PORT}`);
         });

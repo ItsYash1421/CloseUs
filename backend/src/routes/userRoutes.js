@@ -1,5 +1,6 @@
 const express = require('express');
 const userController = require('../controllers/userController');
+const dailyQuestionController = require('../controllers/dailyQuestionController');
 const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -13,5 +14,9 @@ router.post('/complete-onboarding', userController.completeOnboarding);
 router.post('/heartbeat', userController.heartbeat);
 router.get('/partner-status', userController.getPartnerStatus);
 router.get('/:id', userController.getUserById);
+
+// Daily Question Routes
+router.get('/questions/daily', dailyQuestionController.getDailyQuestion);
+router.post('/questions/daily/:id/answer', dailyQuestionController.answerDailyQuestion);
 
 module.exports = router;

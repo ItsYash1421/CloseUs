@@ -7,12 +7,16 @@ import { useAuthStore } from '../../store/authStore';
 import { useCoupleStore } from '../../store/coupleStore';
 import { differenceInDays, differenceInMonths, differenceInYears } from 'date-fns';
 import { BOTTOM_CONTENT_INSET } from '../../constants/layout';
-import { CoupleHeader, StickyHeader, OurJourney, ChatSection } from '../../components/home';
+import { CoupleHeader, StickyHeader, OurJourney, ChatSection, DailyQuestionCard } from '../../components/home';
+import questionService, { DailyQuestionResponse } from '../../services/questionService';
 
 export const HomeScreen = ({ navigation }: any) => {
     const user = useAuthStore(state => state.user);
     const { couple, partner, stats, isLoading, partnerIsOnline, fetchCoupleInfo, fetchCoupleStats } = useCoupleStore();
     const [refreshing, setRefreshing] = useState(false);
+    const [questionData, setQuestionData] = useState<DailyQuestionResponse | null>(null);
+    const [questionLoading, setQuestionLoading] = useState(true);
+
     const scrollY = useRef(new Animated.Value(0)).current;
 
     console.log('HomeScreen - partnerIsOnline:', partnerIsOnline);
@@ -24,8 +28,21 @@ export const HomeScreen = ({ navigation }: any) => {
     const loadData = async () => {
         await Promise.all([
             fetchCoupleInfo(),
-            fetchCoupleStats()
+            fetchCoupleStats(),
+            fetchDailyQuestion()
         ]);
+    };
+
+    const fetchDailyQuestion = async () => {
+        try {
+            setQuestionLoading(true);
+            const data = await questionService.getDailyQuestion();
+            setQuestionData(data);
+        } catch (error) {
+            console.error('Fetch daily question error:', error);
+        } finally {
+            setQuestionLoading(false);
+        }
     };
 
     const onRefresh = async () => {
@@ -120,6 +137,17 @@ export const HomeScreen = ({ navigation }: any) => {
                         />
                     </View>
 
+                    {/* Daily Question */}
+                    <View>
+                        <Text style={styles.sectionTitle}>Daily Question</Text>
+                        <DailyQuestionCard
+                            data={questionData}
+                            loading={questionLoading}
+                            onRefresh={fetchDailyQuestion}
+                            showFullContent={false}
+                        />
+                    </View>
+
                     {/* Quick Stats */}
                     <View style={styles.statsGrid}>
                         <StatCard
@@ -153,12 +181,6 @@ export const HomeScreen = ({ navigation }: any) => {
                     <View>
                         <Text style={styles.sectionTitle}>Quick Actions</Text>
                         <View style={styles.actionsGrid}>
-                            <TouchableOpacity onPress={() => navigation.navigate('Questions')}>
-                                <Card variant="glass" style={styles.actionCard}>
-                                    <Text style={styles.actionIcon}>❓</Text>
-                                    <Text style={styles.actionTitle}>Daily Question</Text>
-                                </Card>
-                            </TouchableOpacity>
                             <TouchableOpacity onPress={() => navigation.navigate('Games')}>
                                 <Card variant="glass" style={styles.actionCard}>
                                     <Text style={styles.actionIcon}>🎮</Text>
