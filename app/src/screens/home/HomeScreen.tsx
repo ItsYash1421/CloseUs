@@ -79,7 +79,7 @@ export const HomeScreen = ({ navigation }: any) => {
 
     const loadData = async () => {
         // Enforce minimum 2 second loading delay for shimmer effect
-        const minDelay = new Promise(resolve => setTimeout(resolve, 2000));
+        const minDelay = new Promise(resolve => setTimeout(() => resolve(true), 2000));
 
         const dataPromises = Promise.all([
             fetchCoupleInfo(),
