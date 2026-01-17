@@ -13,6 +13,8 @@ import { useCoupleStore } from './src/store/coupleStore';
 import apiClient from './src/services/apiClient';
 import { NetworkLoggerButton } from './src/components/NetworkLoggerButton';
 
+import Toast from 'react-native-toast-message';
+
 function App() {
   const user = useAuthStore(state => state.user);
   const couple = useCoupleStore(state => state.couple);
@@ -147,6 +149,7 @@ function App() {
     <SafeAreaProvider>
       <AppNavigator />
       <NetworkLoggerButton />
+      <Toast />
     </SafeAreaProvider>
   );
 }

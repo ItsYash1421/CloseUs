@@ -174,7 +174,55 @@ const answerDailyQuestion = async (req, res) => {
     }
 };
 
+//----------------------------------------------------//DEV//----------------------------------------------------//
+
+/**
+ * Delete Daily Answer (Dev/Test only)
+ */
+const deleteDailyAnswer = async (req, res) => {
+    try {
+        const userId = req.userId;
+        let { id } = req.params; // Question ID or 'current'
+
+        const user = await User.findById(userId);
+        if (!user || !user.coupleId) {
+            return res.status(404).json(errorResponse('Couple not found', 404));
+        }
+
+        // Handle 'current' to automatically find today's question
+        if (id === 'current') {
+            const today = getTodayDate();
+            const dailyCoupleQuestion = await DailyCoupleQuestion.findOne({
+                coupleId: user.coupleId,
+                date: today
+            });
+
+            if (!dailyCoupleQuestion) {
+                return res.status(404).json(errorResponse('No daily question assigned for today to delete answer for', 404));
+            }
+            id = dailyCoupleQuestion.questionId;
+        }
+
+        const result = await Answer.findOneAndDelete({
+            userId,
+            questionId: id,
+            coupleId: user.coupleId
+        });
+
+        if (!result) {
+            return res.status(404).json(errorResponse('Answer not found', 404));
+        }
+
+        res.json(successResponse(null, 'Answer deleted successfully'));
+
+    } catch (error) {
+        console.error('Delete answer error:', error);
+        res.status(500).json(errorResponse('Internal server error'));
+    }
+};
+
 module.exports = {
     getDailyQuestion,
-    answerDailyQuestion
+    answerDailyQuestion,
+    deleteDailyAnswer
 };

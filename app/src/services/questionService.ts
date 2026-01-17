@@ -33,11 +33,11 @@ class QuestionService {
     /**
      * Submit answer for a question
      */
-    async answerQuestion(questionId: string, text: string): Promise<AnswerData> {
+    async answerQuestion(questionId: string, text: string): Promise<ApiResponse<AnswerData>> {
         const response = await apiClient.post<ApiResponse<AnswerData>>(`/api/users/questions/daily/${questionId}/answer`, {
             text
         });
-        return response.data!;
+        return response;
     }
 }
 

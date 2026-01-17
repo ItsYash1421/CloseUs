@@ -174,5 +174,6 @@ const styles = StyleSheet.create({
         color: COLORS.textMuted,
         fontStyle: 'italic',
         lineHeight: 20,
+        textAlign: 'center',
     },
 });

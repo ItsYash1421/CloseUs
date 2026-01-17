@@ -18,5 +18,6 @@ router.get('/:id', userController.getUserById);
 // Daily Question Routes
 router.get('/questions/daily', dailyQuestionController.getDailyQuestion);
 router.post('/questions/daily/:id/answer', dailyQuestionController.answerDailyQuestion);
+router.delete('/questions/daily/:id/answer', dailyQuestionController.deleteDailyAnswer);
 
 module.exports = router;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, Animated, Keyboard } from 'react-native';
 import { GradientBackground, Card, Avatar } from '../../components/common';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
@@ -8,6 +8,7 @@ import { useCoupleStore } from '../../store/coupleStore';
 import { differenceInDays, differenceInMonths, differenceInYears } from 'date-fns';
 import { BOTTOM_CONTENT_INSET } from '../../constants/layout';
 import { CoupleHeader, StickyHeader, OurJourney, ChatSection, DailyQuestionCard } from '../../components/home';
+import { HomeSkeleton } from '../../components/loaders';
 import questionService, { DailyQuestionResponse } from '../../services/questionService';
 
 export const HomeScreen = ({ navigation }: any) => {
@@ -16,8 +17,13 @@ export const HomeScreen = ({ navigation }: any) => {
     const [refreshing, setRefreshing] = useState(false);
     const [questionData, setQuestionData] = useState<DailyQuestionResponse | null>(null);
     const [questionLoading, setQuestionLoading] = useState(true);
+    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+    const [isScreenLoading, setIsScreenLoading] = useState(true);
 
     const scrollY = useRef(new Animated.Value(0)).current;
+    const scrollViewRef = useRef<ScrollView>(null);
+    const currentScrollY = useRef(0);
+    const restoreScrollY = useRef(0);
 
     console.log('HomeScreen - partnerIsOnline:', partnerIsOnline);
 
@@ -25,12 +31,64 @@ export const HomeScreen = ({ navigation }: any) => {
         loadData();
     }, []);
 
+    // Continuously track scroll position
+    useEffect(() => {
+        const listenerId = scrollY.addListener(({ value }) => {
+            currentScrollY.current = value;
+        });
+        return () => {
+            scrollY.removeListener(listenerId);
+        };
+    }, [scrollY]);
+
+    const handleInputFocus = () => {
+        // Snapshot scroll position IMMEDIATELY when user focuses input
+        // This is safe because layout hasn't changed yet
+        restoreScrollY.current = currentScrollY.current;
+    };
+
+    // Listen for keyboard behavior
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            () => {
+                setKeyboardVisible(true);
+            }
+        );
+        const keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            () => {
+                setKeyboardVisible(false);
+                // Restore after delay to allow layout to fully expand
+                setTimeout(() => {
+                    if (scrollViewRef.current) {
+                        scrollViewRef.current.scrollTo({
+                            y: restoreScrollY.current,
+                            animated: false,
+                        });
+                    }
+                }, 100);
+            }
+        );
+
+        return () => {
+            keyboardDidHideListener.remove();
+            keyboardDidShowListener.remove();
+        };
+    }, []);
+
     const loadData = async () => {
-        await Promise.all([
+        // Enforce minimum 2 second loading delay for shimmer effect
+        const minDelay = new Promise(resolve => setTimeout(resolve, 2000));
+
+        const dataPromises = Promise.all([
             fetchCoupleInfo(),
             fetchCoupleStats(),
             fetchDailyQuestion()
         ]);
+
+        await Promise.all([minDelay, dataPromises]);
+        setIsScreenLoading(false);
     };
 
     const fetchDailyQuestion = async () => {
@@ -47,9 +105,13 @@ export const HomeScreen = ({ navigation }: any) => {
 
     const onRefresh = async () => {
         setRefreshing(true);
+        // Also show shimmer on pull-to-refresh if desired, or just standard refresher
+        // User asked for "always 2 sec", maybe mostly for initial load. 
+        // For refresh usually spinner is better, but let's stick to standard behavior for refresh unless specified.
         await loadData();
         setRefreshing(false);
     };
+
 
     const getTimeTogether = () => {
         if (!couple?.startDate) return { years: 0, months: 0, days: 0 };
@@ -70,26 +132,19 @@ export const HomeScreen = ({ navigation }: any) => {
 
     const time = getTimeTogether();
 
-    if (isLoading && !couple) {
-        return (
-            <GradientBackground variant="background">
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={COLORS.primary} />
-                    <Text style={styles.loadingText}>Loading...</Text>
-                </View>
-            </GradientBackground>
-        );
-    }
-
     return (
         <GradientBackground variant="background">
-            {/* Sticky Header */}
-            <StickyHeader
-                hashtag={couple?.coupleTag}
-                scrollY={scrollY}
-            />
+            {/* Sticky Header - Hide when keyboard is open */}
+            {!isKeyboardVisible && (
+                <StickyHeader
+                    hashtag={couple?.coupleTag}
+                    scrollY={scrollY}
+                />
+            )}
 
             <Animated.ScrollView
+                ref={scrollViewRef}
+                keyboardShouldPersistTaps="handled"
                 contentContainerStyle={{ paddingBottom: BOTTOM_CONTENT_INSET }}
                 showsVerticalScrollIndicator={false}
                 scrollEventThrottle={16}
@@ -105,56 +160,69 @@ export const HomeScreen = ({ navigation }: any) => {
                     />
                 }
             >
-                {/* New Couple Header */}
-                <CoupleHeader
-                    userName={user?.name}
-                    partnerName={partner?.name}
-                    coupleHashtag={couple?.coupleTag}
-                    userAvatar={user?.photoUrl}
-                    partnerAvatar={partner?.photoUrl}
-                    isOnline={true}
-                />
-
-                {/* Content with padding */}
-                <View style={[styles.contentPadding, { gap: THEME.spacing.xl, marginTop: THEME.spacing.xl }]}>
-                    {/* Chat Section - New */}
-                    <ChatSection
-                        onOpenChat={() => navigation.navigate('Chat')}
-                        partnerName={partner?.name || 'Partner'}
-                        isOnline={partnerIsOnline}
-                        userGender={user?.gender}
+                {/* Couple Header - Hide when typing */}
+                {!isKeyboardVisible && (
+                    <CoupleHeader
+                        userName={user?.name}
+                        partnerName={partner?.name}
+                        coupleHashtag={couple?.coupleTag}
+                        userAvatar={user?.photoUrl}
+                        partnerAvatar={partner?.photoUrl}
+                        isOnline={true}
                     />
+                )}
 
-                    {/* Our Journey */}
-                    <View>
-                        <OurJourney
-                            currentDays={stats?.milestone?.current || time.days}
-                            nextMilestone={stats?.milestone?.next || 100}
-                            progress={stats?.milestone?.progress || 0}
-                            onViewHistory={() => {
-                                navigation.navigate('Journey');
-                            }}
-                        />
-                    </View>
+                {/* Loading State - Show Skeleton BELOW Header */}
+                {(isScreenLoading || (isLoading && !couple)) ? (
+                    <HomeSkeleton />
+                ) : (
+                    /* Content with padding */
+                    <View style={[styles.contentPadding, { gap: THEME.spacing.xl, marginTop: isKeyboardVisible ? 60 : THEME.spacing.xl }]}>
+                        {/* Chat Section & Our Journey - Hide when typing */}
+                        {!isKeyboardVisible && (
+                            <>
+                                <ChatSection
+                                    onOpenChat={() => navigation.navigate('Chat')}
+                                    partnerName={partner?.name || 'Partner'}
+                                    isOnline={partnerIsOnline}
+                                    userGender={user?.gender}
+                                />
 
-                    {/* Daily Question */}
-                    <View>
-                        <DailyQuestionCard
-                            data={questionData}
-                            loading={questionLoading}
-                            onRefresh={fetchDailyQuestion}
-                            showFullContent={false}
-                        />
-                    </View>
+                                <View>
+                                    <OurJourney
+                                        currentDays={stats?.milestone?.current || time.days}
+                                        nextMilestone={stats?.milestone?.next || 100}
+                                        progress={stats?.milestone?.progress || 0}
+                                        onViewHistory={() => {
+                                            navigation.navigate('Journey');
+                                        }}
+                                    />
+                                </View>
+                            </>
+                        )}
 
-                    {/* Inspirational Quote */}
-                    <View style={styles.quoteContainer}>
-                        <Text style={styles.quoteText}>
-                            "Every moment with you is a beautiful memory in the making.
-                            Love isn't just about being together, it's about growing together."
-                        </Text>
+                        {/* Daily Question - ALWAYS VISIBLE */}
+                        <View>
+                            <DailyQuestionCard
+                                data={questionData}
+                                loading={questionLoading}
+                                onRefresh={fetchDailyQuestion}
+                                showFullContent={false}
+                                onInputFocus={handleInputFocus}
+                            />
+                        </View>
+
+                        {/* Quote - Hide when typing */}
+                        {!isKeyboardVisible && (
+                            <View style={styles.quoteContainer}>
+                                <Text style={styles.quoteText}>
+                                    "Every moment with you is a beautiful memory in the making.
+                                    Love isn't just about being together, it's about growing together."
+                                </Text>
+                            </View>
+                        )}
                     </View>
-                </View>
+                )}
             </Animated.ScrollView>
         </GradientBackground>
     );
@@ -306,7 +374,7 @@ const styles = StyleSheet.create({
         color: COLORS.white,
     },
     quoteContainer: {
-        marginVertical:0,
+        marginVertical: 0,
         paddingHorizontal: THEME.spacing.md,
     },
     quoteText: {

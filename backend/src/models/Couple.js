@@ -16,7 +16,7 @@ const coupleSchema = new mongoose.Schema(
         pairingKey: {
             type: String,
             unique: true,
-            sparse: true 
+            sparse: true
         },
         pairingKeyExpires: Date,
         isPaired: {
@@ -41,6 +41,12 @@ const coupleSchema = new mongoose.Schema(
         isActive: {
             type: Boolean,
             default: true
+        },
+
+        // Dev mode flag (for testing with dummy partner)
+        isDevPartner: {
+            type: Boolean,
+            default: false
         }
     },
     {

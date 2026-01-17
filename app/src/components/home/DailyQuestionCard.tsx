@@ -1,24 +1,67 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, Image } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, Image, Keyboard, Animated } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
+import { BlurView } from '@react-native-community/blur';
+import { BLUR_CONFIG } from '../../constants/blur';
 import questionService, { DailyQuestionResponse } from '../../services/questionService';
 import { useNavigation } from '@react-navigation/native';
 import { QuestionSkeleton } from '../loaders';
+import Toast from 'react-native-toast-message';
+import { useAuthStore } from '../../store/authStore';
+import { useCoupleStore } from '../../store/coupleStore';
 
 interface DailyQuestionCardProps {
     data: DailyQuestionResponse | null;
     loading: boolean;
     onRefresh: () => void;
     showFullContent?: boolean;
+    onInputFocus?: () => void;
 }
 
-export const DailyQuestionCard = ({ data, loading, onRefresh, showFullContent = false }: DailyQuestionCardProps) => {
+export const DailyQuestionCard = ({ data, loading, onRefresh, showFullContent = false, onInputFocus }: DailyQuestionCardProps) => {
     const navigation = useNavigation();
+    const user = useAuthStore(state => state.user);
+    const partner = useCoupleStore(state => state.partner);
+
     const [answering, setAnswering] = useState(false);
     const [answerText, setAnswerText] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [timeRemaining, setTimeRemaining] = useState('');
+    const [revealed, setRevealed] = useState(false);
+
+    // Animation refs
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const slideAnim = useRef(new Animated.Value(-20)).current;
+
+    const revealAnswer = () => {
+        setRevealed(true);
+        Animated.parallel([
+            Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 500,
+                useNativeDriver: true,
+            }),
+            Animated.timing(slideAnim, {
+                toValue: 0,
+                duration: 500,
+                useNativeDriver: true,
+            })
+        ]).start();
+    };
+
+    // Get avatar based on gender
+    const getUserAvatar = () => {
+        return user?.gender === 'male'
+            ? require('../../assets/images/Logo-Male-2.png')
+            : require('../../assets/images/Logo-Female-2.png');
+    };
+
+    const getPartnerAvatar = () => {
+        return partner?.gender === 'male'
+            ? require('../../assets/images/Logo-Male-2.png')
+            : require('../../assets/images/Logo-Female-2.png');
+    };
 
     // Calculate time remaining until midnight
     const calculateTimeRemaining = () => {
@@ -48,13 +91,24 @@ export const DailyQuestionCard = ({ data, loading, onRefresh, showFullContent = 
 
         try {
             setSubmitting(true);
-            await questionService.answerQuestion(data.question.id, answerText);
+            const response = await questionService.answerQuestion(data.question.id, answerText);
             setAnswerText('');
             setAnswering(false);
-            Alert.alert('Success', 'Answer submitted!');
+            Toast.show({
+                type: 'success',
+                text1: 'Success',
+                text2: response.message || 'Your answer is saved!',
+                position: 'top',
+                visibilityTime: 3000,
+            });
             onRefresh();
         } catch (error) {
-            Alert.alert('Error', 'Failed to submit answer');
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to submit answer',
+                position: 'top',
+            });
         } finally {
             setSubmitting(false);
         }
@@ -97,43 +151,91 @@ export const DailyQuestionCard = ({ data, loading, onRefresh, showFullContent = 
 
                         {data.myAnswer ? (
                             <View style={styles.answerContainer}>
-                                <Text style={styles.answerLabel}>Your Answer:</Text>
-                                <Text style={styles.answerText}>{data.myAnswer.text}</Text>
+                                {/* User's Answer with Avatar */}
+                                <View style={styles.answerRow}>
+                                    <Image source={getUserAvatar()} style={styles.answerAvatar} />
+                                    <View style={styles.answerContent}>
+                                        <Text style={styles.answerText}>{data.myAnswer.text}</Text>
+                                    </View>
+                                </View>
 
                                 {showFullContent && (
                                     <>
                                         <View style={styles.divider} />
                                         {data.partnerAnswer ? (
-                                            <View>
-                                                <Text style={styles.answerLabel}>Partner's Answer:</Text>
-                                                <Text style={styles.answerText}>{data.partnerAnswer.text}</Text>
+                                            <View style={styles.answerRow}>
+                                                <Image source={getPartnerAvatar()} style={styles.answerAvatar} />
+                                                <View style={styles.answerContent}>
+                                                    <Text style={styles.answerText}>{data.partnerAnswer.text}</Text>
+                                                </View>
                                             </View>
                                         ) : (
-                                            <Text style={styles.waitingText}>⏳ Waiting for partner...</Text>
+                                            <View style={styles.answerRow}>
+                                                <Image source={getPartnerAvatar()} style={styles.answerAvatar} />
+                                                <View style={styles.answerContent}>
+                                                    <Text style={styles.waitingText}>⏳ Waiting for partner...</Text>
+                                                </View>
+                                            </View>
                                         )}
                                     </>
                                 )}
 
                                 {!showFullContent && data.partnerAnswer && (
-                                    <Text style={styles.partnerAnswerHint}>❤️ Partner answered! Tap to see.</Text>
+                                    <View style={styles.answerRow}>
+                                        <Image source={getPartnerAvatar()} style={styles.answerAvatar} />
+                                        <View style={styles.answerContent}>
+                                            {!revealed ? (
+                                                <TouchableOpacity onPress={revealAnswer} activeOpacity={0.7}>
+                                                    <Text style={styles.partnerAnswerHint}>❤️ Partner answered! Tap to see.</Text>
+                                                </TouchableOpacity>
+                                            ) : (
+                                                <Animated.View
+                                                    style={{
+                                                        opacity: fadeAnim,
+                                                        transform: [{ translateX: slideAnim }]
+                                                    }}
+                                                >
+                                                    <Text style={styles.answerText}>{data.partnerAnswer.text}</Text>
+                                                </Animated.View>
+                                            )}
+                                        </View>
+                                    </View>
                                 )}
                                 {!showFullContent && !data.partnerAnswer && (
-                                    <Text style={styles.partnerAnswerHint}>⏳ Waiting for partner...</Text>
+                                    <View style={styles.answerRow}>
+                                        <Image source={getPartnerAvatar()} style={styles.answerAvatar} />
+                                        <View style={styles.answerContent}>
+                                            <Text style={styles.partnerAnswerHint}>⏳ Waiting for partner...</Text>
+                                        </View>
+                                    </View>
                                 )}
                             </View>
                         ) : answering ? (
                             <View style={styles.inputContainer}>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="Type your answer..."
-                                    placeholderTextColor={COLORS.textSecondary}
-                                    multiline
-                                    value={answerText}
-                                    onChangeText={setAnswerText}
-                                />
+                                <View style={styles.glassInputWrapper}>
+                                    <BlurView
+                                        style={StyleSheet.absoluteFill}
+                                        blurType={BLUR_CONFIG.blurType}
+                                        blurAmount={15}
+                                        reducedTransparencyFallbackColor={BLUR_CONFIG.fallbackColor}
+                                    />
+                                    <View style={styles.inputTint} />
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Type your answer..."
+                                        placeholderTextColor={COLORS.textSecondary}
+                                        multiline
+                                        value={answerText}
+                                        onChangeText={setAnswerText}
+                                    />
+                                </View>
                                 <View style={styles.buttonRow}>
                                     <TouchableOpacity
-                                        onPress={() => setAnswering(false)}
+                                        onPress={() => {
+                                            Keyboard.dismiss();
+                                            setAnswering(false);
+                                            setAnswerText('');
+                                        }}
                                         style={[styles.actionButton, styles.cancelButton]}
                                     >
                                         <Text style={styles.cancelButtonText}>Cancel</Text>
@@ -199,7 +301,7 @@ const styles = StyleSheet.create({
     timerBadge: {
         position: 'absolute',
         top: -12,
-        right:10,
+        right: 10,
         backgroundColor: '#1A1A2E',
         paddingHorizontal: 12,
         paddingVertical: 6,
@@ -235,6 +337,7 @@ const styles = StyleSheet.create({
         color: COLORS.white,
         lineHeight: 26,
         marginBottom: THEME.spacing.lg,
+        textAlign: 'center',
     },
     answerButton: {
         backgroundColor: COLORS.white,
@@ -259,12 +362,27 @@ const styles = StyleSheet.create({
     },
     answerContainer: {
         marginTop: THEME.spacing.sm,
+        gap: THEME.spacing.md,
+    },
+    answerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    answerAvatar: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    },
+    answerContent: {
+        flex: 1,
     },
     answerLabel: {
-        fontSize: THEME.fontSizes.xs,
-        color: COLORS.textSecondary,
+        fontSize: THEME.fontSizes.sm,
+        color: COLORS.primary,
         marginBottom: 6,
-        fontWeight: '600',
+        fontWeight: '700',
     },
     answerText: {
         fontSize: THEME.fontSizes.md,
@@ -275,28 +393,33 @@ const styles = StyleSheet.create({
         fontSize: THEME.fontSizes.sm,
         color: COLORS.textSecondary,
         fontStyle: 'italic',
-        marginTop: 5,
     },
     partnerAnswerHint: {
         fontSize: THEME.fontSizes.sm,
         color: COLORS.textSecondary,
-        marginTop: 10,
         fontStyle: 'italic',
     },
     inputContainer: {
         marginTop: 10,
     },
-    input: {
-        backgroundColor: 'rgba(255,255,255,0.1)',
+    glassInputWrapper: {
         borderRadius: THEME.borderRadius.md,
+        overflow: 'hidden',
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.36)',
+    },
+    inputTint: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(45, 45, 78, 0.36)',
+    },
+    input: {
         padding: 12,
         color: COLORS.white,
         fontSize: THEME.fontSizes.md,
         minHeight: 80,
         textAlignVertical: 'top',
-        marginBottom: 10,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.2)',
+        backgroundColor: 'transparent',
     },
     buttonRow: {
         flexDirection: 'row',

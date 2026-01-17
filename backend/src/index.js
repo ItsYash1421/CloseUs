@@ -143,6 +143,10 @@ const startServer = async () => {
         const initCronJobs = require('./questionScheduler');
         initCronJobs();
 
+        // Start Dev Partner Auto-Answer Scheduler (Dev Mode Only)
+        const devPartnerScheduler = require('./services/devPartnerScheduler');
+        devPartnerScheduler.start();
+
         server.listen(PORT, () => {
             console.log(`🚀 Server running on port ${PORT}`);
         });

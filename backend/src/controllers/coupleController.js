@@ -284,6 +284,9 @@ const getTimeTogether = async (req, res) => {
     }
 };
 
+
+//----------------------------------------------------//DEV//----------------------------------------------------//
+
 const devPair = async (req, res) => {
     try {
         const userId = req.userId;
@@ -368,7 +371,8 @@ const devPair = async (req, res) => {
             partner2Id: newDummyPartner._id,
             isPaired: true,
             coupleTag: coupleTag,
-            startDate: currentUser.anniversary || new Date()
+            startDate: currentUser.anniversary || new Date(),
+            isDevPartner: true // Mark as dev partnership
         });
 
         // 6. Update both users
@@ -382,6 +386,37 @@ const devPair = async (req, res) => {
     }
 };
 
+/**
+ * Enable Dev Mode for existing couple
+ */
+const enableDevMode = async (req, res) => {
+    try {
+        const userId = req.userId;
+
+        // Find user's couple
+        const user = await User.findById(userId);
+        if (!user || !user.coupleId) {
+            return res.status(404).json(errorResponse('No couple found', 404));
+        }
+
+        // Update couple to enable dev mode
+        const couple = await Couple.findByIdAndUpdate(
+            user.coupleId,
+            { isDevPartner: true },
+            { new: true }
+        );
+
+        if (!couple) {
+            return res.status(404).json(errorResponse('Couple not found', 404));
+        }
+
+        res.json(successResponse({ couple }, 'Dev mode enabled for this couple'));
+    } catch (error) {
+        console.error('Enable dev mode error:', error);
+        res.status(500).json(errorResponse('Internal server error'));
+    }
+};
+
 module.exports = {
     createPairingKey,
     refreshPairingKey,
@@ -390,5 +425,6 @@ module.exports = {
     getCoupleInfo,
     getCoupleStats,
     getTimeTogether,
-    devPair
+    devPair,
+    enableDevMode
 };

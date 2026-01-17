@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     },
     activeTabLabel: {
         fontWeight: THEME.fontWeights.bold,
-        color: COLORS.textPrimary, 
+        color: COLORS.textPrimary,
         textShadowColor: 'rgba(255, 255, 255, 0.3)',
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 6,
