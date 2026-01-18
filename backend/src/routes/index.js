@@ -9,6 +9,10 @@ const chatRoutes = require('./chatRoutes');
 const adminAuthRoutes = require('./adminAuthRoutes');
 const adminRoutes = require('./adminRoutes');
 const adminNotificationRoutes = require('./adminNotificationRoutes');
+const webRoutes = require('../web/web.routes');
+
+// Web routes (public)
+router.use('/web', webRoutes);
 
 // Auth routes (public)
 router.use('/auth', authRoutes);
