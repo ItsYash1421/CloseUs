@@ -1,7 +1,7 @@
 // API Environments
 export const ENV_CONFIG = {
     PROD: 'https://api.closeus.com', // TODO: Update with actual PROD URL
-    PRE_PROD: 'https://staging-api.closeus.com', // TODO: Update with actual PRE-PROD URL
+    PRE_PROD: 'https://closeus.onrender.com', // Actual PRE-PROD URL
     REMOTE_DEV: 'http://172.20.10.4:3000', // Your local machine IP for device testing
     LOCAL: 'http://localhost:3000', // Simulator/Emulator only
 };
