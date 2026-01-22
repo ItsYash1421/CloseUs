@@ -1,197 +1,241 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { GradientBackground, Card, Avatar, Button } from '../../components/common';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image, Animated } from 'react-native';
+import { GradientBackground } from '../../components/common';
+import {
+    ProfileStats,
+    RelationshipInfo,
+    ProfileMenu
+} from '../../components/profile';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
 import { useAuthStore } from '../../store/authStore';
 import { useCoupleStore } from '../../store/coupleStore';
+import { useNavigation } from '@react-navigation/native';
+import { differenceInDays } from 'date-fns';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import LinearGradient from 'react-native-linear-gradient';
 
-export const ProfileScreen = ({ navigation }: any) => {
+export const ProfileScreen = () => {
+    const navigation = useNavigation();
     const { user, logout } = useAuthStore();
-    const couple = useCoupleStore(state => state.couple);
+    const { couple, partner, stats, fetchCoupleStats } = useCoupleStore();
+    const [daysTogether, setDaysTogether] = useState(0);
+    const scrollY = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        fetchCoupleStats();
+    }, []);
+
+    useEffect(() => {
+        if (couple?.startDate) {
+            const start = new Date(couple.startDate);
+            const now = new Date();
+            setDaysTogether(differenceInDays(now, start));
+        }
+    }, [couple]);
 
     const handleLogout = () => {
-        Alert.alert('Logout', 'Are you sure you want to logout?', [
-            { text: 'Cancel', style: 'cancel' },
-            {
-                text: 'Logout',
-                style: 'destructive',
-                onPress: () => {
-                    // Logout and navigate immediately without waiting
-                    logout();
-                    navigation.replace('Welcome');
-                },
-            },
-        ]);
+        Alert.alert(
+            "Logout",
+            "Are you sure you want to logout? You'll need to sign in again to access your space.",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Logout",
+                    style: "destructive",
+                    onPress: () => {
+                        logout();
+                        // Navigation will automatically handle auth state change
+                    }
+                }
+            ]
+        );
     };
 
     return (
-        <GradientBackground variant="background">
-            <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-                {/* Header */}
-                <View style={styles.header}>
-                    <Avatar uri={user?.photoUrl} name={user?.name} size={100} />
-                    <Text style={styles.name}>{user?.name}</Text>
-                    <Text style={styles.email}>{user?.email}</Text>
-                    {couple?.coupleTag && (
-                        <Text style={styles.coupleTag}>{couple.coupleTag}</Text>
-                    )}
+        <GradientBackground variant="background" scrollY={scrollY}>
+            <Animated.ScrollView
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+                onScroll={Animated.event(
+                    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                    { useNativeDriver: true }
+                )}
+                scrollEventThrottle={16}
+            >
+                {/* Spacer for status bar/top padding since we removed header */}
+                <View style={{ height: 60 }} />
+
+                {/* Profile Header Section (Inlined) */}
+                <View style={styles.headerContent}>
+                    {/* Avatars */}
+                    <View style={styles.avatarsContainer}>
+                        <View style={styles.avatarWrapper}>
+                            {/* User Avatar (Left / Front) */}
+                            <View style={[styles.avatarFrame, styles.userAvatar]}>
+                                <Image
+                                    source={user?.photoUrl ? { uri: user.photoUrl } : require('../../assets/images/Logo-Male-2.png')}
+                                    style={styles.avatarImage}
+                                />
+                            </View>
+
+                            {/* Partner Avatar (Right / Behind) */}
+                            <View style={[styles.avatarFrame, styles.partnerAvatar]}>
+                                <Image
+                                    source={partner?.photoUrl ? { uri: partner.photoUrl } : require('../../assets/images/Logo-Female-2.png')}
+                                    style={styles.avatarImage}
+                                />
+                            </View>
+
+                            {/* Heart badge removed as per request ("icon bich m remove kr de") */}
+                        </View>
+                    </View>
+
+                    {/* Names */}
+                    <View style={styles.namesContainer}>
+                        <Text style={styles.names}>
+                            {user?.name?.split(' ')[0] || 'Me'} & {partner?.name?.split(' ')[0] || 'Partner'}
+                        </Text>
+                        <View style={styles.tagContainer}>
+                            <Text style={styles.tag}>{couple?.coupleTag || '#Us'} on CloseUs</Text>
+                        </View>
+                    </View>
                 </View>
 
-                {/* Relationship Info */}
-                <Card variant="glass" padding="large" style={styles.card}>
-                    <Text style={styles.cardTitle}>Relationship Info</Text>
-                    <InfoRow label="Status" value={user?.relationshipStatus || 'Not set'} />
-                    <InfoRow label="Living Style" value={user?.livingStyle || 'Not set'} />
-                    <InfoRow
-                        label="Anniversary"
-                        value={user?.anniversary ? new Date(user.anniversary).toLocaleDateString() : 'Not set'}
-                    />
-                </Card>
+                <ProfileStats
+                    daysTogether={daysTogether}
+                    questionsCount={stats?.questionsAnswered || 0}
+                    gamesWon={stats?.gamesWon || 0}
+                />
 
-                {/* Settings */}
-                <Text style={styles.sectionTitle}>Settings</Text>
-                <Card variant="glass" padding="none" style={styles.card}>
-                    <SettingItem icon="✏️" title="Edit Profile" onPress={() => { }} />
-                    <SettingItem icon="🔔" title="Notifications" onPress={() => { }} />
-                    <SettingItem icon="🔒" title="Privacy" onPress={() => { }} />
-                    <SettingItem icon="ℹ️" title="About" onPress={() => { }} />
-                    <SettingItem icon="❓" title="Help & Support" onPress={() => { }} />
-                </Card>
+                <RelationshipInfo
+                    status="Officially Together" // TODO: Fetch from backend or couple object
+                    style="Long Distance"       // TODO: Fetch from couple prefs
+                    anniversary={couple?.startDate ? new Date(couple.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A'}
+                />
 
-                {/* Logout */}
+                <ProfileMenu />
+
+                {/* Logout Button */}
                 <View style={styles.logoutContainer}>
-                    <Button
-                        title="Logout"
+                    <TouchableOpacity
+                        style={styles.logoutButton}
                         onPress={handleLogout}
-                        variant="outline"
-                        size="large"
-                        fullWidth
-                    />
+                        activeOpacity={0.9}
+                    >
+                        <Icon name="logout" size={20} color={COLORS.error} />
+                        <Text style={styles.logoutText}>Logout</Text>
+                    </TouchableOpacity>
                 </View>
 
-                <Text style={styles.version}>Version 1.0.0</Text>
-            </ScrollView>
+                {/* Bottom padding for scroll */}
+                <View style={{ height: 40 }} />
+            </Animated.ScrollView>
         </GradientBackground>
     );
 };
 
-const InfoRow = ({ label, value }: { label: string; value: string }) => (
-    <View style={styles.infoRow}>
-        <Text style={styles.infoLabel}>{label}</Text>
-        <Text style={styles.infoValue}>{value}</Text>
-    </View>
-);
-
-const SettingItem = ({
-    icon,
-    title,
-    onPress,
-}: {
-    icon: string;
-    title: string;
-    onPress: () => void;
-}) => (
-    <TouchableOpacity style={styles.settingItem} onPress={onPress} activeOpacity={0.7}>
-        <View style={styles.settingLeft}>
-            <Text style={styles.settingIcon}>{icon}</Text>
-            <Text style={styles.settingTitle}>{title}</Text>
-        </View>
-        <Text style={styles.settingArrow}>›</Text>
-    </TouchableOpacity>
-);
-
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: THEME.spacing.lg,
+    scrollContent: {
+        paddingTop: 0,
     },
-    header: {
+    headerContent: {
         alignItems: 'center',
-        marginTop: THEME.spacing.xl,
-        marginBottom: THEME.spacing.xl,
+        paddingHorizontal: 24,
+        marginBottom: 32,
     },
-    name: {
-        fontSize: THEME.fontSizes.xxl,
-        fontWeight: THEME.fontWeights.bold,
-        color: COLORS.white,
-        marginTop: THEME.spacing.md,
+    avatarsContainer: {
+        marginBottom: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    email: {
-        fontSize: THEME.fontSizes.sm,
-        color: COLORS.textSecondary,
-        marginTop: THEME.spacing.xs,
-    },
-    coupleTag: {
-        fontSize: THEME.fontSizes.lg,
-        fontWeight: THEME.fontWeights.semibold,
-        color: COLORS.primary,
-        marginTop: THEME.spacing.sm,
-    },
-    card: {
-        marginBottom: THEME.spacing.lg,
-    },
-    cardTitle: {
-        fontSize: THEME.fontSizes.lg,
-        fontWeight: THEME.fontWeights.semibold,
-        color: COLORS.white,
-        marginBottom: THEME.spacing.md,
-    },
-    infoRow: {
+    avatarWrapper: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingVertical: THEME.spacing.sm,
-        borderBottomWidth: 1,
-        borderBottomColor: COLORS.border,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+        // Total width logic: 
+        // 2 avatars of w-28 (112px).
+        // -space-x-6 (approx -24px overlap).
+        // Total visible width approx 112 + (112 - 24) = 200px.
+        width: 200,
+        height: 112,
     },
-    infoLabel: {
-        fontSize: THEME.fontSizes.sm,
-        color: COLORS.textSecondary,
+    avatarFrame: {
+        width: 112, // w-28
+        height: 112, // h-28
+        borderRadius: 999,
+        borderWidth: 4,
+        borderColor: COLORS.zinc900, // border-[#18181B]
+        backgroundColor: COLORS.zinc800,
+        overflow: 'hidden',
+        position: 'absolute',
+        shadowColor: 'rgba(0,0,0,0.3)', // shadow-soft
+        shadowOffset: { width: 0, height: 10 },
+        shadowRadius: 40,
+        shadowOpacity: 1,
+        elevation: 8,
     },
-    infoValue: {
-        fontSize: THEME.fontSizes.sm,
+    // User First (Left)
+    userAvatar: {
+        left: 0,
+        zIndex: 10, // On top
+    },
+    // Partner Second (Right)
+    partnerAvatar: {
+        right: 0,
+        zIndex: 0, // Behind
+    },
+    avatarImage: {
+        width: '100%',
+        height: '100%',
+    },
+    namesContainer: {
+        alignItems: 'center',
+        gap: 8,
+    },
+    names: {
+        fontSize: 24, // text-2xl
+        fontWeight: '800', // font-extrabold
         color: COLORS.white,
-        fontWeight: THEME.fontWeights.medium,
+        lineHeight: 30,
+        textAlign: 'center',
     },
-    sectionTitle: {
-        fontSize: THEME.fontSizes.lg,
-        fontWeight: THEME.fontWeights.semibold,
-        color: COLORS.white,
-        marginBottom: THEME.spacing.md,
-    },
-    settingItem: {
+    tagContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: THEME.spacing.md,
-        borderBottomWidth: 1,
-        borderBottomColor: COLORS.border,
+        paddingHorizontal: 16,
+        paddingVertical: 6,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        borderRadius: 999,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.1)',
     },
-    settingLeft: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: THEME.spacing.md,
-    },
-    settingIcon: {
-        fontSize: 24,
-    },
-    settingTitle: {
-        fontSize: THEME.fontSizes.md,
-        color: COLORS.white,
-        fontWeight: THEME.fontWeights.medium,
-    },
-    settingArrow: {
-        fontSize: 24,
-        color: COLORS.textMuted,
+    tag: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: COLORS.blue300,
+        letterSpacing: 0.5,
     },
     logoutContainer: {
-        marginTop: THEME.spacing.xl,
-        marginBottom: THEME.spacing.lg,
+        paddingHorizontal: 20,
+        marginTop: 40,
+        marginBottom: 48,
     },
-    version: {
-        fontSize: THEME.fontSizes.xs,
-        color: COLORS.textMuted,
-        textAlign: 'center',
-        marginBottom: THEME.spacing.xl,
+    logoutButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 16,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: 'rgba(239, 68, 68, 0.3)',
+        backgroundColor: 'transparent',
+    },
+    logoutText: {
+        color: COLORS.error,
+        fontSize: 16,
+        fontWeight: '700',
+        letterSpacing: 0.5,
     },
 });

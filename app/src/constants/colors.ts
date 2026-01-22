@@ -47,6 +47,21 @@ export const COLORS = {
     // Glassmorphism
     glass: 'rgba(255, 255, 255, 0.08)',
     glassBorder: 'rgba(255, 255, 255, 0.15)',
+
+    // Profile Specific
+    zinc800: '#27272A',
+    zinc900: '#18181B',
+    zinc50: '#F4F4F5', // text-primary equivalent
+    zinc400: '#A1A1AA', // text-muted equivalent
+    blue300: '#93C5FD',
+    blue400: '#60A5FA',
+    blue500: '#3B82F6',
+    blue100: '#DBEAFE',
+
+    // Profile UI Colors (for easy theming)
+    profileSectionTitle: '#FFFFFF', // White section titles
+    profileMenuIconBg: 'rgba(255, 255, 255, 0.08)', // Lighter icon background
+    profileDivider: 'rgba(255, 255, 255, 0.15)', // White divider
 };
 
 export const GRADIENTS = {

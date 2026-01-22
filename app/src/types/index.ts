@@ -46,6 +46,7 @@ export interface CoupleStats {
     totalMessages: number;
     questionsAnswered: number;
     gamesPlayed: number;
+    gamesWon?: number;
     memoriesCreated?: number;
     milestone?: {
         current: number;
