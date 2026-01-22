@@ -62,7 +62,6 @@ We are working hard to bring you the ultimate couple's experience. Stay tuned fo
 ### **Status:** 🚧 In Development
 
 *CloseUs is currently in closed beta testing. We are crafting every pixel to ensure a perfect experience for you.*
-
 ---
 
 **Built with ❤️ for couples.**
