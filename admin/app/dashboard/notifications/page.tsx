@@ -1,13 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -242,7 +236,8 @@ export default function NotificationsPage() {
                                     value={formData.type}
                                     onValueChange={(value) =>
                                         setFormData({ ...formData, type: value })
-                                    }>
+                                    }
+                                >
                                     <SelectTrigger>
                                         <SelectValue />
                                     </SelectTrigger>
@@ -261,7 +256,8 @@ export default function NotificationsPage() {
                                     value={formData.targetScreen}
                                     onValueChange={(value) =>
                                         setFormData({ ...formData, targetScreen: value })
-                                    }>
+                                    }
+                                >
                                     <SelectTrigger>
                                         <SelectValue />
                                     </SelectTrigger>
@@ -287,9 +283,7 @@ export default function NotificationsPage() {
                 <div className="grid gap-4 md:grid-cols-4">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Total Templates
-                            </CardTitle>
+                            <CardTitle className="text-sm font-medium">Total Templates</CardTitle>
                             <Bell className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
@@ -301,31 +295,21 @@ export default function NotificationsPage() {
                     </Card>
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Total Sent
-                            </CardTitle>
+                            <CardTitle className="text-sm font-medium">Total Sent</CardTitle>
                             <Send className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">
-                                {stats.totalNotificationsSent}
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                                All time notifications
-                            </p>
+                            <div className="text-2xl font-bold">{stats.totalNotificationsSent}</div>
+                            <p className="text-xs text-muted-foreground">All time notifications</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Users with Tokens
-                            </CardTitle>
+                            <CardTitle className="text-sm font-medium">Users with Tokens</CardTitle>
                             <Bell className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">
-                                {stats.usersWithPushTokens}
-                            </div>
+                            <div className="text-2xl font-bold">{stats.usersWithPushTokens}</div>
                             <p className="text-xs text-muted-foreground">
                                 {stats.tokenCoverage}% coverage
                             </p>
@@ -333,16 +317,12 @@ export default function NotificationsPage() {
                     </Card>
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Total Users
-                            </CardTitle>
+                            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
                             <Bell className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{stats.totalUsers}</div>
-                            <p className="text-xs text-muted-foreground">
-                                Registered users
-                            </p>
+                            <p className="text-xs text-muted-foreground">Registered users</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -352,9 +332,7 @@ export default function NotificationsPage() {
             <Card>
                 <CardHeader>
                     <CardTitle>Notification Templates</CardTitle>
-                    <CardDescription>
-                        Manage and send notification templates
-                    </CardDescription>
+                    <CardDescription>Manage and send notification templates</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Table>
@@ -398,8 +376,12 @@ export default function NotificationsPage() {
                                                 size="sm"
                                                 variant="outline"
                                                 onClick={() =>
-                                                    handleToggleStatus(template._id, template.isActive)
-                                                }>
+                                                    handleToggleStatus(
+                                                        template._id,
+                                                        template.isActive
+                                                    )
+                                                }
+                                            >
                                                 {template.isActive ? (
                                                     <PowerOff className="h-4 w-4" />
                                                 ) : (
@@ -409,13 +391,15 @@ export default function NotificationsPage() {
                                             <Button
                                                 size="sm"
                                                 onClick={() => handleSendToAll(template._id)}
-                                                disabled={!template.isActive || loading}>
+                                                disabled={!template.isActive || loading}
+                                            >
                                                 <Send className="h-4 w-4" />
                                             </Button>
                                             <Button
                                                 size="sm"
                                                 variant="destructive"
-                                                onClick={() => handleDeleteTemplate(template._id)}>
+                                                onClick={() => handleDeleteTemplate(template._id)}
+                                            >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </div>

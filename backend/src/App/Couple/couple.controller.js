@@ -6,34 +6,37 @@ const {
     calculateTimeTogether,
     getNextMilestone,
     successResponse,
-    errorResponse
+    errorResponse,
 } = require('../../Shared/Utils');
 
-/**
- * Create pairing key (start pairing process)
- */
+// ------------------------------------------------------------------
+// Create Pairing Key
+// ------------------------------------------------------------------
 const createPairingKey = async (req, res) => {
     try {
         const userId = req.userId;
 
-        // Check if already paired or has active key
         const existingCouple = await Couple.findOne({
             $or: [{ partner1Id: userId }, { partner2Id: userId }],
-            isActive: true
+            isActive: true,
         });
 
         if (existingCouple) {
             if (existingCouple.isPaired) {
                 return res.status(400).json(errorResponse('Already paired with someone', 400));
             }
-            // Return existing pending couple with key
-            return res.json(successResponse({
-                pairingKey: existingCouple.pairingKey,
-                pairingKeyExpires: existingCouple.pairingKeyExpires
-            }, 'Pending pairing found'));
+
+            return res.json(
+                successResponse(
+                    {
+                        pairingKey: existingCouple.pairingKey,
+                        pairingKeyExpires: existingCouple.pairingKeyExpires,
+                    },
+                    'Pending pairing found'
+                )
+            );
         }
 
-        // Generate unique key
         let pairingKey;
         let isUnique = false;
         while (!isUnique) {
@@ -42,45 +45,46 @@ const createPairingKey = async (req, res) => {
             if (!duplicate) isUnique = true;
         }
 
-        // Create expiry: 6 hours from now
-        const expiryTime = new Date(Date.now() + (6 * 60 * 60 * 1000));
+        const expiryTime = new Date(Date.now() + 6 * 60 * 60 * 1000);
 
-        // Create couple document
         const couple = await Couple.create({
             partner1Id: userId,
             pairingKey,
-            pairingKeyExpires: expiryTime
+            pairingKeyExpires: expiryTime,
         });
 
-        res.status(201).json(successResponse({
-            pairingKey: couple.pairingKey,
-            pairingKeyExpires: couple.pairingKeyExpires
-        }, 'Pairing key generated'));
+        res.status(201).json(
+            successResponse(
+                {
+                    pairingKey: couple.pairingKey,
+                    pairingKeyExpires: couple.pairingKeyExpires,
+                },
+                'Pairing key generated'
+            )
+        );
     } catch (error) {
         console.error('Create pairing key error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
 
-/**
- * Refresh pairing key (generate new key with 6hr expiry)
- */
+// ------------------------------------------------------------------
+// Refresh Pairing Key
+// ------------------------------------------------------------------
 const refreshPairingKey = async (req, res) => {
     try {
         const userId = req.userId;
 
-        // Find user's pending couple
         const couple = await Couple.findOne({
             partner1Id: userId,
             isPaired: false,
-            isActive: true
+            isActive: true,
         });
 
         if (!couple) {
             return res.status(404).json(errorResponse('No pending pairing found', 404));
         }
 
-        // Generate new unique key
         let pairingKey;
         let isUnique = false;
         while (!isUnique) {
@@ -89,53 +93,65 @@ const refreshPairingKey = async (req, res) => {
             if (!duplicate) isUnique = true;
         }
 
-        // Create expiry: 6 hours from now
-        const expiryTime = new Date(Date.now() + (6 * 60 * 60 * 1000));
+        const expiryTime = new Date(Date.now() + 6 * 60 * 60 * 1000);
 
-        // Update couple with new key and expiry
         couple.pairingKey = pairingKey;
         couple.pairingKeyExpires = expiryTime;
         await couple.save();
 
-        res.json(successResponse({
-            pairingKey: couple.pairingKey,
-            pairingKeyExpires: couple.pairingKeyExpires
-        }, 'Pairing key refreshed'));
+        res.json(
+            successResponse(
+                {
+                    pairingKey: couple.pairingKey,
+                    pairingKeyExpires: couple.pairingKeyExpires,
+                },
+                'Pairing key refreshed'
+            )
+        );
     } catch (error) {
         console.error('Refresh pairing key error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
 
-/**
- * Check pairing status (polling endpoint)
- */
+// ------------------------------------------------------------------
+// Check Pairing Status
+// ------------------------------------------------------------------
 const checkPairingStatus = async (req, res) => {
     try {
         const userId = req.userId;
 
-        // Check if user has been paired
         const user = await User.findById(userId).populate('coupleId');
 
         if (user.coupleId && user.coupleId.isPaired) {
-            return res.json(successResponse({
-                isPaired: true,
-                couple: user.coupleId
-            }, 'User is paired'));
+            return res.json(
+                successResponse(
+                    {
+                        isPaired: true,
+                        couple: user.coupleId,
+                    },
+                    'User is paired'
+                )
+            );
         }
 
-        res.json(successResponse({
-            isPaired: false
-        }, 'User not paired yet'));
+        res.json(
+            successResponse(
+                {
+                    isPaired: false,
+                },
+                'User not paired yet'
+            )
+        );
     } catch (error) {
         console.error('Check pairing status error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
 
-/**
- * Pair with partner using key
- */
+// ------------------------------------------------------------------
+// Pair with Partner
+// ------------------------------------------------------------------
 const pairWithPartner = async (req, res) => {
     try {
         const userId = req.userId;
@@ -145,11 +161,10 @@ const pairWithPartner = async (req, res) => {
             return res.status(400).json(errorResponse('Pairing key required', 400));
         }
 
-        // Find the couple with this key
         const couple = await Couple.findOne({
             pairingKey: pairingKey.toUpperCase(),
             isActive: true,
-            isPaired: false
+            isPaired: false,
         });
 
         if (!couple) {
@@ -160,13 +175,11 @@ const pairWithPartner = async (req, res) => {
             return res.status(400).json(errorResponse('Cannot pair with yourself', 400));
         }
 
-        // Get both users details to generate tag
         const partner1 = await User.findById(couple.partner1Id);
         const partner2 = await User.findById(userId);
 
         const coupleTag = generateCoupleTag(partner1.name, partner2.name);
 
-        // Update couple
         couple.partner2Id = userId;
         couple.isPaired = true;
         couple.coupleTag = coupleTag;
@@ -174,7 +187,6 @@ const pairWithPartner = async (req, res) => {
         couple.pairingKey = undefined; // Clear used key
         await couple.save();
 
-        // Update both users
         await User.findByIdAndUpdate(partner1._id, { coupleId: couple._id });
         await User.findByIdAndUpdate(userId, { coupleId: couple._id });
 
@@ -185,9 +197,9 @@ const pairWithPartner = async (req, res) => {
     }
 };
 
-/**
- * Get couple information
- */
+// ------------------------------------------------------------------
+// Get Couple Information
+// ------------------------------------------------------------------
 const getCoupleInfo = async (req, res) => {
     try {
         const userId = req.userId;
@@ -198,22 +210,25 @@ const getCoupleInfo = async (req, res) => {
             return res.status(404).json(errorResponse('Not paired yet', 404));
         }
 
-        // Get partner info
         const couple = user.coupleId;
-        const partnerId = couple.partner1Id.toString() === userId
-            ? couple.partner2Id
-            : couple.partner1Id;
+        const partnerId =
+            couple.partner1Id.toString() === userId ? couple.partner2Id : couple.partner1Id;
 
         const partner = await User.findById(partnerId);
 
-        res.json(successResponse({
-            couple,
-            partner: {
-                name: partner.name,
-                photoUrl: partner.photoUrl,
-                gender: partner.gender
-            }
-        }, 'Couple information'));
+        res.json(
+            successResponse(
+                {
+                    couple,
+                    partner: {
+                        name: partner.name,
+                        photoUrl: partner.photoUrl,
+                        gender: partner.gender,
+                    },
+                },
+                'Couple information'
+            )
+        );
     } catch (error) {
         console.error('Get couple info error:', error);
         res.status(500).json(errorResponse('Internal server error'));
@@ -231,12 +246,11 @@ const getCoupleStats = async (req, res) => {
             return res.status(404).json(errorResponse('Not paired yet', 404));
         }
 
-        // Get partner info to regenerate tag if needed
-        const partnerId = couple.partner1Id.toString() === userId ? couple.partner2Id : couple.partner1Id;
+        const partnerId =
+            couple.partner1Id.toString() === userId ? couple.partner2Id : couple.partner1Id;
         const partner = await User.findById(partnerId);
         const currentUser = await User.findById(userId);
 
-        // Check if coupleTag needs regeneration (old format or missing)
         const expectedTag = generateCoupleTag(currentUser.name, partner.name);
         if (!couple.coupleTag || couple.coupleTag !== expectedTag) {
             couple.coupleTag = expectedTag;
@@ -248,16 +262,18 @@ const getCoupleStats = async (req, res) => {
         const nextMilestone = getNextMilestone(currentDays);
         const progressPercentage = Math.floor((currentDays / nextMilestone) * 100);
 
-        res.json(successResponse({
-            ...timeTogether,
-            startDate: couple.startDate,
-            coupleTag: couple.coupleTag,
-            milestone: {
-                current: currentDays,
-                next: nextMilestone,
-                progress: progressPercentage
-            }
-        }));
+        res.json(
+            successResponse({
+                ...timeTogether,
+                startDate: couple.startDate,
+                coupleTag: couple.coupleTag,
+                milestone: {
+                    current: currentDays,
+                    next: nextMilestone,
+                    progress: progressPercentage,
+                },
+            })
+        );
     } catch (error) {
         console.error('Stats error:', error);
         res.status(500).json(errorResponse('Internal server error'));
@@ -284,59 +300,52 @@ const getTimeTogether = async (req, res) => {
     }
 };
 
-
-//----------------------------------------------------//DEV//----------------------------------------------------//
+// ------------------------------------------------------------------
+// DEV ROUTES
+// ------------------------------------------------------------------
 
 const devPair = async (req, res) => {
     try {
         const userId = req.userId;
 
-        // 1. Check if current user already has a couple (paired or unpaired)
         const existingCouple = await Couple.findOne({
             $or: [{ partner1Id: userId }, { partner2Id: userId }],
-            isActive: true
+            isActive: true,
         });
 
-        // 2. If already paired, unpair and delete the old couple
         if (existingCouple) {
             const partner1Id = existingCouple.partner1Id;
             const partner2Id = existingCouple.partner2Id;
 
-            // Clear coupleId from both partner users
             await User.findByIdAndUpdate(partner1Id, { coupleId: null });
             if (partner2Id) {
                 await User.findByIdAndUpdate(partner2Id, { coupleId: null });
             }
 
-            // Delete the couple
             await Couple.findByIdAndDelete(existingCouple._id);
         }
 
-        // 3. Find or create dummy partner
         let dummyPartner = await User.findOne({ email: 'dummy@closeus.app' });
 
         if (!dummyPartner) {
-            // Create dummy partner
             dummyPartner = await User.create({
                 email: `dummy_${Date.now()}@closeus.dev`,
                 googleId: 'DUMMY_PARTNER_' + Date.now(),
                 name: 'Dummy Partner',
-                gender: 'female', // assuming opposite gender for variety
+                gender: 'female',
                 dob: new Date('2000-01-01'),
                 relationshipStatus: 'dating',
                 livingStyle: 'living_together',
-                anniversary: new Date()
+                anniversary: new Date(),
             });
         }
 
-        // 4. Check if dummy partner has an existing couple
         const dummyCouple = await Couple.findOne({
             $or: [{ partner1Id: dummyPartner._id }, { partner2Id: dummyPartner._id }],
-            isActive: true
+            isActive: true,
         });
 
         if (dummyCouple) {
-            // Clear dummy's old partnership
             const dp1 = dummyCouple.partner1Id;
             const dp2 = dummyCouple.partner2Id;
 
@@ -348,7 +357,6 @@ const devPair = async (req, res) => {
             await Couple.findByIdAndDelete(dummyCouple._id);
         }
 
-        // 5. Create new couple
         const currentUser = await User.findById(userId);
 
         const newDummyPartner = await User.create({
@@ -361,7 +369,7 @@ const devPair = async (req, res) => {
             partnerName: currentUser.name,
             anniversary: currentUser.anniversary || new Date(),
             isOnboarded: true,
-            lastActive: new Date() // Set as online
+            lastActive: new Date(),
         });
 
         const coupleTag = generateCoupleTag(currentUser.name, newDummyPartner.name);
@@ -372,10 +380,9 @@ const devPair = async (req, res) => {
             isPaired: true,
             coupleTag: coupleTag,
             startDate: currentUser.anniversary || new Date(),
-            isDevPartner: true // Mark as dev partnership
+            isDevPartner: true, // Mark as dev partnership
         });
 
-        // 6. Update both users
         await User.findByIdAndUpdate(userId, { coupleId: newCouple._id });
         await User.findByIdAndUpdate(newDummyPartner._id, { coupleId: newCouple._id });
 
@@ -386,20 +393,18 @@ const devPair = async (req, res) => {
     }
 };
 
-/**
- * Enable Dev Mode for existing couple
- */
+// ------------------------------------------------------------------
+// Enable Dev Mode
+// ------------------------------------------------------------------
 const enableDevMode = async (req, res) => {
     try {
         const userId = req.userId;
 
-        // Find user's couple
         const user = await User.findById(userId);
         if (!user || !user.coupleId) {
             return res.status(404).json(errorResponse('No couple found', 404));
         }
 
-        // Update couple to enable dev mode
         const couple = await Couple.findByIdAndUpdate(
             user.coupleId,
             { isDevPartner: true },
@@ -426,5 +431,5 @@ module.exports = {
     getCoupleStats,
     getTimeTogether,
     devPair,
-    enableDevMode
+    enableDevMode,
 };

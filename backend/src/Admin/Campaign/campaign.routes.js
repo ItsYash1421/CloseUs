@@ -5,6 +5,9 @@ const adminAuthMiddleware = require('../Middleware/auth.middleware');
 
 router.use(adminAuthMiddleware);
 
+// ------------------------------------------------------------------
+// Campaign Routes
+// ------------------------------------------------------------------
 router.post('/', campaignController.createCampaign);
 router.get('/', campaignController.getCampaigns);
 router.get('/:id', campaignController.getCampaignById);

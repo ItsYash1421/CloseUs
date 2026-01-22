@@ -10,18 +10,24 @@ const User = require('./models/User');
 
 const PORT = process.env.PORT || 3000;
 
+// ------------------------------------------------------------------
 // Create HTTP server
+// ------------------------------------------------------------------
 const server = http.createServer(app);
 
+// ------------------------------------------------------------------
 // Initialize Socket.io
+// ------------------------------------------------------------------
 const io = new Server(server, {
     cors: {
         origin: '*',
-        methods: ['GET', 'POST']
-    }
+        methods: ['GET', 'POST'],
+    },
 });
 
+// ------------------------------------------------------------------
 // Socket Middleware
+// ------------------------------------------------------------------
 io.use(async (socket, next) => {
     try {
         const token = socket.handshake.auth.token;
@@ -37,15 +43,16 @@ io.use(async (socket, next) => {
     }
 });
 
+// ------------------------------------------------------------------
 // Socket Events
+// ------------------------------------------------------------------
 io.on('connection', async (socket) => {
     console.log(`User connected: ${socket.userId}`);
 
-    // Join couple room
     const couple = await Couple.findOne({
         $or: [{ partner1Id: socket.userId }, { partner2Id: socket.userId }],
         isActive: true,
-        isPaired: true
+        isPaired: true,
     });
 
     if (couple) {
@@ -55,7 +62,6 @@ io.on('connection', async (socket) => {
         console.log(`User ${socket.userId} joined room ${roomName}`);
     }
 
-    // Handle messages
     socket.on('send_message', async (data) => {
         try {
             if (!socket.coupleId) {
@@ -69,30 +75,30 @@ io.on('connection', async (socket) => {
                 senderId: socket.userId,
                 type: type || 'text',
                 content,
-                metadata: metadata || {}
+                metadata: metadata || {},
             });
 
-            const populatedMessage = await Message.findById(message._id).populate('senderId', 'name photoUrl');
+            const populatedMessage = await Message.findById(message._id).populate(
+                'senderId',
+                'name photoUrl'
+            );
             io.to(`couple_${socket.coupleId}`).emit('receive_message', populatedMessage);
 
-            // AUTO-REPLY LOGIC FOR DEV PARTNER
             try {
-                // Find the couple again to be sure of partners (or use cached if reliable, but safe to fetch or check IDs)
                 const coupleForReply = await Couple.findById(socket.coupleId);
                 if (coupleForReply) {
-                    const partnerId = coupleForReply.partner1Id.toString() === socket.userId
-                        ? coupleForReply.partner2Id
-                        : coupleForReply.partner1Id;
+                    const partnerId =
+                        coupleForReply.partner1Id.toString() === socket.userId
+                            ? coupleForReply.partner2Id
+                            : coupleForReply.partner1Id;
 
                     const partner = await User.findById(partnerId);
 
                     if (partner && partner.name === 'Dev Partner') {
-                        // Check if online (0-5, 10-15, etc.)
                         const currentMinute = new Date().getMinutes();
                         const isOnline = Math.floor(currentMinute / 5) % 2 === 0;
 
                         if (isOnline) {
-                            // Send reply
                             setTimeout(async () => {
                                 try {
                                     const reply = await Message.create({
@@ -100,10 +106,15 @@ io.on('connection', async (socket) => {
                                         senderId: partner._id,
                                         type: 'text',
                                         content: 'Working',
-                                        metadata: {}
+                                        metadata: {},
                                     });
-                                    const populatedReply = await Message.findById(reply._id).populate('senderId', 'name photoUrl');
-                                    io.to(`couple_${socket.coupleId}`).emit('receive_message', populatedReply);
+                                    const populatedReply = await Message.findById(
+                                        reply._id
+                                    ).populate('senderId', 'name photoUrl');
+                                    io.to(`couple_${socket.coupleId}`).emit(
+                                        'receive_message',
+                                        populatedReply
+                                    );
                                     console.log('Sent auto-reply from Dev Partner');
                                 } catch (err) {
                                     console.error('Auto-reply error:', err);
@@ -120,13 +131,18 @@ io.on('connection', async (socket) => {
         }
     });
 
-    // Typing matching
     socket.on('typing', () => {
-        if (socket.coupleId) socket.to(`couple_${socket.coupleId}`).emit('partner_typing', { userId: socket.userId });
+        if (socket.coupleId)
+            socket
+                .to(`couple_${socket.coupleId}`)
+                .emit('partner_typing', { userId: socket.userId });
     });
 
     socket.on('stop_typing', () => {
-        if (socket.coupleId) socket.to(`couple_${socket.coupleId}`).emit('partner_stopped_typing', { userId: socket.userId });
+        if (socket.coupleId)
+            socket
+                .to(`couple_${socket.coupleId}`)
+                .emit('partner_stopped_typing', { userId: socket.userId });
     });
 
     socket.on('disconnect', () => {
@@ -134,13 +150,13 @@ io.on('connection', async (socket) => {
     });
 });
 
+// ------------------------------------------------------------------
 // Start Server
+// ------------------------------------------------------------------
 const startServer = async () => {
     try {
         await connectDB();
 
-        // Initialize Scheduler
-        // Initialize Scheduler
         const initCronJobs = require('./App/Home/question.scheduler');
         initCronJobs();
 

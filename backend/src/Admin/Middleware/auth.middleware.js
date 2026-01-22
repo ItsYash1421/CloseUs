@@ -1,5 +1,8 @@
 const { verifyToken, errorResponse } = require('../../Shared/Utils');
 
+// ------------------------------------------------------------------
+// Admin Auth Middleware
+// ------------------------------------------------------------------
 const adminAuthMiddleware = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;

@@ -20,11 +20,10 @@ passport.use(
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: process.env.GOOGLE_CALLBACK_URL || '/api/auth/google/callback'
+            callbackURL: process.env.GOOGLE_CALLBACK_URL || '/api/auth/google/callback',
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
-                // Check if user exists
                 let user = await User.findOne({ googleId: profile.id });
 
                 if (user) {
@@ -33,13 +32,12 @@ passport.use(
                     return done(null, user);
                 }
 
-                // Create new user
                 user = await User.create({
                     googleId: profile.id,
                     email: profile.emails[0].value,
                     name: profile.displayName,
                     photoUrl: profile.photos[0]?.value,
-                    isOnboardingComplete: false
+                    isOnboardingComplete: false,
                 });
 
                 done(null, user);

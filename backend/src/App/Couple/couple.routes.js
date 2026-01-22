@@ -14,7 +14,9 @@ router.get('/me', coupleController.getCoupleInfo);
 router.get('/stats', coupleController.getCoupleStats);
 router.get('/time-together', coupleController.getTimeTogether);
 
-//----------------------------------------------------//DEV//----------------------------------------------------//
+// ------------------------------------------------------------------
+// Development Routes
+// ------------------------------------------------------------------
 router.post('/dev-pair', coupleController.devPair);
 router.post('/enable-dev-mode', coupleController.enableDevMode);
 

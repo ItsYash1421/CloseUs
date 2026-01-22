@@ -13,7 +13,9 @@ const StatCard = ({ number, label, delay }) => {
             transition={{ duration: 0.5, delay }}
             className="text-center"
         >
-            <div className="text-4xl md:text-5xl font-bold text-[var(--color-primary)] mb-2">{number}</div>
+            <div className="text-4xl md:text-5xl font-bold text-[var(--color-primary)] mb-2">
+                {number}
+            </div>
             <div className="text-sm md:text-base text-gray-600">{label}</div>
         </motion.div>
     );

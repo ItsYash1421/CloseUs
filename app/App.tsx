@@ -28,7 +28,10 @@ function App() {
         const initialData = await notificationService.getInitialNotification();
 
         if (initialData && initialData.screen) {
-          console.log('Navigating to screen from initial notification:', initialData.screen);
+          console.log(
+            'Navigating to screen from initial notification:',
+            initialData.screen,
+          );
 
           // Import navigation service and navigate
           const { navigate } = await import('./src/services/navigationService');
@@ -72,16 +75,22 @@ function App() {
           console.log('User paired - scheduling all reminders');
 
           // Daily engagement reminders
-          await userStateNotificationService.scheduleForPaired(partner.name || 'Partner');
+          await userStateNotificationService.scheduleForPaired(
+            partner.name || 'Partner',
+          );
 
           // Special occasion reminders (birthday, anniversary, etc.)
-          const partnerBirthday = partner.dob ? new Date(partner.dob) : new Date();
-          const anniversary = couple.startDate ? new Date(couple.startDate) : new Date();
+          const partnerBirthday = partner.dob
+            ? new Date(partner.dob)
+            : new Date();
+          const anniversary = couple.startDate
+            ? new Date(couple.startDate)
+            : new Date();
 
           await reminderService.scheduleAllReminders(
             partnerBirthday,
             anniversary,
-            partner.name || 'Partner'
+            partner.name || 'Partner',
           );
 
           console.log('All reminders scheduled successfully');
@@ -133,14 +142,17 @@ function App() {
             { text: 'Cancel', style: 'cancel' },
             { text: 'Exit', onPress: () => BackHandler.exitApp() },
           ],
-          { cancelable: true }
+          { cancelable: true },
         );
         return true; // Prevent default back action
       }
       return false; // Allow default back action
     };
 
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
 
     return () => backHandler.remove();
   }, []);

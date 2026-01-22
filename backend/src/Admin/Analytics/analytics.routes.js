@@ -5,6 +5,9 @@ const adminAuthMiddleware = require('../Middleware/auth.middleware');
 
 router.use(adminAuthMiddleware);
 
+// ------------------------------------------------------------------
+// Analytics Routes
+// ------------------------------------------------------------------
 router.get('/stats', analyticsController.getEnhancedStats);
 router.get('/users', analyticsController.getUserAnalytics);
 router.get('/engagement', analyticsController.getEngagementAnalytics);

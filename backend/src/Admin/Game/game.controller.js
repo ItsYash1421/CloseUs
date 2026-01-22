@@ -2,9 +2,9 @@ const GameCategory = require('../../models/GameCategory');
 const GameQuestion = require('../../models/GameQuestion');
 const { successResponse, errorResponse } = require('../../Shared/Utils');
 
-/**
- * Create Game Category
- */
+// ------------------------------------------------------------------
+// Create Game Category
+// ------------------------------------------------------------------
 const createGameCategory = async (req, res) => {
     try {
         const { gameType, name, emoji, tags, color } = req.body;
@@ -24,9 +24,9 @@ const createGameCategory = async (req, res) => {
     }
 };
 
-/**
- * Get All Game Categories
- */
+// ------------------------------------------------------------------
+// Get All Game Categories
+// ------------------------------------------------------------------
 const getGameCategories = async (req, res) => {
     try {
         const { gameType } = req.query;
@@ -34,7 +34,9 @@ const getGameCategories = async (req, res) => {
 
         const categories = await GameCategory.find(query).sort({ order: 1, timesPlayed: -1 });
 
-        // Get question count for each category
+        // ------------------------------------------------------------------
+        // Count Questions Per Category
+        // ------------------------------------------------------------------
         const categoriesWithCount = await Promise.all(
             categories.map(async (cat) => {
                 const questionCount = await GameQuestion.countDocuments({ categoryId: cat._id });
@@ -51,9 +53,9 @@ const getGameCategories = async (req, res) => {
     }
 };
 
-/**
- * Update Game Category
- */
+// ------------------------------------------------------------------
+// Update Game Category
+// ------------------------------------------------------------------
 const updateGameCategory = async (req, res) => {
     try {
         const { id } = req.params;
@@ -70,17 +72,21 @@ const updateGameCategory = async (req, res) => {
     }
 };
 
-/**
- * Delete Game Category
- */
+// ------------------------------------------------------------------
+// Delete Game Category
+// ------------------------------------------------------------------
 const deleteGameCategory = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Check if category has questions
+        // ------------------------------------------------------------------
+        // Check for Existing Questions
+        // ------------------------------------------------------------------
         const questionCount = await GameQuestion.countDocuments({ categoryId: id });
         if (questionCount > 0) {
-            return res.status(400).json(errorResponse('Cannot delete category with questions', 400));
+            return res
+                .status(400)
+                .json(errorResponse('Cannot delete category with questions', 400));
         }
 
         await GameCategory.findByIdAndDelete(id);
@@ -90,9 +96,9 @@ const deleteGameCategory = async (req, res) => {
     }
 };
 
-/**
- * Create Game Question
- */
+// ------------------------------------------------------------------
+// Create Game Question
+// ------------------------------------------------------------------
 const createGameQuestion = async (req, res) => {
     try {
         const { categoryId, text } = req.body;
@@ -109,9 +115,9 @@ const createGameQuestion = async (req, res) => {
     }
 };
 
-/**
- * Get Game Questions by Category
- */
+// ------------------------------------------------------------------
+// Get Game Questions by Category
+// ------------------------------------------------------------------
 const getGameQuestions = async (req, res) => {
     try {
         const { categoryId } = req.params;
@@ -126,9 +132,9 @@ const getGameQuestions = async (req, res) => {
     }
 };
 
-/**
- * Update Game Question
- */
+// ------------------------------------------------------------------
+// Update Game Question
+// ------------------------------------------------------------------
 const updateGameQuestion = async (req, res) => {
     try {
         const { id } = req.params;
@@ -145,9 +151,9 @@ const updateGameQuestion = async (req, res) => {
     }
 };
 
-/**
- * Delete Game Question
- */
+// ------------------------------------------------------------------
+// Delete Game Question
+// ------------------------------------------------------------------
 const deleteGameQuestion = async (req, res) => {
     try {
         const { id } = req.params;

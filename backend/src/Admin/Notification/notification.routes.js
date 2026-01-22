@@ -8,21 +8,29 @@ const adminAuthMiddleware = require('../Middleware/auth.middleware');
 router.use(authMiddleware);
 router.use(adminAuthMiddleware);
 
-// ========== NOTIFICATION TEMPLATES ==========
+// ------------------------------------------------------------------
+// Notification Templates
+// ------------------------------------------------------------------
 router.get('/templates', adminNotificationController.getAllTemplates);
 router.post('/templates', adminNotificationController.createTemplate);
 router.put('/templates/:id', adminNotificationController.updateTemplate);
 router.delete('/templates/:id', adminNotificationController.deleteTemplate);
 router.patch('/templates/:id/toggle', adminNotificationController.toggleTemplateStatus);
 
-// ========== SEND NOTIFICATIONS ==========
+// ------------------------------------------------------------------
+// Send Notifications
+// ------------------------------------------------------------------
 router.post('/send/all', adminNotificationController.sendToAllUsers);
 router.post('/send/specific', adminNotificationController.sendToSpecificUsers);
 
-// ========== STATS ==========
+// ------------------------------------------------------------------
+// Stats
+// ------------------------------------------------------------------
 router.get('/stats', adminNotificationController.getNotificationStats);
 
-// ========== LEGACY ROUTES (Backward compatibility) ==========
+// ------------------------------------------------------------------
+// Legacy Routes
+// ------------------------------------------------------------------
 router.post('/notifications', adminNotificationController.createNotification);
 router.get('/notifications', adminNotificationController.getNotifications);
 router.post('/notifications/:id/send', adminNotificationController.sendNotification);

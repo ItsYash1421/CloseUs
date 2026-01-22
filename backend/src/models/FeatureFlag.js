@@ -1,66 +1,73 @@
 const mongoose = require('mongoose');
 
-const featureFlagSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-    },
-    displayName: {
-        type: String,
-        required: true,
-    },
-    description: {
-        type: String,
-    },
-    isEnabled: {
-        type: Boolean,
-        default: false,
-    },
-    rolloutPercentage: {
-        type: Number,
-        min: 0,
-        max: 100,
-        default: 0,
-    },
-    targetGroups: [{
-        type: String,
-        enum: ['beta_users', 'premium', 'all', 'new_users', 'active_couples'],
-    }],
-    enabledAt: {
-        type: Date,
-    },
-    disabledAt: {
-        type: Date,
-    },
-    usageMetrics: {
-        totalUsers: {
+const featureFlagSchema = new mongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+            unique: true,
+            trim: true,
+        },
+        displayName: {
+            type: String,
+            required: true,
+        },
+        description: {
+            type: String,
+        },
+        isEnabled: {
+            type: Boolean,
+            default: false,
+        },
+        rolloutPercentage: {
             type: Number,
+            min: 0,
+            max: 100,
             default: 0,
         },
-        activeUsers: {
-            type: Number,
-            default: 0,
+        targetGroups: [
+            {
+                type: String,
+                enum: ['beta_users', 'premium', 'all', 'new_users', 'active_couples'],
+            },
+        ],
+        enabledAt: {
+            type: Date,
+        },
+        disabledAt: {
+            type: Date,
+        },
+        usageMetrics: {
+            totalUsers: {
+                type: Number,
+                default: 0,
+            },
+            activeUsers: {
+                type: Number,
+                default: 0,
+            },
+        },
+        createdBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Admin',
+            required: true,
         },
     },
-    createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Admin',
-        required: true,
-    },
-}, {
-    timestamps: true,
-});
+    {
+        timestamps: true,
+    }
+);
 
-// Method to check if feature is enabled for a user
+// ------------------------------------------------------------------
+// Check if Feature is Enabled for User
+// ------------------------------------------------------------------
 featureFlagSchema.methods.isEnabledForUser = function (user) {
     if (!this.isEnabled) return false;
 
     // Check rollout percentage
     if (this.rolloutPercentage < 100) {
         const userHash = parseInt(user._id.toString().slice(-8), 16);
-        const threshold = (this.rolloutPercentage / 100) * 0xFFFFFFFF;
+        const threshold = (this.rolloutPercentage / 100) * 0xffffffff;
         if (userHash > threshold) return false;
     }
 

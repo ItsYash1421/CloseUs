@@ -29,6 +29,9 @@ const gameQuestionSchema = new mongoose.Schema(
     }
 );
 
+// ------------------------------------------------------------------
+// Indexes
+// ------------------------------------------------------------------
 gameQuestionSchema.index({ categoryId: 1 });
 
 module.exports = mongoose.model('GameQuestion', gameQuestionSchema);

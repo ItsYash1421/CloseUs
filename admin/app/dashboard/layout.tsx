@@ -33,10 +33,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                             <Link
                                 key={item.name}
                                 href={item.href}
-                                className={`flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
-                                    ? 'bg-blue-50 text-blue-700'
-                                    : 'text-gray-700 hover:bg-gray-50'
-                                    }`}
+                                className={`flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                                    isActive
+                                        ? 'bg-blue-50 text-blue-700'
+                                        : 'text-gray-700 hover:bg-gray-50'
+                                }`}
                             >
                                 <span className="mr-3 text-lg">{item.icon}</span>
                                 {item.name}
@@ -64,9 +65,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
-                <div className="p-8">
-                    {children}
-                </div>
+                <div className="p-8">{children}</div>
             </main>
         </div>
     );

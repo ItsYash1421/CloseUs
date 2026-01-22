@@ -36,6 +36,9 @@ const gameCategorySchema = new mongoose.Schema(
     }
 );
 
+// ------------------------------------------------------------------
+// Indexes
+// ------------------------------------------------------------------
 gameCategorySchema.index({ gameType: 1 });
 
 module.exports = mongoose.model('GameCategory', gameCategorySchema);

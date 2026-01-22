@@ -9,20 +9,20 @@ import Contact from './pages/Contact';
 import EarlyAccess from './pages/EarlyAccess';
 
 function App() {
-  return (
-    <Router>
-      <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/features" element={<Features />} />
-        <Route path="/pricing" element={<Pricing />} />
-        <Route path="/roadmap" element={<Roadmap />} />
-        <Route path="/about" element={<AboutUs />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/early-access" element={<EarlyAccess />} />
-      </Routes>
-    </Router>
-  );
+    return (
+        <Router>
+            <ScrollToTop />
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/features" element={<Features />} />
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/roadmap" element={<Roadmap />} />
+                <Route path="/about" element={<AboutUs />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/early-access" element={<EarlyAccess />} />
+            </Routes>
+        </Router>
+    );
 }
 
 export default App;

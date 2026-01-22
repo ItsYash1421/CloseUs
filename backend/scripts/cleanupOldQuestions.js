@@ -17,7 +17,7 @@ const cleanupOldQuestions = async () => {
         const result = await Question.deleteMany({
             isDaily: true,
             isAiGenerated: true,
-            createdAt: { $lt: twoDaysAgo }
+            createdAt: { $lt: twoDaysAgo },
         });
 
         console.log(`✅ Deleted ${result.deletedCount} old questions`);

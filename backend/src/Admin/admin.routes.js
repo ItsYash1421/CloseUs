@@ -9,7 +9,9 @@ const analyticsRoutes = require('./Analytics/analytics.routes');
 const notificationRoutes = require('./Notification/notification.routes');
 const dashboardRoutes = require('./Dashboard/dashboard.routes');
 
-// Mount routes
+// ------------------------------------------------------------------
+// Mount Routes
+// ------------------------------------------------------------------
 router.use('/auth', authRoutes);
 router.use('/campaigns', campaignRoutes);
 router.use('/promotions', promotionRoutes);

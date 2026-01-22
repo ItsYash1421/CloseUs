@@ -19,47 +19,73 @@ const FeatureCard = ({ icon: Icon, title, desc }) => (
 
 const FeatureSection = ({ title, subtitle, desc, align = 'left', visual }) => {
     return (
-        <div className={`py-16 md:py-24 flex flex-col md:flex-row items-center gap-12 md:gap-16 ${align === 'right' ? 'md:flex-row-reverse' : ''}`}>
+        <div
+            className={`py-16 md:py-24 flex flex-col md:flex-row items-center gap-12 md:gap-16 ${align === 'right' ? 'md:flex-row-reverse' : ''}`}
+        >
             <div className="flex-1">
-                <span className="text-[var(--color-primary)] font-bold tracking-wider uppercase text-sm mb-3 block opacity-80">{subtitle}</span>
-                <h2 className="text-3xl md:text-4xl font-bold mb-6 text-[#2B2B2B] leading-tight">{title}</h2>
-                <p className="text-base md:text-lg text-gray-600 mb-6 leading-relaxed max-w-lg">{desc}</p>
+                <span className="text-[var(--color-primary)] font-bold tracking-wider uppercase text-sm mb-3 block opacity-80">
+                    {subtitle}
+                </span>
+                <h2 className="text-3xl md:text-4xl font-bold mb-6 text-[#2B2B2B] leading-tight">
+                    {title}
+                </h2>
+                <p className="text-base md:text-lg text-gray-600 mb-6 leading-relaxed max-w-lg">
+                    {desc}
+                </p>
 
                 <div className="flex flex-col gap-3 mb-6">
                     <div className="flex items-center gap-3 text-base text-gray-700">
-                        <div className="w-6 h-6 rounded-full bg-red-100 text-[var(--color-primary)] flex items-center justify-center text-xs font-bold">✓</div>
+                        <div className="w-6 h-6 rounded-full bg-red-100 text-[var(--color-primary)] flex items-center justify-center text-xs font-bold">
+                            ✓
+                        </div>
                         Designed exclusively for two people
                     </div>
                     <div className="flex items-center gap-3 text-base text-gray-700">
-                        <div className="w-6 h-6 rounded-full bg-red-100 text-[var(--color-primary)] flex items-center justify-center text-xs font-bold">✓</div>
+                        <div className="w-6 h-6 rounded-full bg-red-100 text-[var(--color-primary)] flex items-center justify-center text-xs font-bold">
+                            ✓
+                        </div>
                         End-to-end encrypted & secure
                     </div>
                     <div className="flex items-center gap-3 text-base text-gray-700">
-                        <div className="w-6 h-6 rounded-full bg-red-100 text-[var(--color-primary)] flex items-center justify-center text-xs font-bold">✓</div>
+                        <div className="w-6 h-6 rounded-full bg-red-100 text-[var(--color-primary)] flex items-center justify-center text-xs font-bold">
+                            ✓
+                        </div>
                         Real-time sync across all devices
                     </div>
                 </div>
             </div>
 
-            <div className="flex-1 w-full flex justify-center">
-                {visual}
-            </div>
+            <div className="flex-1 w-full flex justify-center">{visual}</div>
         </div>
     );
 };
 
 const FeatureShowcase = () => {
-
     return (
         <section id="features" className="py-20 bg-white relative overflow-hidden">
             <div className="container px-4 max-w-6xl mx-auto">
-
                 {/* Intro Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-24 max-w-5xl mx-auto">
-                    <FeatureCard icon={Lock} title="Private Pairing" desc="Unique key access for just the two of you." />
-                    <FeatureCard icon={Smile} title="Daily Squeeze" desc="Fun questions to spark conversation." />
-                    <FeatureCard icon={MessageCircle} title="Heartbeat Chat" desc="Feel their presence while typing." />
-                    <FeatureCard icon={Gamepad2} title="Couple Games" desc="Play & explore each other's minds." />
+                    <FeatureCard
+                        icon={Lock}
+                        title="Private Pairing"
+                        desc="Unique key access for just the two of you."
+                    />
+                    <FeatureCard
+                        icon={Smile}
+                        title="Daily Squeeze"
+                        desc="Fun questions to spark conversation."
+                    />
+                    <FeatureCard
+                        icon={MessageCircle}
+                        title="Heartbeat Chat"
+                        desc="Feel their presence while typing."
+                    />
+                    <FeatureCard
+                        icon={Gamepad2}
+                        title="Couple Games"
+                        desc="Play & explore each other's minds."
+                    />
                 </div>
 
                 {/* Feature 1: Chat */}
@@ -133,7 +159,6 @@ const FeatureShowcase = () => {
                         </div>
                     }
                 />
-
             </div>
         </section>
     );

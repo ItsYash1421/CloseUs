@@ -1,10 +1,20 @@
 import React from 'react';
 import { ArrowRight, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { trackEvent } from '../utils/analytics';
 
 // Import branded logo for the phone mockup
 import LogoImg from '../assets/LOGO.png';
 
 const Hero = () => {
+    const handleEarlyAccessClick = () => {
+        trackEvent('early_access_clicked_hero');
+    };
+
+    const handleHowItWorksClick = () => {
+        trackEvent('how_it_works_clicked');
+    };
+
     return (
         <section className="relative min-h-screen pt-[var(--header-height)] flex items-center overflow-hidden">
             {/* Background Blobs */}
@@ -26,31 +36,30 @@ const Hero = () => {
                         </h1>
 
                         <p className="text-lg md:text-xl text-[#6B6B6B] mb-8 max-w-lg leading-relaxed">
-                            Your private digital sanctuary. Built exclusively for two hearts, one relationship.
+                            Your private digital sanctuary. Built exclusively for two hearts, one
+                            relationship.
                         </p>
 
                         <div className="flex flex-wrap gap-4 mb-10">
-                            <button className="group bg-[var(--color-primary)] text-white px-8 py-4 rounded-full font-bold shadow-[0_10px_25px_rgba(255,107,107,0.3)] hover:shadow-[0_15px_30px_rgba(255,107,107,0.4)] hover:-translate-y-1 transition-all flex items-center gap-2">
+                            <Link
+                                to="/early-access"
+                                onClick={handleEarlyAccessClick}
+                                className="group bg-[var(--color-primary)] text-white px-8 py-4 rounded-full font-bold shadow-[0_10px_25px_rgba(255,107,107,0.3)] hover:shadow-[0_15px_30px_rgba(255,107,107,0.4)] hover:-translate-y-1 transition-all flex items-center gap-2"
+                            >
                                 Get Early Access
-                                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                            </button>
-                            <a href="#how-it-works" className="bg-white text-[#2B2B2B] px-8 py-4 rounded-full font-bold border-2 border-gray-200 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all">
+                                <ArrowRight
+                                    size={20}
+                                    className="group-hover:translate-x-1 transition-transform"
+                                />
+                            </Link>
+                            <a
+                                href="#how-it-works"
+                                onClick={handleHowItWorksClick}
+                                className="bg-white text-[#2B2B2B] px-8 py-4 rounded-full font-bold border-2 border-gray-200 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all"
+                            >
                                 How it works
                             </a>
                         </div>
-
-                        {/* Social proof - 2,000+ couples */}
-                        {/* <div className="flex items-center gap-4 text-sm text-gray-500">
-              <div className="flex -space-x-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-gradient-to-br from-red-200 to-pink-200" />
-                ))}
-              </div>
-              <div>
-                <p className="font-semibold text-gray-700">2,000+ couples</p>
-                <p className="text-xs">already connected</p>
-              </div>
-            </div> */}
                     </div>
                 </div>
 
@@ -82,7 +91,9 @@ const Hero = () => {
                                     ❤️
                                 </div>
                                 <div className="text-left">
-                                    <div className="text-[9px] text-gray-400 font-bold uppercase">Daily</div>
+                                    <div className="text-[9px] text-gray-400 font-bold uppercase">
+                                        Daily
+                                    </div>
                                     <div className="text-xs font-bold text-gray-800">Answered</div>
                                 </div>
                             </div>
@@ -94,7 +105,9 @@ const Hero = () => {
                                     💬
                                 </div>
                                 <div className="text-left">
-                                    <div className="text-[9px] text-gray-400 font-bold uppercase">Chat</div>
+                                    <div className="text-[9px] text-gray-400 font-bold uppercase">
+                                        Chat
+                                    </div>
                                     <div className="text-xs font-bold text-gray-800">Active</div>
                                 </div>
                             </div>

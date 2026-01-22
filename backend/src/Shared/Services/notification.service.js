@@ -1,6 +1,5 @@
 const admin = require('firebase-admin');
 
-// Initialize Firebase Admin SDK
 const initializeFirebase = () => {
     if (!admin.apps.length) {
         admin.initializeApp({
@@ -13,7 +12,9 @@ const initializeFirebase = () => {
     }
 };
 
-// Send push notification
+// ------------------------------------------------------------------
+// Send Push Notification
+// ------------------------------------------------------------------
 const sendPushNotification = async (token, title, body, data = {}) => {
     try {
         initializeFirebase();
@@ -55,8 +56,15 @@ const sendPushNotification = async (token, title, body, data = {}) => {
     }
 };
 
-// Send message notification to partner
-const sendMessageNotification = async (recipientToken, senderName, messageText, messageType = 'text') => {
+// ------------------------------------------------------------------
+// Send Message Notification
+// ------------------------------------------------------------------
+const sendMessageNotification = async (
+    recipientToken,
+    senderName,
+    messageText,
+    messageType = 'text'
+) => {
     let body = messageText;
 
     if (messageType === 'image') {
@@ -67,48 +75,39 @@ const sendMessageNotification = async (recipientToken, senderName, messageText, 
         body = '🎬 Sent a GIF';
     }
 
-    return sendPushNotification(
-        recipientToken,
-        `💬 ${senderName}`,
-        body,
-        {
-            type: 'message',
-            screen: 'Chat',
-        }
-    );
+    return sendPushNotification(recipientToken, `💬 ${senderName}`, body, {
+        type: 'message',
+        screen: 'Chat',
+    });
 };
 
-// Send typing notification
+// ------------------------------------------------------------------
+// Send Typing Notification
+// ------------------------------------------------------------------
 const sendTypingNotification = async (recipientToken, senderName) => {
-    return sendPushNotification(
-        recipientToken,
-        `${senderName} is typing...`,
-        '',
-        {
-            type: 'typing',
-            screen: 'Chat',
-        }
-    );
+    return sendPushNotification(recipientToken, `${senderName} is typing...`, '', {
+        type: 'typing',
+        screen: 'Chat',
+    });
 };
 
-// Send daily question notification
+// ------------------------------------------------------------------
+// Send Daily Question Notification
+// ------------------------------------------------------------------
 const sendDailyQuestionNotification = async (tokens, questionText) => {
-    const promises = tokens.map(token =>
-        sendPushNotification(
-            token,
-            '❓ New Daily Question!',
-            questionText,
-            {
-                type: 'daily_question',
-                screen: 'Questions',
-            }
-        )
+    const promises = tokens.map((token) =>
+        sendPushNotification(token, '❓ New Daily Question!', questionText, {
+            type: 'daily_question',
+            screen: 'Questions',
+        })
     );
 
     return Promise.allSettled(promises);
 };
 
-// Send game invitation
+// ------------------------------------------------------------------
+// Send Game Invitation
+// ------------------------------------------------------------------
 const sendGameInvitation = async (recipientToken, senderName, gameName) => {
     return sendPushNotification(
         recipientToken,
@@ -121,7 +120,9 @@ const sendGameInvitation = async (recipientToken, senderName, gameName) => {
     );
 };
 
-// Send answer notification (when partner answers question)
+// ------------------------------------------------------------------
+// Send Answer Notification
+// ------------------------------------------------------------------
 const sendAnswerNotification = async (recipientToken, partnerName, questionText) => {
     return sendPushNotification(
         recipientToken,
@@ -134,7 +135,9 @@ const sendAnswerNotification = async (recipientToken, partnerName, questionText)
     );
 };
 
-// Send multiple notifications (for broadcasts)
+// ------------------------------------------------------------------
+// Send Bulk Notifications
+// ------------------------------------------------------------------
 const sendBulkNotifications = async (notifications) => {
     const promises = notifications.map(({ token, title, body, data }) =>
         sendPushNotification(token, title, body, data)
@@ -154,5 +157,3 @@ module.exports = {
     sendAnswerNotification,
     sendBulkNotifications,
 };
-
-

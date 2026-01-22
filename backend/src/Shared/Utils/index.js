@@ -19,5 +19,5 @@ module.exports = {
     calculateDaysTogether,
     getNextMilestone,
     successResponse,
-    errorResponse
+    errorResponse,
 };

@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Mail, Check, Sparkles, Lock, Heart, Zap } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
+import { trackEvent } from '../utils/analytics';
 
 const EarlyAccess = () => {
     const [name, setName] = useState('');
@@ -11,9 +12,17 @@ const EarlyAccess = () => {
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    // trackEvent page view when component mounts
+    React.useEffect(() => {
+        trackEvent('early_access_page_view');
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+
+        // trackEvent join waitlist attempt
+        trackEvent('join_waitlist_clicked');
 
         try {
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -25,19 +34,26 @@ const EarlyAccess = () => {
                 body: JSON.stringify({
                     name,
                     email: yourEmail,
-                    partnerEmail
+                    partnerEmail,
                 }),
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                // Handle duplication specific error message
+                // trackEvent failed submission
+                trackEvent('join_waitlist_failed', {
+                    error: response.status === 409 ? 'duplicate_email' : 'other_error',
+                });
+
                 if (response.status === 409) {
                     throw new Error('This email is already on the waitlist!');
                 }
                 throw new Error(data.error || 'Something went wrong');
             }
+
+            // trackEvent successful submission
+            trackEvent('join_waitlist_success');
 
             toast.success("You've joined the waitlist! Check your email.");
             setSubmitted(true);
@@ -57,6 +73,11 @@ const EarlyAccess = () => {
         }
     };
 
+    const handleAddAnotherCouple = () => {
+        trackEvent('add_another_couple_clicked');
+        setSubmitted(false);
+    };
+
     return (
         <div className="min-h-screen bg-[var(--color-bg-soft)]">
             <Navbar />
@@ -64,7 +85,7 @@ const EarlyAccess = () => {
                 position="bottom-center"
                 reverseOrder={false}
                 containerStyle={{
-                    zIndex: 99999
+                    zIndex: 99999,
                 }}
             />
 
@@ -89,13 +110,20 @@ const EarlyAccess = () => {
                             </h1>
 
                             <p className="text-xl text-gray-600 mb-12 leading-relaxed">
-                                Join our exclusive waitlist and get early access to CloseUs. Plus, enjoy <span className="font-bold text-[var(--color-primary)]">lifetime premium features</span> when we launch.
+                                Join our exclusive waitlist and get early access to CloseUs. Plus,
+                                enjoy{' '}
+                                <span className="font-bold text-[var(--color-primary)]">
+                                    lifetime premium features
+                                </span>{' '}
+                                when we launch.
                             </p>
 
                             {!submitted ? (
                                 <form onSubmit={handleSubmit} className="max-w-md mx-auto">
                                     <div className="bg-white p-8 rounded-3xl shadow-xl border border-red-50">
-                                        <h3 className="text-2xl font-bold mb-6 text-[#2B2B2B]">Join Waitlist as a Couple</h3>
+                                        <h3 className="text-2xl font-bold mb-6 text-[#2B2B2B]">
+                                            Join Waitlist as a Couple
+                                        </h3>
 
                                         {/* Your Name */}
                                         <div className="mb-5">
@@ -131,7 +159,10 @@ const EarlyAccess = () => {
                                                     required
                                                     className="w-full px-4 py-3 pl-11 border-2 border-gray-200 rounded-xl focus:border-[var(--color-primary)] focus:outline-none transition-colors text-gray-800"
                                                 />
-                                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                                <Mail
+                                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                                    size={18}
+                                                />
                                             </div>
                                         </div>
 
@@ -144,12 +175,17 @@ const EarlyAccess = () => {
                                                 <input
                                                     type="email"
                                                     value={partnerEmail}
-                                                    onChange={(e) => setPartnerEmail(e.target.value)}
+                                                    onChange={(e) =>
+                                                        setPartnerEmail(e.target.value)
+                                                    }
                                                     placeholder="partner@example.com"
                                                     required
                                                     className="w-full px-4 py-3 pl-11 border-2 border-gray-200 rounded-xl focus:border-[var(--color-primary)] focus:outline-none transition-colors text-gray-800"
                                                 />
-                                                <Heart className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                                <Heart
+                                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                                    size={18}
+                                                />
                                             </div>
                                         </div>
 
@@ -171,12 +207,15 @@ const EarlyAccess = () => {
                                     <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <Check size={32} className="text-green-600" />
                                     </div>
-                                    <h3 className="text-2xl font-bold mb-2 text-[#2B2B2B]">You're on the waitlist!</h3>
+                                    <h3 className="text-2xl font-bold mb-2 text-[#2B2B2B]">
+                                        You're on the waitlist!
+                                    </h3>
                                     <p className="text-gray-600 mb-6">
-                                        Check both inboxes for confirmation emails. We'll notify you both as soon as we launch.
+                                        Check both inboxes for confirmation emails. We'll notify you
+                                        both as soon as we launch.
                                     </p>
                                     <button
-                                        onClick={() => setSubmitted(false)}
+                                        onClick={handleAddAnotherCouple}
                                         className="text-[var(--color-primary)] font-semibold hover:underline"
                                     >
                                         Add another couple
@@ -187,11 +226,14 @@ const EarlyAccess = () => {
                     </div>
                 </section>
 
+                {/* Rest of your component remains the same */}
                 {/* Benefits Section */}
                 <section className="py-20">
                     <div className="container px-4">
                         <div className="text-center mb-16">
-                            <h2 className="text-4xl font-bold mb-4 text-[#2B2B2B]">Early Access Benefits</h2>
+                            <h2 className="text-4xl font-bold mb-4 text-[#2B2B2B]">
+                                Early Access Benefits
+                            </h2>
                             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                                 Get more by joining early
                             </p>
@@ -202,9 +244,12 @@ const EarlyAccess = () => {
                                 <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-purple-500">
                                     <Sparkles size={32} />
                                 </div>
-                                <h3 className="text-xl font-bold mb-3 text-[#2B2B2B]">Lifetime Premium</h3>
+                                <h3 className="text-xl font-bold mb-3 text-[#2B2B2B]">
+                                    Lifetime Premium
+                                </h3>
                                 <p className="text-gray-600">
-                                    Get free lifetime access to all premium features worth ₹1,188/year
+                                    Get free lifetime access to all premium features worth
+                                    ₹1,188/year
                                 </p>
                             </div>
 
@@ -212,7 +257,9 @@ const EarlyAccess = () => {
                                 <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-blue-500">
                                     <Zap size={32} />
                                 </div>
-                                <h3 className="text-xl font-bold mb-3 text-[#2B2B2B]">First to Try</h3>
+                                <h3 className="text-xl font-bold mb-3 text-[#2B2B2B]">
+                                    First to Try
+                                </h3>
                                 <p className="text-gray-600">
                                     Be the first to experience new features before anyone else
                                 </p>
@@ -222,7 +269,9 @@ const EarlyAccess = () => {
                                 <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-[var(--color-primary)]">
                                     <Heart size={32} />
                                 </div>
-                                <h3 className="text-xl font-bold mb-3 text-[#2B2B2B]">Shape the Future</h3>
+                                <h3 className="text-xl font-bold mb-3 text-[#2B2B2B]">
+                                    Shape the Future
+                                </h3>
                                 <p className="text-gray-600">
                                     Your feedback will directly influence what we build next
                                 </p>
@@ -236,10 +285,17 @@ const EarlyAccess = () => {
                     <div className="container px-4">
                         <div className="max-w-4xl mx-auto text-center">
                             <div className="bg-white p-12 rounded-3xl shadow-xl">
-                                <Lock size={48} className="text-[var(--color-primary)] mx-auto mb-6" />
-                                <h2 className="text-3xl font-bold mb-4 text-[#2B2B2B]">Your Privacy Matters</h2>
+                                <Lock
+                                    size={48}
+                                    className="text-[var(--color-primary)] mx-auto mb-6"
+                                />
+                                <h2 className="text-3xl font-bold mb-4 text-[#2B2B2B]">
+                                    Your Privacy Matters
+                                </h2>
                                 <p className="text-lg text-gray-600 leading-relaxed">
-                                    We'll never share your emails with anyone. You're signing up for early access to CloseUs—a private app designed exclusively for couples. We respect your inbox.
+                                    We'll never share your emails with anyone. You're signing up for
+                                    early access to CloseUs—a private app designed exclusively for
+                                    couples. We respect your inbox.
                                 </p>
                             </div>
                         </div>

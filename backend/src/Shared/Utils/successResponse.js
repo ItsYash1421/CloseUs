@@ -1,8 +1,11 @@
+// ------------------------------------------------------------------
+// Standard Success Response
+// ------------------------------------------------------------------
 const successResponse = (data, message = 'Success') => {
     return {
         success: true,
         message,
-        data
+        data,
     };
 };
 

@@ -20,10 +20,7 @@ export default function CouplesPage() {
 
         setLoading(true);
         try {
-            const response = await apiClient.get(
-                `/admin/couples?page=${page}&limit=20`,
-                token
-            );
+            const response = await apiClient.get(`/admin/couples?page=${page}&limit=20`, token);
             setCouples(response.data.couples);
             setTotalPages(response.data.pagination.pages);
         } catch (error) {
@@ -92,7 +89,9 @@ export default function CouplesPage() {
                                             )}
                                         </td>
                                         <td className="text-gray-600">
-                                            {couple.anniversaryDate ? formatDate(couple.anniversaryDate) : '-'}
+                                            {couple.anniversaryDate
+                                                ? formatDate(couple.anniversaryDate)
+                                                : '-'}
                                         </td>
                                         <td className="text-gray-500">
                                             {formatDate(couple.createdAt)}

@@ -6,39 +6,41 @@ const messageSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Couple',
             required: true,
-            index: true
+            index: true,
         },
         senderId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
-            required: true
+            required: true,
         },
         type: {
             type: String,
             enum: ['text', 'image', 'voice', 'gif'],
-            default: 'text'
+            default: 'text',
         },
         content: {
             type: String,
-            required: true
+            required: true,
         },
         metadata: {
             duration: Number, // For voice messages
             size: Number,
             mimeType: String,
-            thumbnailUrl: String
+            thumbnailUrl: String,
         },
         isRead: {
             type: Boolean,
-            default: false
-        }
+            default: false,
+        },
     },
     {
-        timestamps: true
+        timestamps: true,
     }
 );
 
+// ------------------------------------------------------------------
 // Indexes
+// ------------------------------------------------------------------
 messageSchema.index({ coupleId: 1, createdAt: -1 });
 messageSchema.index({ senderId: 1 });
 

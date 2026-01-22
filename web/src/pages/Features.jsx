@@ -6,52 +6,77 @@ import { MessageCircle, Heart, Gamepad2, Camera, Calendar, Lock, Share2, Bell } 
 const features = [
     {
         icon: MessageCircle,
-        title: "Heartbeat Chat",
+        title: 'Heartbeat Chat',
         desc: "See your partner's heartbeat animation when they're typing. Share photos, voice notes, and exclusive couple stickers instantly.",
-        highlights: ["Real-time typing indicators", "Voice messages", "Photo sharing", "Custom stickers"]
+        highlights: [
+            'Real-time typing indicators',
+            'Voice messages',
+            'Photo sharing',
+            'Custom stickers',
+        ],
     },
     {
         icon: Gamepad2,
-        title: "Couple Games",
+        title: 'Couple Games',
         desc: "Play interactive games designed for two. From 'Never Have I Ever' to deep bonding questions.",
-        highlights: ["10+ couple games", "Daily challenges", "Progress tracking", "Fun & meaningful"]
+        highlights: [
+            '10+ couple games',
+            'Daily challenges',
+            'Progress tracking',
+            'Fun & meaningful',
+        ],
     },
     {
         icon: Calendar,
-        title: "Shared Memories",
-        desc: "Create a digital scrapbook with your favorite moments. Track your relationship timeline down to the second.",
-        highlights: ["Photo & video albums", "Timeline tracker", "Special date reminders", "Memory prompts"]
+        title: 'Shared Memories',
+        desc: 'Create a digital scrapbook with your favorite moments. Track your relationship timeline down to the second.',
+        highlights: [
+            'Photo & video albums',
+            'Timeline tracker',
+            'Special date reminders',
+            'Memory prompts',
+        ],
     },
     {
         icon: Heart,
-        title: "Daily Squeeze",
-        desc: "Answer a new question every day about your relationship. Build deeper understanding through daily connection.",
-        highlights: ["Daily questions", "Hidden answers until reveal", "Question history", "Personalized prompts"]
+        title: 'Daily Squeeze',
+        desc: 'Answer a new question every day about your relationship. Build deeper understanding through daily connection.',
+        highlights: [
+            'Daily questions',
+            'Hidden answers until reveal',
+            'Question history',
+            'Personalized prompts',
+        ],
     },
     {
         icon: Lock,
-        title: "Private & Secure",
-        desc: "End-to-end encrypted messaging and data storage. Your private space stays private.",
-        highlights: ["E2E encryption", "Secure cloud storage", "No data selling", "GDPR compliant"]
+        title: 'Private & Secure',
+        desc: 'End-to-end encrypted messaging and data storage. Your private space stays private.',
+        highlights: ['E2E encryption', 'Secure cloud storage', 'No data selling', 'GDPR compliant'],
     },
     {
         icon: Share2,
-        title: "Real-time Sync",
-        desc: "Everything syncs instantly across all devices. Pick up right where you left off.",
-        highlights: ["Cross-platform sync", "Offline mode", "Auto-backup", "Fast & reliable"]
+        title: 'Real-time Sync',
+        desc: 'Everything syncs instantly across all devices. Pick up right where you left off.',
+        highlights: ['Cross-platform sync', 'Offline mode', 'Auto-backup', 'Fast & reliable'],
     },
     {
         icon: Camera,
-        title: "Moments Capture",
-        desc: "Capture and share spontaneous moments with your partner in your private timeline.",
-        highlights: ["Quick photo sharing", "Video messages", "Story timeline", "Memory alerts"]
+        title: 'Moments Capture',
+        desc: 'Capture and share spontaneous moments with your partner in your private timeline.',
+        highlights: ['Quick photo sharing', 'Video messages', 'Story timeline', 'Memory alerts'],
     },
     {
         icon: Bell,
-        title: "Smart Notifications",
-        desc: "Get reminded of special dates, anniversaries, and when your partner is thinking of you.",
-        highlights: ["Anniversary reminders", "Birthday alerts", "Custom notifications", "Partner activity"]
-    }
+        title: 'Smart Notifications',
+        desc: 'Get reminded of special dates, anniversaries, and when your partner is thinking of you.',
+        highlights: [
+            'Anniversary reminders',
+            'Birthday alerts',
+            'Custom notifications',
+            'Partner activity',
+        ],
+    },
 ];
 
 const FeatureCard = ({ feature: { icon: Icon, title, desc, highlights } }) => (
@@ -64,7 +89,9 @@ const FeatureCard = ({ feature: { icon: Icon, title, desc, highlights } }) => (
         <ul className="space-y-2">
             {highlights.map((highlight, idx) => (
                 <li key={idx} className="flex items-center gap-2 text-sm text-gray-700">
-                    <div className="w-5 h-5 rounded-full bg-red-100 text-[var(--color-primary)] flex items-center justify-center text-xs font-bold">✓</div>
+                    <div className="w-5 h-5 rounded-full bg-red-100 text-[var(--color-primary)] flex items-center justify-center text-xs font-bold">
+                        ✓
+                    </div>
                     {highlight}
                 </li>
             ))}
@@ -87,7 +114,8 @@ const Features = () => {
                             <span className="text-gradient">stronger relationship.</span>
                         </h1>
                         <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                            CloseUs is packed with features designed exclusively for couples. Build connection, create memories, and grow closer together.
+                            CloseUs is packed with features designed exclusively for couples. Build
+                            connection, create memories, and grow closer together.
                         </p>
                     </div>
                 </section>

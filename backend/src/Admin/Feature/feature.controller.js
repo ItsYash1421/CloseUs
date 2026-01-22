@@ -1,7 +1,9 @@
 const FeatureFlag = require('../../models/FeatureFlag');
 const { successResponse, errorResponse } = require('../../Shared/Utils');
 
-// Create feature flag
+// ------------------------------------------------------------------
+// Create Feature Flag
+// ------------------------------------------------------------------
 exports.createFeatureFlag = async (req, res) => {
     try {
         const featureFlag = new FeatureFlag({
@@ -21,7 +23,9 @@ exports.createFeatureFlag = async (req, res) => {
     }
 };
 
-// Get all feature flags
+// ------------------------------------------------------------------
+// Get All Feature Flags
+// ------------------------------------------------------------------
 exports.getFeatureFlags = async (req, res) => {
     try {
         const featureFlags = await FeatureFlag.find()
@@ -35,14 +39,15 @@ exports.getFeatureFlags = async (req, res) => {
     }
 };
 
-// Update feature flag
+// ------------------------------------------------------------------
+// Update Feature Flag
+// ------------------------------------------------------------------
 exports.updateFeatureFlag = async (req, res) => {
     try {
-        const featureFlag = await FeatureFlag.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true, runValidators: true }
-        );
+        const featureFlag = await FeatureFlag.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true,
+        });
 
         if (!featureFlag) {
             return res.status(404).json(errorResponse('Feature flag not found', 404));
@@ -55,7 +60,9 @@ exports.updateFeatureFlag = async (req, res) => {
     }
 };
 
-// Toggle feature flag
+// ------------------------------------------------------------------
+// Toggle Feature Flag
+// ------------------------------------------------------------------
 exports.toggleFeatureFlag = async (req, res) => {
     try {
         const featureFlag = await FeatureFlag.findById(req.params.id);
@@ -75,20 +82,29 @@ exports.toggleFeatureFlag = async (req, res) => {
 
         await featureFlag.save();
 
-        res.json(successResponse(featureFlag, `Feature ${featureFlag.isEnabled ? 'enabled' : 'disabled'}`));
+        res.json(
+            successResponse(
+                featureFlag,
+                `Feature ${featureFlag.isEnabled ? 'enabled' : 'disabled'}`
+            )
+        );
     } catch (error) {
         console.error('Error toggling feature flag:', error);
         res.status(500).json(errorResponse('Failed to toggle feature flag'));
     }
 };
 
-// Update rollout percentage
+// ------------------------------------------------------------------
+// Update Rollout Percentage
+// ------------------------------------------------------------------
 exports.updateRollout = async (req, res) => {
     try {
         const { rolloutPercentage } = req.body;
 
         if (rolloutPercentage < 0 || rolloutPercentage > 100) {
-            return res.status(400).json(errorResponse('Rollout percentage must be between 0 and 100'));
+            return res
+                .status(400)
+                .json(errorResponse('Rollout percentage must be between 0 and 100'));
         }
 
         const featureFlag = await FeatureFlag.findByIdAndUpdate(
@@ -108,16 +124,18 @@ exports.updateRollout = async (req, res) => {
     }
 };
 
-// Get enabled features for user (called from mobile app)
+// ------------------------------------------------------------------
+// Get User Features (Mobile)
+// ------------------------------------------------------------------
 exports.getUserFeatures = async (req, res) => {
     try {
-        const user = req.user; // From auth middleware
+        const user = req.user;
 
         const featureFlags = await FeatureFlag.find({ isEnabled: true });
 
         const enabledFeatures = featureFlags
-            .filter(ff => ff.isEnabledForUser(user))
-            .map(ff => ({
+            .filter((ff) => ff.isEnabledForUser(user))
+            .map((ff) => ({
                 name: ff.name,
                 displayName: ff.displayName,
                 description: ff.description,

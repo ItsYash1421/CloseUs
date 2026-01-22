@@ -1,8 +1,8 @@
 const User = require('../../models/User');
 
-/**
- * Get notification preferences for the authenticated user
- */
+// ------------------------------------------------------------------
+// Get Notification Preferences
+// ------------------------------------------------------------------
 exports.getNotificationPreferences = async (req, res) => {
     try {
         console.log('[Preferences] Getting preferences for user:', req.user?.userId);
@@ -12,36 +12,34 @@ exports.getNotificationPreferences = async (req, res) => {
             console.log('[Preferences] User not found:', req.user?.userId);
             return res.status(404).json({
                 success: false,
-                message: 'User not found'
+                message: 'User not found',
             });
         }
 
-        // Return default preferences if not set
         const preferences = user.notificationPreferences || {
             pushEnabled: true,
             dailyReminders: true,
             partnerActivity: true,
-            messages: true
+            messages: true,
         };
 
         console.log('[Preferences] Returning preferences:', preferences);
         res.json({
             success: true,
-            data: preferences
+            data: preferences,
         });
     } catch (error) {
         console.error('Error getting notification preferences:', error);
         res.status(500).json({
             success: false,
-            message: 'Failed to get notification preferences'
+            message: 'Failed to get notification preferences',
         });
     }
 };
 
-
-/**
- * Update notification preferences for the authenticated user
- */
+// ------------------------------------------------------------------
+// Update Notification Preferences
+// ------------------------------------------------------------------
 exports.updateNotificationPreferences = async (req, res) => {
     try {
         const { pushEnabled, dailyReminders, partnerActivity, messages } = req.body;
@@ -54,8 +52,8 @@ exports.updateNotificationPreferences = async (req, res) => {
                     pushEnabled: pushEnabled ?? true,
                     dailyReminders: dailyReminders ?? true,
                     partnerActivity: partnerActivity ?? true,
-                    messages: messages ?? true
-                }
+                    messages: messages ?? true,
+                },
             },
             { new: true, runValidators: true }
         ).select('notificationPreferences');
@@ -64,7 +62,7 @@ exports.updateNotificationPreferences = async (req, res) => {
             console.log('[Preferences] User not found for update:', req.user?.userId);
             return res.status(404).json({
                 success: false,
-                message: 'User not found'
+                message: 'User not found',
             });
         }
 
@@ -72,13 +70,13 @@ exports.updateNotificationPreferences = async (req, res) => {
         res.json({
             success: true,
             data: user.notificationPreferences,
-            message: 'Notification preferences updated successfully'
+            message: 'Notification preferences updated successfully',
         });
     } catch (error) {
         console.error('Error updating notification preferences:', error);
         res.status(500).json({
             success: false,
-            message: 'Failed to update notification preferences'
+            message: 'Failed to update notification preferences',
         });
     }
 };

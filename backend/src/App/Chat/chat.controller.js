@@ -2,37 +2,37 @@ const Message = require('../../models/Message');
 const Couple = require('../../models/Couple');
 const { successResponse, errorResponse } = require('../../Shared/Utils');
 
-/**
- * Send message (HTTP fallback)
- */
+// ------------------------------------------------------------------
+// Send Message
+// ------------------------------------------------------------------
 const sendMessage = async (req, res) => {
     try {
         const userId = req.userId;
         const { type, content, metadata } = req.body;
 
-        // Get user's couple
         const couple = await Couple.findOne({
             $or: [{ partner1Id: userId }, { partner2Id: userId }],
             isActive: true,
-            isPaired: true
+            isPaired: true,
         });
 
         if (!couple) {
             return res.status(404).json(errorResponse('You are not part of a paired couple', 404));
         }
 
-        // Create message
         const message = await Message.create({
             coupleId: couple._id,
             senderId: userId,
             type: type || 'text',
             content,
-            metadata: metadata || {}
+            metadata: metadata || {},
         });
 
-        const populatedMessage = await Message.findById(message._id).populate('senderId', 'name photoUrl');
+        const populatedMessage = await Message.findById(message._id).populate(
+            'senderId',
+            'name photoUrl'
+        );
 
-        // Return message
         res.json(successResponse({ message: populatedMessage }, 'Message sent'));
     } catch (error) {
         console.error('Send message error:', error);
@@ -40,25 +40,23 @@ const sendMessage = async (req, res) => {
     }
 };
 
-/**
- * Get message history
- */
+// ------------------------------------------------------------------
+// Get Message History
+// ------------------------------------------------------------------
 const getMessages = async (req, res) => {
     try {
         const userId = req.userId;
         const { limit = 50, before } = req.query;
 
-        // Get user's couple
         const couple = await Couple.findOne({
             $or: [{ partner1Id: userId }, { partner2Id: userId }],
-            isActive: true
+            isActive: true,
         });
 
         if (!couple) {
             return res.status(404).json(errorResponse('Couple not found', 404));
         }
 
-        // Build query
         const query = { coupleId: couple._id };
         if (before) {
             query.createdAt = { $lt: new Date(before) };
@@ -76,18 +74,14 @@ const getMessages = async (req, res) => {
     }
 };
 
-/**
- * Mark message as read
- */
+// ------------------------------------------------------------------
+// Mark Message as Read
+// ------------------------------------------------------------------
 const markAsRead = async (req, res) => {
     try {
         const { messageId } = req.params;
 
-        const message = await Message.findByIdAndUpdate(
-            messageId,
-            { isRead: true },
-            { new: true }
-        );
+        const message = await Message.findByIdAndUpdate(messageId, { isRead: true }, { new: true });
 
         if (!message) {
             return res.status(404).json(errorResponse('Message not found', 404));
@@ -103,5 +97,5 @@ const markAsRead = async (req, res) => {
 module.exports = {
     sendMessage,
     getMessages,
-    markAsRead
+    markAsRead,
 };

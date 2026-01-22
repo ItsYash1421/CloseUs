@@ -2,9 +2,9 @@ const QuestionCategory = require('../../models/QuestionCategory');
 const Question = require('../../models/Question');
 const { successResponse, errorResponse } = require('../../Shared/Utils');
 
-/**
- * Create Question Category
- */
+// ------------------------------------------------------------------
+// Create Question Category
+// ------------------------------------------------------------------
 const createCategory = async (req, res) => {
     try {
         const { name, description, emoji, color } = req.body;
@@ -23,14 +23,13 @@ const createCategory = async (req, res) => {
     }
 };
 
-/**
- * Get All Categories
- */
+// ------------------------------------------------------------------
+// Get All Categories
+// ------------------------------------------------------------------
 const getCategories = async (req, res) => {
     try {
         const categories = await QuestionCategory.find().sort({ order: 1, createdAt: -1 });
 
-        // Get question count for each category
         const categoriesWithCount = await Promise.all(
             categories.map(async (cat) => {
                 const questionCount = await Question.countDocuments({ categoryId: cat._id });
@@ -47,9 +46,9 @@ const getCategories = async (req, res) => {
     }
 };
 
-/**
- * Update Category
- */
+// ------------------------------------------------------------------
+// Update Category
+// ------------------------------------------------------------------
 const updateCategory = async (req, res) => {
     try {
         const { id } = req.params;
@@ -66,17 +65,18 @@ const updateCategory = async (req, res) => {
     }
 };
 
-/**
- * Delete Category
- */
+// ------------------------------------------------------------------
+// Delete Category
+// ------------------------------------------------------------------
 const deleteCategory = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Check if category has questions
         const questionCount = await Question.countDocuments({ categoryId: id });
         if (questionCount > 0) {
-            return res.status(400).json(errorResponse('Cannot delete category with questions', 400));
+            return res
+                .status(400)
+                .json(errorResponse('Cannot delete category with questions', 400));
         }
 
         await QuestionCategory.findByIdAndDelete(id);
@@ -86,9 +86,9 @@ const deleteCategory = async (req, res) => {
     }
 };
 
-/**
- * Create Question
- */
+// ------------------------------------------------------------------
+// Create Question
+// ------------------------------------------------------------------
 const createQuestion = async (req, res) => {
     try {
         const { categoryId, text, isDaily } = req.body;
@@ -106,9 +106,9 @@ const createQuestion = async (req, res) => {
     }
 };
 
-/**
- * Get Questions by Category
- */
+// ------------------------------------------------------------------
+// Get Questions by Category
+// ------------------------------------------------------------------
 const getQuestionsByCategory = async (req, res) => {
     try {
         const { categoryId } = req.params;
@@ -123,9 +123,9 @@ const getQuestionsByCategory = async (req, res) => {
     }
 };
 
-/**
- * Update Question
- */
+// ------------------------------------------------------------------
+// Update Question
+// ------------------------------------------------------------------
 const updateQuestion = async (req, res) => {
     try {
         const { id } = req.params;
@@ -142,9 +142,9 @@ const updateQuestion = async (req, res) => {
     }
 };
 
-/**
- * Delete Question
- */
+// ------------------------------------------------------------------
+// Delete Question
+// ------------------------------------------------------------------
 const deleteQuestion = async (req, res) => {
     try {
         const { id } = req.params;

@@ -2,97 +2,109 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
     {
-        // Auth fields
+        // ------------------------------------------------------------------
+        // Auth Fields
+        // ------------------------------------------------------------------
         email: {
             type: String,
             required: true,
             unique: true,
             lowercase: true,
-            trim: true
+            trim: true,
         },
         googleId: {
             type: String,
-            unique: true
+            unique: true,
         },
         name: {
             type: String,
-            required: true
+            required: true,
         },
         photoUrl: String,
         isDefaultAvatar: {
             type: Boolean,
-            default: false
+            default: false,
         },
 
         gender: {
             type: String,
-            enum: ['male', 'female']
+            enum: ['male', 'female'],
         },
         dob: Date,
         relationshipStatus: {
             type: String,
-            enum: ['dating', 'engaged', 'married', 'other']
+            enum: ['dating', 'engaged', 'married', 'other'],
         },
         livingStyle: {
             type: String,
-            enum: ['long_distance', 'same_city', 'living_together']
+            enum: ['long_distance', 'same_city', 'living_together'],
         },
         anniversary: Date,
         partnerName: String, // Temporary storage until paired
 
-        // Pairing fields
+        // ------------------------------------------------------------------
+        // Pairing Fields
+        // ------------------------------------------------------------------
         coupleId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Couple'
+            ref: 'Couple',
         },
 
-        // App tracking
+        // ------------------------------------------------------------------
+        // App Tracking
+        // ------------------------------------------------------------------
         isOnboardingComplete: {
             type: Boolean,
-            default: false
+            default: false,
         },
         lastActive: Date,
         pushToken: String,
         platform: {
             type: String,
-            enum: ['ios', 'android']
+            enum: ['ios', 'android'],
         },
 
+        // ------------------------------------------------------------------
         // Notification Preferences
+        // ------------------------------------------------------------------
         notificationPreferences: {
             pushEnabled: {
                 type: Boolean,
-                default: true
+                default: true,
             },
             dailyReminders: {
                 type: Boolean,
-                default: true
+                default: true,
             },
             partnerActivity: {
                 type: Boolean,
-                default: true
+                default: true,
             },
             messages: {
                 type: Boolean,
-                default: true
-            }
-        }
+                default: true,
+            },
+        },
     },
     {
         timestamps: true,
         toJSON: { virtuals: true },
-        toObject: { virtuals: true }
+        toObject: { virtuals: true },
     }
 );
 
-// Virtual field: isOnline (true if lastActive within 5 minutes)
+// ------------------------------------------------------------------
+// Virtual Field: isOnline
+// ------------------------------------------------------------------
 userSchema.virtual('isOnline').get(function () {
     if (!this.lastActive) return false;
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     return this.lastActive > fiveMinutesAgo;
 });
 
+// ------------------------------------------------------------------
 // Indexes
+// ------------------------------------------------------------------
 userSchema.index({ coupleId: 1 });
 
 module.exports = mongoose.model('User', userSchema);

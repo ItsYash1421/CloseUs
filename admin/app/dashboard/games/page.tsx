@@ -43,7 +43,10 @@ export default function GamesPage() {
 
     const fetchCategories = async () => {
         try {
-            const response = await apiClient.get('/admin/games/categories?gameType=never_have_i_ever', token!);
+            const response = await apiClient.get(
+                '/admin/games/categories?gameType=never_have_i_ever',
+                token!
+            );
             setCategories(response.data);
         } catch (error) {
             console.error('Failed to fetch categories:', error);
@@ -53,7 +56,10 @@ export default function GamesPage() {
     const fetchQuestions = async (categoryId: string) => {
         setLoading(true);
         try {
-            const response = await apiClient.get(`/admin/games/questions/category/${categoryId}`, token!);
+            const response = await apiClient.get(
+                `/admin/games/questions/category/${categoryId}`,
+                token!
+            );
             setQuestions(response.data);
         } catch (error) {
             console.error('Failed to fetch questions:', error);
@@ -65,11 +71,18 @@ export default function GamesPage() {
     const handleCreateCategory = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const tagsArray = categoryForm.tags.split(',').map(t => t.trim()).filter(Boolean);
-            await apiClient.post('/admin/games/categories', {
-                ...categoryForm,
-                tags: tagsArray,
-            }, token!);
+            const tagsArray = categoryForm.tags
+                .split(',')
+                .map((t) => t.trim())
+                .filter(Boolean);
+            await apiClient.post(
+                '/admin/games/categories',
+                {
+                    ...categoryForm,
+                    tags: tagsArray,
+                },
+                token!
+            );
             setShowCategoryForm(false);
             setCategoryForm({
                 gameType: 'never_have_i_ever',
@@ -125,9 +138,13 @@ export default function GamesPage() {
 
     const toggleTrending = async (id: string, currentStatus: boolean) => {
         try {
-            await apiClient.put(`/admin/games/categories/${id}`, {
-                isTrending: !currentStatus,
-            }, token!);
+            await apiClient.put(
+                `/admin/games/categories/${id}`,
+                {
+                    isTrending: !currentStatus,
+                },
+                token!
+            );
             fetchCategories();
         } catch (error) {
             console.error('Failed to update category:', error);
@@ -141,7 +158,10 @@ export default function GamesPage() {
             </div>
 
             <div className="mb-4">
-                <button onClick={() => setShowCategoryForm(!showCategoryForm)} className="btn-primary">
+                <button
+                    onClick={() => setShowCategoryForm(!showCategoryForm)}
+                    className="btn-primary"
+                >
                     + Create Game Category
                 </button>
             </div>
@@ -155,7 +175,9 @@ export default function GamesPage() {
                             <label className="block text-sm font-medium mb-2">Game Type</label>
                             <select
                                 value={categoryForm.gameType}
-                                onChange={(e) => setCategoryForm({ ...categoryForm, gameType: e.target.value })}
+                                onChange={(e) =>
+                                    setCategoryForm({ ...categoryForm, gameType: e.target.value })
+                                }
                                 className="input"
                             >
                                 <option value="never_have_i_ever">Never Have I Ever</option>
@@ -168,7 +190,9 @@ export default function GamesPage() {
                             <input
                                 type="text"
                                 value={categoryForm.name}
-                                onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
+                                onChange={(e) =>
+                                    setCategoryForm({ ...categoryForm, name: e.target.value })
+                                }
                                 className="input"
                                 placeholder="Travel F*ckups & Brags"
                                 required
@@ -180,7 +204,9 @@ export default function GamesPage() {
                                 <input
                                     type="text"
                                     value={categoryForm.emoji}
-                                    onChange={(e) => setCategoryForm({ ...categoryForm, emoji: e.target.value })}
+                                    onChange={(e) =>
+                                        setCategoryForm({ ...categoryForm, emoji: e.target.value })
+                                    }
                                     className="input"
                                     placeholder="🧳"
                                 />
@@ -190,17 +216,23 @@ export default function GamesPage() {
                                 <input
                                     type="color"
                                     value={categoryForm.color}
-                                    onChange={(e) => setCategoryForm({ ...categoryForm, color: e.target.value })}
+                                    onChange={(e) =>
+                                        setCategoryForm({ ...categoryForm, color: e.target.value })
+                                    }
                                     className="input h-10"
                                 />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-2">Tags (comma separated)</label>
+                            <label className="block text-sm font-medium mb-2">
+                                Tags (comma separated)
+                            </label>
                             <input
                                 type="text"
                                 value={categoryForm.tags}
-                                onChange={(e) => setCategoryForm({ ...categoryForm, tags: e.target.value })}
+                                onChange={(e) =>
+                                    setCategoryForm({ ...categoryForm, tags: e.target.value })
+                                }
                                 className="input"
                                 placeholder="#TravelOops, #Should'veStayedHome"
                             />
@@ -210,7 +242,12 @@ export default function GamesPage() {
                                 type="checkbox"
                                 id="isTrending"
                                 checked={categoryForm.isTrending}
-                                onChange={(e) => setCategoryForm({ ...categoryForm, isTrending: e.target.checked })}
+                                onChange={(e) =>
+                                    setCategoryForm({
+                                        ...categoryForm,
+                                        isTrending: e.target.checked,
+                                    })
+                                }
                                 className="w-4 h-4"
                             />
                             <label htmlFor="isTrending" className="text-sm font-medium">
@@ -218,8 +255,14 @@ export default function GamesPage() {
                             </label>
                         </div>
                         <div className="flex gap-2">
-                            <button type="submit" className="btn-primary">Create</button>
-                            <button type="button" onClick={() => setShowCategoryForm(false)} className="btn-secondary">
+                            <button type="submit" className="btn-primary">
+                                Create
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setShowCategoryForm(false)}
+                                className="btn-secondary"
+                            >
                                 Cancel
                             </button>
                         </div>
@@ -242,20 +285,27 @@ export default function GamesPage() {
                                     <h3 className="font-bold text-lg">{category.name}</h3>
                                     <div className="flex gap-2 mt-1">
                                         {category.tags?.map((tag: string, idx: number) => (
-                                            <span key={idx} className="text-xs text-blue-600">{tag}</span>
+                                            <span key={idx} className="text-xs text-blue-600">
+                                                {tag}
+                                            </span>
                                         ))}
                                     </div>
                                     <p className="text-sm text-gray-600 mt-1">
-                                        {category.questionCount} questions • {category.timesPlayed} plays
+                                        {category.questionCount} questions • {category.timesPlayed}{' '}
+                                        plays
                                     </p>
                                 </div>
                             </div>
                             <div className="flex gap-2">
                                 {category.isTrending && (
-                                    <span className="badge bg-red-100 text-red-800">📈 Trending</span>
+                                    <span className="badge bg-red-100 text-red-800">
+                                        📈 Trending
+                                    </span>
                                 )}
                                 <button
-                                    onClick={() => toggleTrending(category._id, category.isTrending)}
+                                    onClick={() =>
+                                        toggleTrending(category._id, category.isTrending)
+                                    }
                                     className="text-blue-600 hover:text-blue-700"
                                     title="Toggle trending"
                                 >
@@ -284,8 +334,7 @@ export default function GamesPage() {
                 <div className="card">
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="text-xl font-semibold">
-                            Questions for{' '}
-                            {categories.find((c) => c._id === selectedCategory)?.name}
+                            Questions for {categories.find((c) => c._id === selectedCategory)?.name}
                         </h3>
                         <div className="flex gap-2">
                             <button
@@ -294,7 +343,10 @@ export default function GamesPage() {
                             >
                                 + Add Question
                             </button>
-                            <button onClick={() => setSelectedCategory('')} className="btn-secondary">
+                            <button
+                                onClick={() => setSelectedCategory('')}
+                                className="btn-secondary"
+                            >
                                 Close
                             </button>
                         </div>
@@ -305,10 +357,17 @@ export default function GamesPage() {
                         <div className="mb-6 p-4 bg-gray-50 rounded-lg">
                             <form onSubmit={handleCreateQuestion} className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">Question Text</label>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Question Text
+                                    </label>
                                     <textarea
                                         value={questionForm.text}
-                                        onChange={(e) => setQuestionForm({ ...questionForm, text: e.target.value })}
+                                        onChange={(e) =>
+                                            setQuestionForm({
+                                                ...questionForm,
+                                                text: e.target.value,
+                                            })
+                                        }
                                         className="input"
                                         rows={2}
                                         placeholder="Never have I ever..."
@@ -318,12 +377,21 @@ export default function GamesPage() {
                                 <div className="flex gap-2">
                                     <button
                                         type="submit"
-                                        onClick={() => setQuestionForm({ ...questionForm, categoryId: selectedCategory })}
+                                        onClick={() =>
+                                            setQuestionForm({
+                                                ...questionForm,
+                                                categoryId: selectedCategory,
+                                            })
+                                        }
                                         className="btn-primary"
                                     >
                                         Add
                                     </button>
-                                    <button type="button" onClick={() => setShowQuestionForm(false)} className="btn-secondary">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowQuestionForm(false)}
+                                        className="btn-secondary"
+                                    >
                                         Cancel
                                     </button>
                                 </div>
@@ -339,7 +407,10 @@ export default function GamesPage() {
                     ) : (
                         <div className="space-y-2">
                             {questions.map((question, idx) => (
-                                <div key={question._id} className="flex justify-between items-center p-3 bg-white rounded border">
+                                <div
+                                    key={question._id}
+                                    className="flex justify-between items-center p-3 bg-white rounded border"
+                                >
                                     <div className="flex-1">
                                         <span className="font-medium mr-2">{idx + 1}.</span>
                                         {question.text}
@@ -356,7 +427,9 @@ export default function GamesPage() {
                                 </div>
                             ))}
                             {questions.length === 0 && (
-                                <p className="text-center text-gray-500 py-8">No questions yet. Add some!</p>
+                                <p className="text-center text-gray-500 py-8">
+                                    No questions yet. Add some!
+                                </p>
                             )}
                         </div>
                     )}

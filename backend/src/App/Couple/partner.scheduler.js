@@ -3,10 +3,9 @@ const Answer = require('../../models/Answer');
 const User = require('../../models/User');
 const Couple = require('../../models/Couple');
 
-/**
- * Dev Partner Auto-Answer Scheduler
- * Checks every minute for dev partner answers that need to be submitted
- */
+// ------------------------------------------------------------------
+// Dev Partner Auto-Answer Scheduler
+// ------------------------------------------------------------------
 class DevPartnerScheduler {
     constructor() {
         this.intervalId = null;
@@ -22,12 +21,10 @@ class DevPartnerScheduler {
         console.log('✅ Dev Partner Auto-Answer Scheduler started');
         this.isRunning = true;
 
-        // Run every minute
         this.intervalId = setInterval(async () => {
             await this.processDevPartnerAnswers();
-        }, 60 * 1000); // 1 minute
+        }, 60 * 1000);
 
-        // Run immediately on start
         this.processDevPartnerAnswers();
     }
 
@@ -43,38 +40,34 @@ class DevPartnerScheduler {
     async processDevPartnerAnswers() {
         try {
             const now = new Date();
-            // FOR TESTING: 10 seconds delay instead of 15 minutes
+
             const delayTime = new Date(now.getTime() - 10 * 1000);
 
-            // Find all dev couples
             const devCouples = await Couple.find({ isDevPartner: true, isPaired: true });
 
             for (const couple of devCouples) {
-                // Get today's question for this couple
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 
                 const dailyQuestion = await DailyCoupleQuestion.findOne({
                     coupleId: couple._id,
-                    date: today
+                    date: today,
                 });
 
                 if (!dailyQuestion) continue;
 
-                // Check if either partner answered
                 const partner1Answer = await Answer.findOne({
                     userId: couple.partner1Id,
                     questionId: dailyQuestion.questionId,
-                    coupleId: couple._id
+                    coupleId: couple._id,
                 });
 
                 const partner2Answer = await Answer.findOne({
                     userId: couple.partner2Id,
                     questionId: dailyQuestion.questionId,
-                    coupleId: couple._id
+                    coupleId: couple._id,
                 });
 
-                // Determine who is the real user and who is the dev partner
                 const partner1 = await User.findById(couple.partner1Id);
                 const partner2 = await User.findById(couple.partner2Id);
 
@@ -92,12 +85,9 @@ class DevPartnerScheduler {
                     devPartnerAnswer = partner2Answer;
                 }
 
-                // If real user answered but dev partner hasn't
                 if (realUserAnswer && !devPartnerAnswer) {
-                    // Check if delay time has passed since user's answer
                     const answerTime = new Date(realUserAnswer.createdAt);
                     if (answerTime <= delayTime) {
-                        // Create dev partner answer
                         await this.createDevPartnerAnswer(
                             devPartner._id,
                             dailyQuestion.questionId,
@@ -113,14 +103,12 @@ class DevPartnerScheduler {
 
     async createDevPartnerAnswer(userId, questionId, coupleId) {
         try {
-            // Generate a simple response
             const responses = [
-                "I love spending time with you! 💕",
-                "You make me so happy every day! 😊",
-                "Being with you is the best feeling! ❤️"
-                ,
+                'I love spending time with you! 💕',
+                'You make me so happy every day! 😊',
+                'Being with you is the best feeling! ❤️',
                 "I'm grateful for every moment we share! 🌟",
-                "You're amazing and I appreciate you! 💖"
+                "You're amazing and I appreciate you! 💖",
             ];
 
             const randomResponse = responses[Math.floor(Math.random() * responses.length)];
@@ -132,7 +120,7 @@ class DevPartnerScheduler {
                 questionId,
                 coupleId,
                 text: randomResponse,
-                date: today
+                date: today,
             });
 
             console.log(`✅ Dev partner auto-answered for question ${questionId}`);

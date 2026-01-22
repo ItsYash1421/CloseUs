@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-// Import routes
-// Import routes
+// ------------------------------------------------------------------
+// Import Routes
+// ------------------------------------------------------------------
 const authRoutes = require('../App/Auth/auth.routes');
 const userRoutes = require('../App/Profile/profile.routes');
 const coupleRoutes = require('../App/Couple/couple.routes');
@@ -11,36 +12,54 @@ const chatRoutes = require('../App/Chat/chat.routes');
 const adminRoutes = require('../Admin/admin.routes');
 const webRoutes = require('../Web/EarlyAccess/earlyAccess.routes');
 
-// Web routes (public)
+// ------------------------------------------------------------------
+// Web Routes (Public)
+// ------------------------------------------------------------------
 router.use('/web', webRoutes);
 
-// Auth routes (public)
+// ------------------------------------------------------------------
+// Auth Routes (Public)
+// ------------------------------------------------------------------
 router.use('/auth', authRoutes);
 
-// Admin routes (protected)
+// ------------------------------------------------------------------
+// Admin Routes (Protected)
+// ------------------------------------------------------------------
 router.use('/admin', adminRoutes);
 
-// User routes (protected)
-// User routes (protected)
-router.use('/users', homeRoutes); // Mount Home routes (Daily Question) on /users to preserve API path
+// ------------------------------------------------------------------
+// User Routes (Protected)
+// ------------------------------------------------------------------
+router.use('/users', homeRoutes);
 router.use('/users', userRoutes);
 router.use('/couples', coupleRoutes);
 router.use('/chat', chatRoutes);
 
-// Analytics tracking (public endpoint for mobile)
+// ------------------------------------------------------------------
+// Analytics & Misc (Protected)
+// ------------------------------------------------------------------
+// ------------------------------------------------------------------
+// Analytics Tracking
+// ------------------------------------------------------------------
 const authMiddleware = require('../App/Middleware/auth.middleware');
 const { trackEvent } = require('../Admin/Analytics/analytics.controller');
 router.post('/analytics/track', authMiddleware, trackEvent);
 
-// Promotion redemption (public endpoint for mobile)
+// ------------------------------------------------------------------
+// Promotion Redemption
+// ------------------------------------------------------------------
 const { redeemPromotion } = require('../Admin/Promotion/promotion.controller');
 router.post('/promotions/redeem', authMiddleware, redeemPromotion);
 
-// Feature flags (public endpoint for mobile)
+// ------------------------------------------------------------------
+// Feature Flags
+// ------------------------------------------------------------------
 const { getUserFeatures } = require('../Admin/Feature/feature.controller');
 router.get('/features/user', authMiddleware, getUserFeatures);
 
-// Notification routes (dev/mixed)
+// ------------------------------------------------------------------
+// Notification Routes (Dev/Mixed)
+// ------------------------------------------------------------------
 const notificationRoutes = require('../App/Notification/notification.routes');
 router.use('/notifications', notificationRoutes);
 

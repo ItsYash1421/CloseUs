@@ -1,0 +1,26 @@
+{
+    "name": "closeus",
+    "version": "1.0.0",
+    "description": "![CloseUs](app/src/assets/images/Logo-Main.png)",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "prettier:check": "prettier --check .",
+        "prettier:write": "prettier --write ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ItsYash1421/CloseUs.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "commonjs",
+    "bugs": {
+        "url": "https://github.com/ItsYash1421/CloseUs/issues"
+    },
+    "homepage": "https://github.com/ItsYash1421/CloseUs#readme",
+    "devDependencies": {
+        "prettier": "^3.8.1"
+    }
+}

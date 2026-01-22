@@ -138,7 +138,10 @@ export default function QuestionsPage() {
             {activeTab === 'categories' && (
                 <div>
                     <div className="mb-4">
-                        <button onClick={() => setShowCategoryForm(!showCategoryForm)} className="btn-primary">
+                        <button
+                            onClick={() => setShowCategoryForm(!showCategoryForm)}
+                            className="btn-primary"
+                        >
                             + Create Category
                         </button>
                     </div>
@@ -153,44 +156,76 @@ export default function QuestionsPage() {
                                     <input
                                         type="text"
                                         value={categoryForm.name}
-                                        onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
+                                        onChange={(e) =>
+                                            setCategoryForm({
+                                                ...categoryForm,
+                                                name: e.target.value,
+                                            })
+                                        }
                                         className="input"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">Description</label>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Description
+                                    </label>
                                     <textarea
                                         value={categoryForm.description}
-                                        onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
+                                        onChange={(e) =>
+                                            setCategoryForm({
+                                                ...categoryForm,
+                                                description: e.target.value,
+                                            })
+                                        }
                                         className="input"
                                         rows={2}
                                     />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium mb-2">Emoji</label>
+                                        <label className="block text-sm font-medium mb-2">
+                                            Emoji
+                                        </label>
                                         <input
                                             type="text"
                                             value={categoryForm.emoji}
-                                            onChange={(e) => setCategoryForm({ ...categoryForm, emoji: e.target.value })}
+                                            onChange={(e) =>
+                                                setCategoryForm({
+                                                    ...categoryForm,
+                                                    emoji: e.target.value,
+                                                })
+                                            }
                                             className="input"
                                             placeholder="💚"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium mb-2">Color</label>
+                                        <label className="block text-sm font-medium mb-2">
+                                            Color
+                                        </label>
                                         <input
                                             type="color"
                                             value={categoryForm.color}
-                                            onChange={(e) => setCategoryForm({ ...categoryForm, color: e.target.value })}
+                                            onChange={(e) =>
+                                                setCategoryForm({
+                                                    ...categoryForm,
+                                                    color: e.target.value,
+                                                })
+                                            }
                                             className="input h-10"
                                         />
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button type="submit" className="btn-primary">Create</button>
-                                    <button type="button" onClick={() => setShowCategoryForm(false)} className="btn-secondary">
+                                    <button type="submit" className="btn-primary">
+                                        Create
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCategoryForm(false)}
+                                        className="btn-secondary"
+                                    >
                                         Cancel
                                     </button>
                                 </div>
@@ -207,7 +242,9 @@ export default function QuestionsPage() {
                                         <span className="text-2xl">{category.emoji}</span>
                                         <div>
                                             <h3 className="font-semibold">{category.name}</h3>
-                                            <p className="text-sm text-gray-600">{category.questionCount} questions</p>
+                                            <p className="text-sm text-gray-600">
+                                                {category.questionCount} questions
+                                            </p>
                                         </div>
                                     </div>
                                     <button
@@ -261,10 +298,17 @@ export default function QuestionsPage() {
                             <h3 className="text-lg font-semibold mb-4">New Question</h3>
                             <form onSubmit={handleCreateQuestion} className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">Question Text</label>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Question Text
+                                    </label>
                                     <textarea
                                         value={questionForm.text}
-                                        onChange={(e) => setQuestionForm({ ...questionForm, text: e.target.value })}
+                                        onChange={(e) =>
+                                            setQuestionForm({
+                                                ...questionForm,
+                                                text: e.target.value,
+                                            })
+                                        }
                                         className="input"
                                         rows={3}
                                         required
@@ -275,7 +319,12 @@ export default function QuestionsPage() {
                                         type="checkbox"
                                         id="isDaily"
                                         checked={questionForm.isDaily}
-                                        onChange={(e) => setQuestionForm({ ...questionForm, isDaily: e.target.checked })}
+                                        onChange={(e) =>
+                                            setQuestionForm({
+                                                ...questionForm,
+                                                isDaily: e.target.checked,
+                                            })
+                                        }
                                         className="w-4 h-4"
                                     />
                                     <label htmlFor="isDaily" className="text-sm font-medium">
@@ -285,12 +334,21 @@ export default function QuestionsPage() {
                                 <div className="flex gap-2">
                                     <button
                                         type="submit"
-                                        onClick={() => setQuestionForm({ ...questionForm, categoryId: selectedCategory })}
+                                        onClick={() =>
+                                            setQuestionForm({
+                                                ...questionForm,
+                                                categoryId: selectedCategory,
+                                            })
+                                        }
                                         className="btn-primary"
                                     >
                                         Create
                                     </button>
-                                    <button type="button" onClick={() => setShowQuestionForm(false)} className="btn-secondary">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowQuestionForm(false)}
+                                        className="btn-secondary"
+                                    >
                                         Cancel
                                     </button>
                                 </div>
@@ -308,12 +366,17 @@ export default function QuestionsPage() {
                             ) : (
                                 <div className="space-y-3">
                                     {questions.map((question) => (
-                                        <div key={question._id} className="flex justify-between items-start p-4 bg-gray-50 rounded-lg">
+                                        <div
+                                            key={question._id}
+                                            className="flex justify-between items-start p-4 bg-gray-50 rounded-lg"
+                                        >
                                             <div className="flex-1">
                                                 <p className="font-medium">{question.text}</p>
                                                 <div className="flex gap-2 mt-2">
                                                     {question.isDaily && (
-                                                        <span className="badge badge-warning">Daily Question</span>
+                                                        <span className="badge badge-warning">
+                                                            Daily Question
+                                                        </span>
                                                     )}
                                                     <span className="text-xs text-gray-500">
                                                         Answered {question.timesAnswered || 0} times
@@ -329,7 +392,9 @@ export default function QuestionsPage() {
                                         </div>
                                     ))}
                                     {questions.length === 0 && (
-                                        <p className="text-center text-gray-500 py-8">No questions yet</p>
+                                        <p className="text-center text-gray-500 py-8">
+                                            No questions yet
+                                        </p>
                                     )}
                                 </div>
                             )}

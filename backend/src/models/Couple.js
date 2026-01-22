@@ -5,56 +5,68 @@ const coupleSchema = new mongoose.Schema(
         partner1Id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
-            required: true
+            required: true,
         },
         partner2Id: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
+            ref: 'User',
         },
 
+        // ------------------------------------------------------------------
         // Pairing
+        // ------------------------------------------------------------------
         pairingKey: {
             type: String,
             unique: true,
-            sparse: true
+            sparse: true,
         },
         pairingKeyExpires: Date,
         isPaired: {
             type: Boolean,
-            default: false
+            default: false,
         },
 
+        // ------------------------------------------------------------------
         // Relationship
+        // ------------------------------------------------------------------
         startDate: Date,
         coupleTag: {
-            type: String, // e.g., #Yasushi
+            type: String,
             unique: true,
-            sparse: true
+            sparse: true,
         },
 
-        // Shared settings
+        // ------------------------------------------------------------------
+        // Shared Settings
+        // ------------------------------------------------------------------
         relationshipStatus: String,
         livingStyle: String,
         timeZone: String,
 
+        // ------------------------------------------------------------------
         // Status
+        // ------------------------------------------------------------------
         isActive: {
             type: Boolean,
-            default: true
+            default: true,
         },
 
-        // Dev mode flag (for testing with dummy partner)
+        // ------------------------------------------------------------------
+        // Dev Mode Flag
+        // ------------------------------------------------------------------
         isDevPartner: {
             type: Boolean,
-            default: false
-        }
+            default: false,
+        },
     },
     {
-        timestamps: true
+        timestamps: true,
     }
 );
 
+// ------------------------------------------------------------------
 // Indexes
+// ------------------------------------------------------------------
 coupleSchema.index({ pairingKey: 1 });
 coupleSchema.index({ partner1Id: 1 });
 coupleSchema.index({ partner2Id: 1 });

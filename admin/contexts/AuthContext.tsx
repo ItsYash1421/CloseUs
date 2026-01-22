@@ -24,8 +24,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (savedToken) {
             setToken(savedToken);
             // Fetch admin profile
-            apiClient.get('/admin/auth/me', savedToken)
-                .then(response => {
+            apiClient
+                .get('/admin/auth/me', savedToken)
+                .then((response) => {
                     setAdmin(response.data);
                 })
                 .catch(() => {

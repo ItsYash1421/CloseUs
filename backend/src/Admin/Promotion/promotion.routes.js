@@ -5,6 +5,9 @@ const adminAuthMiddleware = require('../Middleware/auth.middleware');
 
 router.use(adminAuthMiddleware);
 
+// ------------------------------------------------------------------
+// Promotion Routes
+// ------------------------------------------------------------------
 router.post('/', promotionController.createPromotion);
 router.get('/', promotionController.getPromotions);
 router.put('/:id', promotionController.updatePromotion);

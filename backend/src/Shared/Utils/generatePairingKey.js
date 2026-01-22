@@ -1,3 +1,6 @@
+// ------------------------------------------------------------------
+// Generate 6-Character Pairing Key
+// ------------------------------------------------------------------
 const generatePairingKey = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let key = '';

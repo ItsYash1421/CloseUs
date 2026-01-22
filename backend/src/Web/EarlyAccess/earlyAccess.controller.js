@@ -10,13 +10,10 @@ const joinWaitlist = async (req, res) => {
 
         const { data, error } = await supabase
             .from('early_access_users')
-            .insert([
-                { name, email: email, partner_email: partnerEmail }
-            ])
+            .insert([{ name, email: email, partner_email: partnerEmail }])
             .select();
 
         if (error) {
-            // Check for unique violation on email
             if (error.code === '23505') {
                 return res.status(409).json({ error: 'Email already registered' });
             }
@@ -31,5 +28,5 @@ const joinWaitlist = async (req, res) => {
 };
 
 module.exports = {
-    joinWaitlist
+    joinWaitlist,
 };

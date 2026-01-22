@@ -2,11 +2,18 @@ const Notification = require('../../models/Notification');
 const NotificationTemplate = require('../../models/NotificationTemplate');
 const User = require('../../models/User');
 const { successResponse, errorResponse } = require('../../Shared/Utils');
-const { sendBulkNotifications, sendPushNotification } = require('../../Shared/Services/notification.service');
+const {
+    sendBulkNotifications,
+    sendPushNotification,
+} = require('../../Shared/Services/notification.service');
 
-// ========== NOTIFICATION TEMPLATES ==========
+// ------------------------------------------------------------------
+// Notification Templates
+// ------------------------------------------------------------------
 
-// Get all notification templates
+// ------------------------------------------------------------------
+// Get All Templates
+// ------------------------------------------------------------------
 exports.getAllTemplates = async (req, res) => {
     try {
         const { type, isActive } = req.query;
@@ -15,8 +22,7 @@ exports.getAllTemplates = async (req, res) => {
         if (type) filter.type = type;
         if (isActive !== undefined) filter.isActive = isActive === 'true';
 
-        const templates = await NotificationTemplate.find(filter)
-            .sort({ createdAt: -1 });
+        const templates = await NotificationTemplate.find(filter).sort({ createdAt: -1 });
 
         res.json(successResponse(templates));
     } catch (error) {
@@ -25,7 +31,9 @@ exports.getAllTemplates = async (req, res) => {
     }
 };
 
-// Create new notification template
+// ------------------------------------------------------------------
+// Create New Template
+// ------------------------------------------------------------------
 exports.createTemplate = async (req, res) => {
     try {
         const { title, body, type, targetScreen, emoji, scheduledFor, metadata } = req.body;
@@ -48,17 +56,18 @@ exports.createTemplate = async (req, res) => {
     }
 };
 
-// Update notification template
+// ------------------------------------------------------------------
+// Update Template
+// ------------------------------------------------------------------
 exports.updateTemplate = async (req, res) => {
     try {
         const { id } = req.params;
         const updates = req.body;
 
-        const template = await NotificationTemplate.findByIdAndUpdate(
-            id,
-            updates,
-            { new: true, runValidators: true }
-        );
+        const template = await NotificationTemplate.findByIdAndUpdate(id, updates, {
+            new: true,
+            runValidators: true,
+        });
 
         if (!template) {
             return res.status(404).json(errorResponse('Template not found', 404));
@@ -71,7 +80,9 @@ exports.updateTemplate = async (req, res) => {
     }
 };
 
-// Delete notification template
+// ------------------------------------------------------------------
+// Delete Template
+// ------------------------------------------------------------------
 exports.deleteTemplate = async (req, res) => {
     try {
         const { id } = req.params;
@@ -89,7 +100,9 @@ exports.deleteTemplate = async (req, res) => {
     }
 };
 
-// Activate/Deactivate template
+// ------------------------------------------------------------------
+// Toggle Template Status
+// ------------------------------------------------------------------
 exports.toggleTemplateStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -105,19 +118,25 @@ exports.toggleTemplateStatus = async (req, res) => {
             return res.status(404).json(errorResponse('Template not found', 404));
         }
 
-        res.json(successResponse(
-            template,
-            `Template ${isActive ? 'activated' : 'deactivated'} successfully`
-        ));
+        res.json(
+            successResponse(
+                template,
+                `Template ${isActive ? 'activated' : 'deactivated'} successfully`
+            )
+        );
     } catch (error) {
         console.error('Error toggling template status:', error);
         res.status(500).json(errorResponse('Failed to update template status'));
     }
 };
 
-// ========== SEND NOTIFICATIONS ==========
+// ------------------------------------------------------------------
+// Send Notifications
+// ------------------------------------------------------------------
 
-// Send notification to all users
+// ------------------------------------------------------------------
+// Send to All Users
+// ------------------------------------------------------------------
 exports.sendToAllUsers = async (req, res) => {
     try {
         const { templateId, customTitle, customBody, targetScreen } = req.body;
@@ -150,14 +169,16 @@ exports.sendToAllUsers = async (req, res) => {
         }).select('pushToken');
 
         if (users.length === 0) {
-            return res.json(successResponse({
-                sentCount: 0,
-                message: 'No users with push tokens found',
-            }));
+            return res.json(
+                successResponse({
+                    sentCount: 0,
+                    message: 'No users with push tokens found',
+                })
+            );
         }
 
         // Prepare notifications
-        const notifications = users.map(user => ({
+        const notifications = users.map((user) => ({
             token: user.pushToken,
             title,
             body,
@@ -171,21 +192,28 @@ exports.sendToAllUsers = async (req, res) => {
         // Send in batches
         const results = await sendBulkNotifications(notifications);
 
-        const successCount = results.filter(r => r.status === 'fulfilled').length;
-        const failureCount = results.filter(r => r.status === 'rejected').length;
+        const successCount = results.filter((r) => r.status === 'fulfilled').length;
+        const failureCount = results.filter((r) => r.status === 'rejected').length;
 
-        res.json(successResponse({
-            sentCount: successCount,
-            failedCount: failureCount,
-            totalUsers: users.length,
-        }, 'Notifications sent successfully'));
+        res.json(
+            successResponse(
+                {
+                    sentCount: successCount,
+                    failedCount: failureCount,
+                    totalUsers: users.length,
+                },
+                'Notifications sent successfully'
+            )
+        );
     } catch (error) {
         console.error('Error sending notifications:', error);
         res.status(500).json(errorResponse('Failed to send notifications'));
     }
 };
 
-// Send notification to specific users
+// ------------------------------------------------------------------
+// Send to Specific Users
+// ------------------------------------------------------------------
 exports.sendToSpecificUsers = async (req, res) => {
     try {
         const { userIds, templateId, customTitle, customBody, targetScreen } = req.body;
@@ -218,13 +246,15 @@ exports.sendToSpecificUsers = async (req, res) => {
         }).select('pushToken');
 
         if (users.length === 0) {
-            return res.json(successResponse({
-                sentCount: 0,
-                message: 'No users with push tokens found',
-            }));
+            return res.json(
+                successResponse({
+                    sentCount: 0,
+                    message: 'No users with push tokens found',
+                })
+            );
         }
 
-        const notifications = users.map(user => ({
+        const notifications = users.map((user) => ({
             token: user.pushToken,
             title,
             body,
@@ -236,21 +266,30 @@ exports.sendToSpecificUsers = async (req, res) => {
 
         const results = await sendBulkNotifications(notifications);
 
-        const successCount = results.filter(r => r.status === 'fulfilled').length;
+        const successCount = results.filter((r) => r.status === 'fulfilled').length;
 
-        res.json(successResponse({
-            sentCount: successCount,
-            totalUsers: users.length,
-        }, 'Notifications sent successfully'));
+        res.json(
+            successResponse(
+                {
+                    sentCount: successCount,
+                    totalUsers: users.length,
+                },
+                'Notifications sent successfully'
+            )
+        );
     } catch (error) {
         console.error('Error sending notifications:', error);
         res.status(500).json(errorResponse('Failed to send notifications'));
     }
 };
 
-// ========== NOTIFICATION STATS ==========
+// ------------------------------------------------------------------
+// Notification Stats
+// ------------------------------------------------------------------
 
-// Get notification stats
+// ------------------------------------------------------------------
+// Get Notification Stats
+// ------------------------------------------------------------------
 exports.getNotificationStats = async (req, res) => {
     try {
         const totalTemplates = await NotificationTemplate.countDocuments();
@@ -265,24 +304,31 @@ exports.getNotificationStats = async (req, res) => {
 
         const totalUsers = await User.countDocuments();
 
-        res.json(successResponse({
-            totalTemplates,
-            activeTemplates,
-            inactiveTemplates: totalTemplates - activeTemplates,
-            totalNotificationsSent: totalSent[0]?.total || 0,
-            usersWithPushTokens: usersWithTokens,
-            totalUsers,
-            tokenCoverage: totalUsers > 0 ? ((usersWithTokens / totalUsers) * 100).toFixed(2) : 0,
-        }));
+        res.json(
+            successResponse({
+                totalTemplates,
+                activeTemplates,
+                inactiveTemplates: totalTemplates - activeTemplates,
+                totalNotificationsSent: totalSent[0]?.total || 0,
+                usersWithPushTokens: usersWithTokens,
+                totalUsers,
+                tokenCoverage:
+                    totalUsers > 0 ? ((usersWithTokens / totalUsers) * 100).toFixed(2) : 0,
+            })
+        );
     } catch (error) {
         console.error('Error fetching notification stats:', error);
         res.status(500).json(errorResponse('Failed to fetch stats'));
     }
 };
 
-// ========== LEGACY NOTIFICATION SYSTEM (Keep for backward compatibility) ==========
+// ------------------------------------------------------------------
+// Legacy Notification System
+// ------------------------------------------------------------------
 
-// Create notification
+// ------------------------------------------------------------------
+// Create Notification
+// ------------------------------------------------------------------
 exports.createNotification = async (req, res) => {
     try {
         const notification = new Notification({
@@ -300,7 +346,9 @@ exports.createNotification = async (req, res) => {
     }
 };
 
-// Get all notifications
+// ------------------------------------------------------------------
+// Get All Notifications
+// ------------------------------------------------------------------
 exports.getNotifications = async (req, res) => {
     try {
         const { status, type, page = 1, limit = 20 } = req.query;
@@ -317,22 +365,26 @@ exports.getNotifications = async (req, res) => {
 
         const total = await Notification.countDocuments(query);
 
-        res.json(successResponse({
-            notifications,
-            pagination: {
-                page: Number(page),
-                limit: Number(limit),
-                total,
-                pages: Math.ceil(total / limit),
-            },
-        }));
+        res.json(
+            successResponse({
+                notifications,
+                pagination: {
+                    page: Number(page),
+                    limit: Number(limit),
+                    total,
+                    pages: Math.ceil(total / limit),
+                },
+            })
+        );
     } catch (error) {
         console.error('Error fetching notifications:', error);
         res.status(500).json(errorResponse('Failed to fetch notifications'));
     }
 };
 
-// Send notification immediately
+// ------------------------------------------------------------------
+// Send Notification (Immediate)
+// ------------------------------------------------------------------
 exports.sendNotification = async (req, res) => {
     try {
         const notification = await Notification.findById(req.params.id);
@@ -344,7 +396,10 @@ exports.sendNotification = async (req, res) => {
         // Get target users
         let targetUsers = [];
         if (notification.sendToAll) {
-            targetUsers = await User.find({ pushToken: { $exists: true, $ne: null } }, 'pushToken').lean();
+            targetUsers = await User.find(
+                { pushToken: { $exists: true, $ne: null } },
+                'pushToken'
+            ).lean();
         } else if (notification.targetUsers.length > 0) {
             targetUsers = await User.find(
                 { _id: { $in: notification.targetUsers }, pushToken: { $exists: true, $ne: null } },
@@ -353,7 +408,7 @@ exports.sendNotification = async (req, res) => {
         }
 
         // Send via FCM
-        const notifications = targetUsers.map(user => ({
+        const notifications = targetUsers.map((user) => ({
             token: user.pushToken,
             title: notification.title,
             body: notification.body,
@@ -364,7 +419,7 @@ exports.sendNotification = async (req, res) => {
         }));
 
         const results = await sendBulkNotifications(notifications);
-        const successCount = results.filter(r => r.status === 'fulfilled').length;
+        const successCount = results.filter((r) => r.status === 'fulfilled').length;
 
         notification.metrics.sent = successCount;
         notification.sentAt = new Date();
@@ -378,7 +433,9 @@ exports.sendNotification = async (req, res) => {
     }
 };
 
-// Get notification metrics
+// ------------------------------------------------------------------
+// Get Notification Metrics
+// ------------------------------------------------------------------
 exports.getNotificationMetrics = async (req, res) => {
     try {
         const notification = await Notification.findById(req.params.id);
@@ -392,15 +449,25 @@ exports.getNotificationMetrics = async (req, res) => {
             delivered: notification.metrics.delivered,
             opened: notification.metrics.opened,
             clicked: notification.metrics.clicked,
-            deliveryRate: notification.metrics.sent > 0
-                ? (notification.metrics.delivered / notification.metrics.sent * 100).toFixed(2)
-                : 0,
-            openRate: notification.metrics.delivered > 0
-                ? (notification.metrics.opened / notification.metrics.delivered * 100).toFixed(2)
-                : 0,
-            clickRate: notification.metrics.opened > 0
-                ? (notification.metrics.clicked / notification.metrics.opened * 100).toFixed(2)
-                : 0,
+            deliveryRate:
+                notification.metrics.sent > 0
+                    ? ((notification.metrics.delivered / notification.metrics.sent) * 100).toFixed(
+                          2
+                      )
+                    : 0,
+            openRate:
+                notification.metrics.delivered > 0
+                    ? (
+                          (notification.metrics.opened / notification.metrics.delivered) *
+                          100
+                      ).toFixed(2)
+                    : 0,
+            clickRate:
+                notification.metrics.opened > 0
+                    ? ((notification.metrics.clicked / notification.metrics.opened) * 100).toFixed(
+                          2
+                      )
+                    : 0,
         };
 
         res.json(successResponse(metrics));
@@ -409,4 +476,3 @@ exports.getNotificationMetrics = async (req, res) => {
         res.status(500).json(errorResponse('Failed to fetch metrics'));
     }
 };
-

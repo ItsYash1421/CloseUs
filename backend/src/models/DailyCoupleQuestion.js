@@ -15,14 +15,16 @@ const dailyCoupleQuestionSchema = new mongoose.Schema(
         date: {
             type: Date, // Normalized to YYYY-MM-DD
             required: true,
-        }
+        },
     },
     {
         timestamps: true,
     }
 );
 
-// Ensure one question per couple per day
+// ------------------------------------------------------------------
+// Ensure One Question Per Couple Per Day
+// ------------------------------------------------------------------
 dailyCoupleQuestionSchema.index({ coupleId: 1, date: 1 }, { unique: true });
 
 module.exports = mongoose.model('DailyCoupleQuestion', dailyCoupleQuestionSchema);

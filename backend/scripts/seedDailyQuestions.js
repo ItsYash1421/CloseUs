@@ -18,7 +18,7 @@ const seedDailyQuestions = async () => {
                 description: 'Daily AI generated questions',
                 emoji: '📅',
                 color: '#FF6B9D',
-                order: 0
+                order: 0,
             });
             console.log('✅ Created Daily category');
         } else {
@@ -34,7 +34,7 @@ const seedDailyQuestions = async () => {
             const questions = await aiService.generateQuestions(20);
 
             // 3. Save to Database
-            const operations = questions.map(text => ({
+            const operations = questions.map((text) => ({
                 insertOne: {
                     document: {
                         categoryId: dailyCategory._id,
@@ -42,9 +42,9 @@ const seedDailyQuestions = async () => {
                         isDaily: true,
                         isActive: true,
                         isAiGenerated: true,
-                        createdAt: new Date()
-                    }
-                }
+                        createdAt: new Date(),
+                    },
+                },
             }));
 
             if (operations.length > 0) {

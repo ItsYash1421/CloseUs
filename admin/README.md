@@ -5,6 +5,7 @@ Professional admin panel for managing the CloseUs couples app.
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - Backend server running on port 3000
 
@@ -32,6 +33,7 @@ npm start
 ## 🔐 Admin Login
 
 **Default Credentials:**
+
 - Email: `yashbt22csd@gmail.com`
 - Username: `ysshh_001`
 - Password: `Admin@123456`
@@ -41,6 +43,7 @@ npm start
 ## 📊 Features
 
 ### Dashboard
+
 - Total users (with weekly growth)
 - Paired couples count
 - Active couples (last 7 days)
@@ -48,31 +51,37 @@ npm start
 - System status
 
 ### Users Management
+
 - List all users with pagination
 - Search by name or email
 - View pairing status
 - See couple tags
 
 ### Couples Management
+
 - View all couples (paired and pending)
 - See partner names
 - Check anniversary dates
 - Monitor pairing status
 
 ### Questions Management
+
 **Categories Tab:**
+
 - Create question categories
 - Set emoji icons and colors
 - Add descriptions
 - Delete categories
 
 **Questions Tab:**
+
 - Add questions to categories
 - Set daily questions
 - View answer statistics
 - Delete questions
 
 ### Games Management
+
 - Create game categories (Never Have I Ever, etc.)
 - Add hashtags and emojis
 - Set trending status
@@ -126,15 +135,18 @@ admin/
 ## 📡 API Endpoints
 
 ### Authentication
+
 - `POST /api/admin/auth/login` - Admin login
 - `GET /api/admin/auth/me` - Get profile
 
 ### Dashboard
+
 - `GET /api/admin/dashboard/stats` - Analytics
 - `GET /api/admin/users` - List users
 - `GET /api/admin/couples` - List couples
 
 ### Questions
+
 - `POST /api/admin/questions/categories` - Create category
 - `GET /api/admin/questions/categories` - List categories
 - `PUT /api/admin/questions/categories/:id` - Update category
@@ -145,6 +157,7 @@ admin/
 - `DELETE /api/admin/questions/:id` - Delete question
 
 ### Games
+
 - `POST /api/admin/games/categories` - Create game category
 - `GET /api/admin/games/categories` - List game categories
 - `PUT /api/admin/games/categories/:id` - Update category
@@ -174,18 +187,21 @@ NEXT_PUBLIC_API_URL=http://localhost:3000/api
 ## 🐛 Troubleshooting
 
 **Port already in use:**
+
 ```bash
 # Kill process on port 3001
 lsof -ti:3001 | xargs kill -9
 ```
 
 **Package install issues:**
+
 ```bash
 rm -rf node_modules package-lock.json
 npm install
 ```
 
 **Build errors:**
+
 ```bash
 rm -rf .next
 npm run dev

@@ -16,17 +16,18 @@ import { ProfileScreen } from '../screens/profile/ProfileScreen';
 const Tab = createBottomTabNavigator<TabParamList>();
 
 export const TabNavigator = () => {
-    return (
-        <Tab.Navigator
-            initialRouteName="Home"
-            tabBar={(props) => <CustomTabBar {...props} />}
-            screenOptions={{
-                headerShown: false,
-            }}>
-            <Tab.Screen name="Games" component={GamesScreen} />
-            <Tab.Screen name="Home" component={HomeScreen} />
-            <Tab.Screen name="Profile" component={ProfileScreen} />
-            {/* <Tab.Screen
+  return (
+    <Tab.Navigator
+      initialRouteName="Home"
+      tabBar={props => <CustomTabBar {...props} />}
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Tab.Screen name="Games" component={GamesScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
+      {/* <Tab.Screen
                 name="Chat"
                 component={ChatScreen}
                 options={({ navigation }) => ({
@@ -51,7 +52,7 @@ export const TabNavigator = () => {
                     tabBarStyle: { display: 'none' }, // Hide tab bar on Chat screen
                 })}
             /> */}
-            {/* <Tab.Screen name="Questions" component={QuestionsScreen} /> */}
-        </Tab.Navigator>
-    );
+      {/* <Tab.Screen name="Questions" component={QuestionsScreen} /> */}
+    </Tab.Navigator>
+  );
 };

@@ -11,11 +11,12 @@ export default function DashboardPage() {
 
     useEffect(() => {
         if (token) {
-            apiClient.get('/admin/dashboard/stats', token)
-                .then(response => {
+            apiClient
+                .get('/admin/dashboard/stats', token)
+                .then((response) => {
                     setStats(response.data);
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error('Failed to fetch stats:', error);
                 })
                 .finally(() => setLoading(false));
@@ -101,7 +102,9 @@ function StatsCard({ title, value, change, icon, color }: any) {
     return (
         <div className="card">
             <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl ${colorClasses[color as keyof typeof colorClasses]}`}>
+                <div
+                    className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl ${colorClasses[color as keyof typeof colorClasses]}`}
+                >
                     {icon}
                 </div>
             </div>
@@ -116,7 +119,9 @@ function StatRow({ label, value, isStatus = false }: any) {
     return (
         <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">{label}</span>
-            <span className={`text-sm font-medium ${isStatus ? 'badge badge-success' : 'text-gray-900'}`}>
+            <span
+                className={`text-sm font-medium ${isStatus ? 'badge badge-success' : 'text-gray-900'}`}
+            >
                 {value}
             </span>
         </div>

@@ -4,7 +4,10 @@ import logo from '../assets/Logo-Main.png';
 
 const Navbar = () => {
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 glass-panel" style={{ height: 'var(--header-height)' }}>
+        <nav
+            className="fixed top-0 left-0 right-0 z-50 glass-panel"
+            style={{ height: 'var(--header-height)' }}
+        >
             <div className="w-full h-full flex items-center justify-between px-6 md:px-8">
                 {/* Logo - Made Larger */}
                 <Link to="/" className="h-16 md:h-[70px] flex items-center">
@@ -12,8 +15,18 @@ const Navbar = () => {
                 </Link>
 
                 <div className="flex items-center gap-6">
-                    <a href="/#features" className="hidden md:block text-sm font-medium hover:text-[var(--color-primary)] transition-colors">Features</a>
-                    <a href="/#how-it-works" className="hidden md:block text-sm font-medium hover:text-[var(--color-primary)] transition-colors">How It Works</a>
+                    <a
+                        href="/#features"
+                        className="hidden md:block text-sm font-medium hover:text-[var(--color-primary)] transition-colors"
+                    >
+                        Features
+                    </a>
+                    <a
+                        href="/#how-it-works"
+                        className="hidden md:block text-sm font-medium hover:text-[var(--color-primary)] transition-colors"
+                    >
+                        How It Works
+                    </a>
 
                     {/* Get App Button with Coming Soon Badge Inline */}
                     <Link

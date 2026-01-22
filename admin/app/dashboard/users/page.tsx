@@ -95,12 +95,12 @@ export default function UsersPage() {
                                             {user.coupleId?.isPaired ? (
                                                 <span className="badge badge-success">Paired</span>
                                             ) : (
-                                                <span className="badge badge-warning">Unpaired</span>
+                                                <span className="badge badge-warning">
+                                                    Unpaired
+                                                </span>
                                             )}
                                         </td>
-                                        <td>
-                                            {user.coupleId?.coupleTag || '-'}
-                                        </td>
+                                        <td>{user.coupleId?.coupleTag || '-'}</td>
                                         <td className="text-gray-500">
                                             {formatDate(user.createdAt)}
                                         </td>

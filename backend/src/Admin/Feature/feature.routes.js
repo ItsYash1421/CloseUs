@@ -5,6 +5,9 @@ const adminAuthMiddleware = require('../Middleware/auth.middleware');
 
 router.use(adminAuthMiddleware);
 
+// ------------------------------------------------------------------
+// Feature Routes
+// ------------------------------------------------------------------
 router.post('/', featureController.createFeatureFlag);
 router.get('/', featureController.getFeatureFlags);
 router.put('/:id', featureController.updateFeatureFlag);

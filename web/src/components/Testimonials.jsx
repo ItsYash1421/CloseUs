@@ -4,23 +4,23 @@ import { Quote } from 'lucide-react';
 
 const testimonials = [
     {
-        name: "Sarah & Mike",
-        duration: "Together for 2 years",
+        name: 'Sarah & Mike',
+        duration: 'Together for 2 years',
         text: "CloseUs brought back the spark in our long-distance relationship. The daily questions help us stay connected even when we're miles apart.",
-        rating: 5
+        rating: 5,
     },
     {
-        name: "Priya & Arjun",
-        duration: "Together for 3 years",
-        text: "We love the privacy of having our own space. No distractions, just us. The games are fun and really help us understand each other better!",
-        rating: 5
+        name: 'Priya & Arjun',
+        duration: 'Together for 3 years',
+        text: 'We love the privacy of having our own space. No distractions, just us. The games are fun and really help us understand each other better!',
+        rating: 5,
     },
     {
-        name: "Emily & James",
-        duration: "Together for 5 years",
+        name: 'Emily & James',
+        duration: 'Together for 5 years',
         text: "The anniversary counter and memory timeline are beautiful. It's like a digital scrapbook of our relationship. Highly recommend!",
-        rating: 5
-    }
+        rating: 5,
+    },
 ];
 
 const TestimonialCard = ({ testimonial, delay }) => {
@@ -40,7 +40,9 @@ const TestimonialCard = ({ testimonial, delay }) => {
 
             <div className="flex items-center gap-1 mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
-                    <span key={i} className="text-yellow-400 text-lg">★</span>
+                    <span key={i} className="text-yellow-400 text-lg">
+                        ★
+                    </span>
                 ))}
             </div>
 
@@ -57,8 +59,12 @@ const Testimonials = () => {
         <section className="py-20 bg-gradient-to-br from-white to-red-50">
             <div className="container px-4">
                 <div className="text-center mb-16">
-                    <span className="text-[var(--color-primary)] font-bold tracking-wider uppercase text-sm mb-2 block">Testimonials</span>
-                    <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-800">Loved by Couples Everywhere</h2>
+                    <span className="text-[var(--color-primary)] font-bold tracking-wider uppercase text-sm mb-2 block">
+                        Testimonials
+                    </span>
+                    <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-800">
+                        Loved by Couples Everywhere
+                    </h2>
                     <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                         See what real couples are saying about CloseUs.
                     </p>
@@ -66,7 +72,11 @@ const Testimonials = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                     {testimonials.map((testimonial, index) => (
-                        <TestimonialCard key={index} testimonial={testimonial} delay={index * 0.15} />
+                        <TestimonialCard
+                            key={index}
+                            testimonial={testimonial}
+                            delay={index * 0.15}
+                        />
                     ))}
                 </div>
             </div>

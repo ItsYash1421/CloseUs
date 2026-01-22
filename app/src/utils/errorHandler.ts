@@ -1,9 +1,9 @@
 import { AxiosError } from 'axios';
 
 interface ApiErrorResponse {
-    success: boolean;
-    message?: string;
-    error?: string;
+  success: boolean;
+  message?: string;
+  error?: string;
 }
 
 /**
@@ -12,34 +12,34 @@ interface ApiErrorResponse {
  * @returns User-friendly error message
  */
 export const getErrorMessage = (error: any): string => {
-    // Handle AxiosError
-    if (error.response) {
-        const data = error.response.data as ApiErrorResponse;
+  // Handle AxiosError
+  if (error.response) {
+    const data = error.response.data as ApiErrorResponse;
 
-        // Priority: message > error > status text
-        if (data?.message) {
-            return data.message;
-        }
-        if (data?.error) {
-            return data.error;
-        }
-        if (error.response.statusText) {
-            return error.response.statusText;
-        }
-
-        // Fallback to status code message
-        return `Request failed with status ${error.response.status}`;
+    // Priority: message > error > status text
+    if (data?.message) {
+      return data.message;
+    }
+    if (data?.error) {
+      return data.error;
+    }
+    if (error.response.statusText) {
+      return error.response.statusText;
     }
 
-    // Handle network errors
-    if (error.request) {
-        return 'Network error. Please check your connection.';
-    }
+    // Fallback to status code message
+    return `Request failed with status ${error.response.status}`;
+  }
 
-    // Handle other errors
-    if (error.message) {
-        return error.message;
-    }
+  // Handle network errors
+  if (error.request) {
+    return 'Network error. Please check your connection.';
+  }
 
-    return 'An unexpected error occurred';
+  // Handle other errors
+  if (error.message) {
+    return error.message;
+  }
+
+  return 'An unexpected error occurred';
 };

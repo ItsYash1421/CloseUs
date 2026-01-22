@@ -1,9 +1,9 @@
 const User = require('../../models/User');
 const { successResponse, errorResponse } = require('../../Shared/Utils');
 
-/**
- * Get current user profile
- */
+// ------------------------------------------------------------------
+// Get Current User Profile
+// ------------------------------------------------------------------
 const getProfile = async (req, res) => {
     try {
         const user = await User.findById(req.userId).populate('coupleId');
@@ -19,28 +19,31 @@ const getProfile = async (req, res) => {
     }
 };
 
-/**
- * Update user profile
- */
+// ------------------------------------------------------------------
+// Update User Profile
+// ------------------------------------------------------------------
 const updateProfile = async (req, res) => {
     try {
         const updates = req.body;
         const allowedUpdates = [
-            'name', 'dob', 'relationshipStatus',
-            'livingStyle', 'anniversary', 'partnerName',
-            'photoUrl', 'pushToken', 'isDefaultAvatar'
+            'name',
+            'dob',
+            'relationshipStatus',
+            'livingStyle',
+            'anniversary',
+            'partnerName',
+            'photoUrl',
+            'pushToken',
+            'isDefaultAvatar',
         ];
 
-        // Filter allowed updates
         const safeUpdates = {};
-        Object.keys(updates).forEach(key => {
+        Object.keys(updates).forEach((key) => {
             if (allowedUpdates.includes(key)) {
                 safeUpdates[key] = updates[key];
             }
         });
 
-        // Check if onboarding is complete
-        // Simple logic: if name, dob, status, anniversary are present
         if (!req.user?.isOnboardingComplete) {
             const user = await User.findById(req.userId);
             const merged = { ...user.toObject(), ...safeUpdates };
@@ -50,22 +53,24 @@ const updateProfile = async (req, res) => {
             }
         }
 
-        const user = await User.findByIdAndUpdate(
-            req.userId,
-            safeUpdates,
-            { new: true, runValidators: true }
-        );
+        const user = await User.findByIdAndUpdate(req.userId, safeUpdates, {
+            new: true,
+            runValidators: true,
+        });
 
         if (!user) {
             return res.status(404).json(errorResponse('User not found', 404));
         }
 
-        // Sync shared fields to Couple model if user is paired
-        if (user.coupleId && (safeUpdates.relationshipStatus || safeUpdates.livingStyle || safeUpdates.anniversary)) {
+        if (
+            user.coupleId &&
+            (safeUpdates.relationshipStatus || safeUpdates.livingStyle || safeUpdates.anniversary)
+        ) {
             const Couple = require('../../models/Couple');
             const coupleUpdates = {};
 
-            if (safeUpdates.relationshipStatus) coupleUpdates.relationshipStatus = safeUpdates.relationshipStatus;
+            if (safeUpdates.relationshipStatus)
+                coupleUpdates.relationshipStatus = safeUpdates.relationshipStatus;
             if (safeUpdates.livingStyle) coupleUpdates.livingStyle = safeUpdates.livingStyle;
             if (safeUpdates.anniversary) coupleUpdates.startDate = safeUpdates.anniversary; // Map anniversary to startDate
 
@@ -79,9 +84,9 @@ const updateProfile = async (req, res) => {
     }
 };
 
-/**
- * Update push token
- */
+// ------------------------------------------------------------------
+// Update Push Token
+// ------------------------------------------------------------------
 const updatePushToken = async (req, res) => {
     try {
         const { token } = req.body;
@@ -90,11 +95,7 @@ const updatePushToken = async (req, res) => {
             return res.status(400).json(errorResponse('Token required', 400));
         }
 
-        const user = await User.findByIdAndUpdate(
-            req.userId,
-            { pushToken: token },
-            { new: true }
-        );
+        const user = await User.findByIdAndUpdate(req.userId, { pushToken: token }, { new: true });
 
         if (!user) {
             return res.status(404).json(errorResponse('User not found', 404));
@@ -107,9 +108,9 @@ const updatePushToken = async (req, res) => {
     }
 };
 
-/**
- * Get user by ID
- */
+// ------------------------------------------------------------------
+// Get User By ID
+// ------------------------------------------------------------------
 const getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id).select('-email -googleId');
@@ -122,9 +123,9 @@ const getUserById = async (req, res) => {
     }
 };
 
-/**
- * Complete onboarding - Single API call with all data
- */
+// ------------------------------------------------------------------
+// Complete Onboarding
+// ------------------------------------------------------------------
 const completeOnboarding = async (req, res) => {
     try {
         const {
@@ -135,15 +136,21 @@ const completeOnboarding = async (req, res) => {
             relationshipStatus,
             livingStyle,
             anniversary,
-            partnerName
+            partnerName,
         } = req.body;
 
-        // Validate required fields
-        if (!gender || !name || !dob || !relationshipStatus || !livingStyle || !anniversary || !partnerName) {
+        if (
+            !gender ||
+            !name ||
+            !dob ||
+            !relationshipStatus ||
+            !livingStyle ||
+            !anniversary ||
+            !partnerName
+        ) {
             return res.status(400).json(errorResponse('All fields are required', 400));
         }
 
-        // Update user with all onboarding data
         const user = await User.findByIdAndUpdate(
             req.userId,
             {
@@ -155,7 +162,7 @@ const completeOnboarding = async (req, res) => {
                 livingStyle,
                 anniversary: new Date(anniversary),
                 partnerName,
-                isOnboardingComplete: true
+                isOnboardingComplete: true,
             },
             { new: true, runValidators: true }
         );
@@ -171,16 +178,12 @@ const completeOnboarding = async (req, res) => {
     }
 };
 
-/**
- * Update user's lastActive timestamp (heartbeat)
- */
+// ------------------------------------------------------------------
+// Heartbeat
+// ------------------------------------------------------------------
 const heartbeat = async (req, res) => {
     try {
-        await User.findByIdAndUpdate(
-            req.userId,
-            { lastActive: new Date() },
-            { new: true }
-        );
+        await User.findByIdAndUpdate(req.userId, { lastActive: new Date() }, { new: true });
 
         res.json(successResponse(null, 'Heartbeat updated'));
     } catch (error) {
@@ -189,9 +192,9 @@ const heartbeat = async (req, res) => {
     }
 };
 
-/**
- * Get partner's online status
- */
+// ------------------------------------------------------------------
+// Get Partner Status
+// ------------------------------------------------------------------
 const getPartnerStatus = async (req, res) => {
     try {
         const user = await User.findById(req.userId).populate('coupleId');
@@ -201,9 +204,8 @@ const getPartnerStatus = async (req, res) => {
         }
 
         const couple = user.coupleId;
-        const partnerId = couple.partner1Id.toString() === req.userId
-            ? couple.partner2Id
-            : couple.partner1Id;
+        const partnerId =
+            couple.partner1Id.toString() === req.userId ? couple.partner2Id : couple.partner1Id;
 
         const partner = await User.findById(partnerId).select('name photoUrl lastActive');
 
@@ -214,8 +216,6 @@ const getPartnerStatus = async (req, res) => {
         let isOnline = partner.isOnline;
         let lastActive = partner.lastActive;
 
-        // Special logic for Dev Partner: Toggle online/offline every 5 minutes
-        // 0-5: Online, 5-10: Offline, 10-15: Online, etc.
         if (partner.name === 'Dev Partner') {
             const currentMinute = new Date().getMinutes();
             const isOnlineInterval = Math.floor(currentMinute / 5) % 2 === 0;
@@ -229,12 +229,14 @@ const getPartnerStatus = async (req, res) => {
             }
         }
 
-        res.json(successResponse({
-            name: partner.name,
-            photoUrl: partner.photoUrl,
-            isOnline: isOnline,
-            lastActive: lastActive
-        }));
+        res.json(
+            successResponse({
+                name: partner.name,
+                photoUrl: partner.photoUrl,
+                isOnline: isOnline,
+                lastActive: lastActive,
+            })
+        );
     } catch (error) {
         console.error('Get partner status error:', error);
         res.status(500).json(errorResponse('Internal server error'));
@@ -248,5 +250,5 @@ module.exports = {
     getUserById,
     completeOnboarding,
     heartbeat,
-    getPartnerStatus
+    getPartnerStatus,
 };

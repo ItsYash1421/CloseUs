@@ -6,6 +6,9 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
+// ------------------------------------------------------------------
+// Chat Routes
+// ------------------------------------------------------------------
 router.get('/messages', chatController.getMessages);
 router.post('/send', chatController.sendMessage);
 router.put('/read/:messageId', chatController.markAsRead);

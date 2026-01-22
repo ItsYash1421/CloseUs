@@ -4,7 +4,6 @@ import { UserPlus, Key, Heart, MessageCircle } from 'lucide-react';
 const Step = ({ number, icon: Icon, title, desc, isLast }) => {
     return (
         <div className="relative flex flex-col items-center text-center group">
-
             {/* Step Number Badge */}
             <div className="mb-6 relative z-10">
                 <span className="inline-block px-3 py-1 rounded-full bg-red-50 text-[var(--color-primary)] text-xs font-bold tracking-wider uppercase border border-red-100">
@@ -20,7 +19,9 @@ const Step = ({ number, icon: Icon, title, desc, isLast }) => {
                 <div className="absolute inset-0 bg-[var(--color-primary)] opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity duration-300"></div>
             </div>
 
-            <h3 className="text-xl font-bold mb-3 text-[#2B2B2B] group-hover:text-[var(--color-primary)] transition-colors">{title}</h3>
+            <h3 className="text-xl font-bold mb-3 text-[#2B2B2B] group-hover:text-[var(--color-primary)] transition-colors">
+                {title}
+            </h3>
             <p className="text-sm text-gray-500 max-w-[250px] leading-relaxed">{desc}</p>
 
             {/* Connector Line - Modern Dashed Style */}
@@ -44,10 +45,15 @@ const HowItWorks = () => {
 
             <div className="container px-4 relative z-10">
                 <div className="text-center mb-20">
-                    <span className="text-[var(--color-primary)] font-bold tracking-wider uppercase text-sm mb-3 block">Simple Setup</span>
-                    <h2 className="text-4xl md:text-5xl font-bold mb-6 text-[#2B2B2B]">Start your journey</h2>
+                    <span className="text-[var(--color-primary)] font-bold tracking-wider uppercase text-sm mb-3 block">
+                        Simple Setup
+                    </span>
+                    <h2 className="text-4xl md:text-5xl font-bold mb-6 text-[#2B2B2B]">
+                        Start your journey
+                    </h2>
                     <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
-                        We've made it incredibly easy to create your private space. Just follow these simple steps.
+                        We've made it incredibly easy to create your private space. Just follow
+                        these simple steps.
                     </p>
                 </div>
 
