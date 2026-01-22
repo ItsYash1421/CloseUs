@@ -3,7 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const connectDB = require('./config/db');
 const app = require('./app');
-const { verifyToken } = require('./utils');
+const { verifyToken } = require('./Shared/Utils');
 const Message = require('./models/Message');
 const Couple = require('./models/Couple');
 const User = require('./models/User');
@@ -140,11 +140,12 @@ const startServer = async () => {
         await connectDB();
 
         // Initialize Scheduler
-        const initCronJobs = require('./questionScheduler');
+        // Initialize Scheduler
+        const initCronJobs = require('./App/Home/question.scheduler');
         initCronJobs();
 
         // Start Dev Partner Auto-Answer Scheduler (Dev Mode Only)
-        const devPartnerScheduler = require('./services/devPartnerScheduler');
+        const devPartnerScheduler = require('./App/Couple/partner.scheduler');
         devPartnerScheduler.start();
 
         server.listen(PORT, () => {

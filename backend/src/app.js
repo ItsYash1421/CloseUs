@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const passport = require('./config/passport');
 const routes = require('./routes');
-const { errorResponse } = require('./utils');
+const { errorResponse } = require('./Shared/Utils');
 
 const app = express();
 
