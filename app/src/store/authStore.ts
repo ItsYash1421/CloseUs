@@ -62,17 +62,26 @@ export const useAuthStore = create<AuthState>()(
             updateUser: async (updates) => {
                 const currentUser = get().user;
                 if (currentUser) {
+                    // Optimistic update
+                    const newState = { ...currentUser, ...updates };
+                    set({ user: newState });
+
                     try {
-                        // Update backend
                         const apiClient = (await import('../services/apiClient')).default;
+
+                        // Ensure dates are strings for API if needed, though usually automatic.
+                        // But let's be safe with strict types if needed.
                         await apiClient.put('/api/users/me', updates);
 
-                        // Update local state
-                        set({ user: { ...currentUser, ...updates } });
+                        // If successful, no need to do anything as local state is already updated.
+                        // Optionally, could fetch fresh data:
+                        // const res = await apiClient.get('/api/users/me');
+                        // set({ user: res.data });
                     } catch (error) {
                         console.error('Update user error:', error);
-                        // Still update local state
-                        set({ user: { ...currentUser, ...updates } });
+                        // Revert on failure
+                        set({ user: currentUser });
+                        throw error; // Let caller handle/toast
                     }
                 }
             },

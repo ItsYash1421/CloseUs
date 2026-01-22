@@ -12,6 +12,7 @@ export interface User {
     anniversary?: Date;
     partnerName?: string;
     coupleId?: string;
+    isDefaultAvatar?: boolean;
     isOnboardingComplete: boolean;
     lastActive?: Date;
     fcmToken?: string;

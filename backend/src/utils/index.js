@@ -30,14 +30,18 @@ const verifyToken = (token) => {
  * Example: "Yash" + "Khushi" = "#Yaskhu"
  */
 const generateCoupleTag = (name1, name2) => {
-    // Get first name only and capitalize first letter
+    // Get first name only
     const firstName1 = name1.split(' ')[0];
     const firstName2 = name2.split(' ')[0];
 
-    const capitalizedName1 = firstName1.charAt(0).toUpperCase() + firstName1.slice(1).toLowerCase();
-    const capitalizedName2 = firstName2.charAt(0).toUpperCase() + firstName2.slice(1).toLowerCase();
+    // Take first 3 letters (or less if name is shorter)
+    const part1 = firstName1.substring(0, 3);
+    const part2 = firstName2.substring(0, 3);
 
-    return `#${capitalizedName1}${capitalizedName2}`;
+    const capitalizedPart1 = part1.charAt(0).toUpperCase() + part1.slice(1).toLowerCase();
+    const capitalizedPart2 = part2.charAt(0).toUpperCase() + part2.slice(1).toLowerCase();
+
+    return `#${capitalizedPart1}${capitalizedPart2}`;
 };
 
 /**
@@ -59,28 +63,50 @@ const calculateTimeTogether = (startDate) => {
     // IST is UTC+5:30
     const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
 
-    // Get current time in IST
-    const nowUTC = new Date();
-    const nowIST = new Date(nowUTC.getTime() + IST_OFFSET_MS);
+    const start = new Date(startDate);
+    const now = new Date();
 
-    // Get start date in IST
-    const startUTC = new Date(startDate);
-    const startIST = new Date(startUTC.getTime() + IST_OFFSET_MS);
+    // Convert to IST timestamps
+    const startIST = start.getTime() + IST_OFFSET_MS;
+    const nowIST = now.getTime() + IST_OFFSET_MS;
 
-    // Reset both to midnight IST for accurate day counting
-    const nowISTMidnight = new Date(nowIST.getFullYear(), nowIST.getMonth(), nowIST.getDate());
-    const startISTMidnight = new Date(startIST.getFullYear(), startIST.getMonth(), startIST.getDate());
+    // Floor to get the day number (independent of time)
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const startDay = Math.floor(startIST / msPerDay);
+    const nowDay = Math.floor(nowIST / msPerDay);
 
-    // Calculate difference in days
-    const diffMs = nowISTMidnight - startISTMidnight;
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const diffMonths = Math.floor(diffDays / 30);
-    const diffYears = Math.floor(diffDays / 365);
+    const diffDays = nowDay - startDay;
+
+    // Calculate approx months/years for display
+    // Note: For precise calendar month difference we'd need Date objects, 
+    // but this approximation is usually sufficient for "Time Together" stats
+    // or we can reconstruct valid Dates if needed.
+
+    // Improved month/year calc:
+    // Reconstruct dates at UTC noon to avoid boundary issues
+    const date1 = new Date(startDay * msPerDay);
+    const date2 = new Date(nowDay * msPerDay);
+
+    let years = date2.getUTCFullYear() - date1.getUTCFullYear();
+    let months = date2.getUTCMonth() - date1.getUTCMonth();
+    let days = date2.getUTCDate() - date1.getUTCDate();
+
+    if (days < 0) {
+        months--;
+        // Get days in previous month
+        const prevMonth = new Date(date2.getUTCFullYear(), date2.getUTCMonth(), 0);
+        days += prevMonth.getUTCDate();
+    }
+
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
 
     return {
-        days: diffDays,
-        months: diffMonths,
-        years: diffYears
+        days: diffDays, // Total days
+        months: months + (years * 12), // Total months
+        years: years
     };
 };
 

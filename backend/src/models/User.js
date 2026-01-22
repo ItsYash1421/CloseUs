@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
             required: true
         },
         photoUrl: String,
+        isDefaultAvatar: {
+            type: Boolean,
+            default: false
+        },
 
         gender: {
             type: String,
@@ -52,6 +56,26 @@ const userSchema = new mongoose.Schema(
         platform: {
             type: String,
             enum: ['ios', 'android']
+        },
+
+        // Notification Preferences
+        notificationPreferences: {
+            pushEnabled: {
+                type: Boolean,
+                default: true
+            },
+            dailyReminders: {
+                type: Boolean,
+                default: true
+            },
+            partnerActivity: {
+                type: Boolean,
+                default: true
+            },
+            messages: {
+                type: Boolean,
+                default: true
+            }
         }
     },
     {

@@ -57,6 +57,8 @@ export const COLORS = {
     blue400: '#60A5FA',
     blue500: '#3B82F6',
     blue100: '#DBEAFE',
+    green500: '#10B981',
+    red500: '#EF4444',
 
     // Profile UI Colors (for easy theming)
     profileSectionTitle: '#FFFFFF', // White section titles

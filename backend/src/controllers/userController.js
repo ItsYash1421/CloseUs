@@ -28,7 +28,7 @@ const updateProfile = async (req, res) => {
         const allowedUpdates = [
             'name', 'dob', 'relationshipStatus',
             'livingStyle', 'anniversary', 'partnerName',
-            'photoUrl', 'pushToken'
+            'photoUrl', 'pushToken', 'isDefaultAvatar'
         ];
 
         // Filter allowed updates
@@ -58,6 +58,18 @@ const updateProfile = async (req, res) => {
 
         if (!user) {
             return res.status(404).json(errorResponse('User not found', 404));
+        }
+
+        // Sync shared fields to Couple model if user is paired
+        if (user.coupleId && (safeUpdates.relationshipStatus || safeUpdates.livingStyle || safeUpdates.anniversary)) {
+            const Couple = require('../models/Couple');
+            const coupleUpdates = {};
+
+            if (safeUpdates.relationshipStatus) coupleUpdates.relationshipStatus = safeUpdates.relationshipStatus;
+            if (safeUpdates.livingStyle) coupleUpdates.livingStyle = safeUpdates.livingStyle;
+            if (safeUpdates.anniversary) coupleUpdates.startDate = safeUpdates.anniversary; // Map anniversary to startDate
+
+            await Couple.findByIdAndUpdate(user.coupleId, coupleUpdates);
         }
 
         res.json(successResponse(user, 'Profile updated'));

@@ -7,3 +7,4 @@ export { Spinner } from './Spinner';
 export { Header } from './Header';
 export { ComingSoon } from './ComingSoon';
 export { ShimmerPlaceholder } from './ShimmerPlaceholder';
+export { BottomSheet } from './BottomSheet';

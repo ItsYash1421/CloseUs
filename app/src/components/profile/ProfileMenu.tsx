@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
+import {
+    EditProfileSheet,
+    NotificationsSheet,
+    AboutSheet,
+    HelpSheet,
+    UpdateRelationshipSheet,
+} from './sheets';
 
 interface MenuItemProps {
     icon: string;
@@ -28,6 +35,13 @@ const MenuItem: React.FC<MenuItemProps> = ({ icon, title, onPress, showChevron =
 );
 
 export const ProfileMenu = () => {
+    // Sheet visibility states
+    const [editProfileVisible, setEditProfileVisible] = useState(false);
+    const [updateRelationshipVisible, setUpdateRelationshipVisible] = useState(false);
+    const [notificationsVisible, setNotificationsVisible] = useState(false);
+    const [aboutVisible, setAboutVisible] = useState(false);
+    const [helpVisible, setHelpVisible] = useState(false);
+
     return (
         <View style={styles.container}>
             <Text style={styles.sectionTitle}>MENU</Text>
@@ -36,27 +50,55 @@ export const ProfileMenu = () => {
                 <MenuItem
                     icon="edit"
                     title="Edit Profile"
-                    onPress={() => { }}
+                    onPress={() => setEditProfileVisible(true)}
+                />
+                <View style={styles.divider} />
+                <MenuItem
+                    icon="favorite-border"
+                    title="Update Relationship Status"
+                    onPress={() => setUpdateRelationshipVisible(true)}
                 />
                 <View style={styles.divider} />
                 <MenuItem
                     icon="notifications"
                     title="Notifications"
-                    onPress={() => { }}
+                    onPress={() => setNotificationsVisible(true)}
                 />
                 <View style={styles.divider} />
                 <MenuItem
                     icon="info"
                     title="About"
-                    onPress={() => { }}
+                    onPress={() => setAboutVisible(true)}
                 />
                 <View style={styles.divider} />
                 <MenuItem
                     icon="help"
                     title="Help & Support"
-                    onPress={() => { }}
+                    onPress={() => setHelpVisible(true)}
                 />
             </View>
+
+            {/* Bottom Sheets */}
+            <EditProfileSheet
+                visible={editProfileVisible}
+                onClose={() => setEditProfileVisible(false)}
+            />
+            <UpdateRelationshipSheet
+                visible={updateRelationshipVisible}
+                onClose={() => setUpdateRelationshipVisible(false)}
+            />
+            <NotificationsSheet
+                visible={notificationsVisible}
+                onClose={() => setNotificationsVisible(false)}
+            />
+            <AboutSheet
+                visible={aboutVisible}
+                onClose={() => setAboutVisible(false)}
+            />
+            <HelpSheet
+                visible={helpVisible}
+                onClose={() => setHelpVisible(false)}
+            />
         </View>
     );
 };
