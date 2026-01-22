@@ -18,8 +18,8 @@ export const OurJourney: React.FC<OurJourneyProps> = ({
     onViewHistory,
 }) => {
     return (
-        <View style={styles.container}>
-            {/* Header */}
+        <View style={styles.card}>
+            {/* Header - Moved inside to match ChatSection style */}
             <View style={styles.header}>
                 <Text style={styles.title}>Our Journey</Text>
                 <TouchableOpacity onPress={onViewHistory} activeOpacity={0.7}>
@@ -27,53 +27,47 @@ export const OurJourney: React.FC<OurJourneyProps> = ({
                 </TouchableOpacity>
             </View>
 
-            {/* Journey Card */}
-            <View style={styles.card}>
-                {/* Right gradient overlay */}
-                <LinearGradient
-                    colors={['transparent', 'rgba(26, 26, 46, 0.5)']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={styles.gradientOverlay}
-                    pointerEvents="none"
-                />
-
-                <View style={styles.cardContent}>
-                    {/* Milestone Info */}
-                    <View style={styles.milestoneRow}>
-                        <View style={styles.milestoneInfo}>
-                            <Text style={styles.milestoneLabel}>NEXT MILESTONE</Text>
-                            <Text style={styles.milestoneValue}>{nextMilestone} Days</Text>
-                        </View>
-                        <View style={styles.progressBadge}>
-                            <Text style={styles.progressBadgeText}>{currentDays} Days</Text>
-                        </View>
+            <View style={styles.cardContent}>
+                {/* Milestone Info */}
+                <View style={styles.milestoneRow}>
+                    <View style={styles.milestoneInfo}>
+                        <Text style={styles.milestoneLabel}>NEXT MILESTONE</Text>
+                        <Text style={styles.milestoneValue}>{nextMilestone} Days</Text>
                     </View>
-
-                    {/* Progress Bar */}
-                    <View style={styles.progressBarContainer}>
-                        <View style={styles.progressBarBackground}>
-                            {/* Progress fill */}
-                            <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
-
-                            {/* Diagonal pattern overlay */}
-                            <View style={styles.progressBarPattern} />
-                        </View>
+                    <View style={styles.progressBadge}>
+                        <Text style={styles.progressBadgeText}>{currentDays} Days</Text>
                     </View>
-
-                    {/* Quote */}
-                    <Text style={styles.quote}>
-                        "Love is not about how many days, months, or years you have been together. Love is about how much you love each other every single day."
-                    </Text>
                 </View>
+
+                {/* Progress Bar */}
+                <View style={styles.progressBarContainer}>
+                    <View style={styles.progressBarBackground}>
+                        {/* Progress fill */}
+                        <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
+
+                        {/* Diagonal pattern overlay */}
+                        <View style={styles.progressBarPattern} />
+                    </View>
+                </View>
+
+                {/* Quote */}
+                <Text style={styles.quote}>
+                    "Love is not about how many days, months, or years you have been together. Love is about how much you love each other every single day."
+                </Text>
             </View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        gap: THEME.spacing.sm,
+    card: {
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        padding: 20, // Matched with ChatSection
+        overflow: 'hidden',
+        gap: THEME.spacing.md,
     },
     header: {
         flexDirection: 'row',
@@ -90,26 +84,8 @@ const styles = StyleSheet.create({
         fontWeight: THEME.fontWeights.bold,
         color: COLORS.primary,
     },
-    card: {
-        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-        padding: THEME.spacing.lg,
-        overflow: 'hidden',
-        position: 'relative',
-    },
-    gradientOverlay: {
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        width: 96,
-        height: '100%',
-        zIndex: 10,
-    },
     cardContent: {
         gap: THEME.spacing.md,
-        zIndex: 0,
     },
     milestoneRow: {
         flexDirection: 'row',
@@ -117,7 +93,7 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
     },
     milestoneInfo: {
-        gap: THEME.spacing.xs / 2,
+        gap: THEME.spacing.xs / 2, // 2px
     },
     milestoneLabel: {
         fontSize: THEME.fontSizes.xs,

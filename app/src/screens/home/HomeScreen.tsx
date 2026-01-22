@@ -133,7 +133,11 @@ export const HomeScreen = ({ navigation }: any) => {
     const time = getTimeTogether();
 
     return (
-        <GradientBackground variant="background">
+        <GradientBackground
+            variant="background"
+            scrollY={scrollY}
+            scrollInputRange={[0, 300]} // Fully dark after 300px scroll
+        >
             {/* Sticky Header - Hide when keyboard is open */}
             {!isKeyboardVisible && (
                 <StickyHeader

@@ -16,6 +16,8 @@ export const COLORS = {
     gradientBlue: ['#3B82F6', '#8B5CF6'],
     gradientPink: ['#EC4899', '#F472B6'],
     gradientBackground: ['#1A1A2E', '#16213E'],
+    gradientBackgroundLight: ['#2E2E48', '#252542'], // Lighter start
+    gradientBackgroundDark: ['#1A1A2E', '#16213E'], // Darker end (current default)
 
     // Neutrals
     white: '#FFFFFF',
