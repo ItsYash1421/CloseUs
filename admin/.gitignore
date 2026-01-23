@@ -38,3 +38,5 @@ next-env.d.ts
 
 # turbopack
 .next/dev/cache/
+# explicit turbopack cache artifact
+.next/dev/cache/turbopack/v16.1.0-canary.19-84-g3aa53984e/00000001.sst

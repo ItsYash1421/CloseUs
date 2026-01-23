@@ -159,7 +159,11 @@ export default function CampaignsPage() {
             completed: { variant: 'outline', label: 'Completed' },
         };
         const config = statusConfig[status] || statusConfig.draft;
-        return <Badge className={config.className} variant={config.variant}>{config.label}</Badge>;
+        return (
+            <Badge className={config.className} variant={config.variant}>
+                {config.label}
+            </Badge>
+        );
     };
 
     return (
@@ -167,9 +171,7 @@ export default function CampaignsPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold">Campaigns</h1>
-                    <p className="text-muted-foreground">
-                        Create and manage marketing campaigns
-                    </p>
+                    <p className="text-muted-foreground">Create and manage marketing campaigns</p>
                 </div>
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>
@@ -211,7 +213,9 @@ export default function CampaignsPage() {
                                     <SelectContent>
                                         <SelectItem value="promotion">Promotion</SelectItem>
                                         <SelectItem value="event">Event</SelectItem>
-                                        <SelectItem value="feature_launch">Feature Launch</SelectItem>
+                                        <SelectItem value="feature_launch">
+                                            Feature Launch
+                                        </SelectItem>
                                         <SelectItem value="announcement">Announcement</SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -221,7 +225,10 @@ export default function CampaignsPage() {
                                 <Textarea
                                     value={campaignForm.description}
                                     onChange={(e) =>
-                                        setCampaignForm({ ...campaignForm, description: e.target.value })
+                                        setCampaignForm({
+                                            ...campaignForm,
+                                            description: e.target.value,
+                                        })
                                     }
                                     placeholder="Brief description of the campaign"
                                     rows={2}
@@ -237,7 +244,10 @@ export default function CampaignsPage() {
                                             onChange={(e) =>
                                                 setCampaignForm({
                                                     ...campaignForm,
-                                                    content: { ...campaignForm.content, title: e.target.value },
+                                                    content: {
+                                                        ...campaignForm.content,
+                                                        title: e.target.value,
+                                                    },
                                                 })
                                             }
                                             placeholder="Campaign title"
@@ -251,7 +261,10 @@ export default function CampaignsPage() {
                                             onChange={(e) =>
                                                 setCampaignForm({
                                                     ...campaignForm,
-                                                    content: { ...campaignForm.content, message: e.target.value },
+                                                    content: {
+                                                        ...campaignForm.content,
+                                                        message: e.target.value,
+                                                    },
                                                 })
                                             }
                                             placeholder="Campaign message"
@@ -302,8 +315,12 @@ export default function CampaignsPage() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="all">All</SelectItem>
-                                                    <SelectItem value="paired">Paired Only</SelectItem>
-                                                    <SelectItem value="unpaired">Unpaired Only</SelectItem>
+                                                    <SelectItem value="paired">
+                                                        Paired Only
+                                                    </SelectItem>
+                                                    <SelectItem value="unpaired">
+                                                        Unpaired Only
+                                                    </SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -407,7 +424,9 @@ export default function CampaignsPage() {
                                             {campaign.status === 'draft' && (
                                                 <Button
                                                     size="sm"
-                                                    onClick={() => handleLaunchCampaign(campaign._id)}
+                                                    onClick={() =>
+                                                        handleLaunchCampaign(campaign._id)
+                                                    }
                                                 >
                                                     <Play className="h-4 w-4" />
                                                 </Button>
@@ -416,7 +435,9 @@ export default function CampaignsPage() {
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    onClick={() => handlePauseCampaign(campaign._id)}
+                                                    onClick={() =>
+                                                        handlePauseCampaign(campaign._id)
+                                                    }
                                                 >
                                                     <Pause className="h-4 w-4" />
                                                 </Button>

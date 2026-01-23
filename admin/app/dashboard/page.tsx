@@ -3,7 +3,17 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    BarChart,
+    Bar,
+} from 'recharts';
 
 export default function DashboardPage() {
     const { token } = useAuth();
@@ -20,12 +30,12 @@ export default function DashboardPage() {
         try {
             const [overviewRes, analyticsRes] = await Promise.all([
                 apiClient.get('/admin/dashboard/stats', token!),
-                apiClient.get('/admin/analytics/stats', token!)
+                apiClient.get('/admin/analytics/stats', token!),
             ]);
 
             setStats({
                 ...overviewRes.data,
-                ...analyticsRes.data
+                ...analyticsRes.data,
             });
         } catch (error) {
             console.error('Failed to fetch dashboard stats:', error);
@@ -83,7 +93,9 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex justify-between">
                             <span className="text-gray-600">New This Week:</span>
-                            <span className="font-bold text-green-600">{stats?.users?.recent || 0}</span>
+                            <span className="font-bold text-green-600">
+                                {stats?.users?.recent || 0}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -97,15 +109,21 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex justify-between">
                             <span className="text-gray-600">Paired:</span>
-                            <span className="font-bold text-green-600">{stats?.couples?.paired || 0}</span>
+                            <span className="font-bold text-green-600">
+                                {stats?.couples?.paired || 0}
+                            </span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-gray-600">Unpaired:</span>
-                            <span className="font-bold text-yellow-600">{stats?.couples?.unpaired || 0}</span>
+                            <span className="font-bold text-yellow-600">
+                                {stats?.couples?.unpaired || 0}
+                            </span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-gray-600">Active (7 days):</span>
-                            <span className="font-bold text-blue-600">{stats?.couples?.active || 0}</span>
+                            <span className="font-bold text-blue-600">
+                                {stats?.couples?.active || 0}
+                            </span>
                         </div>
                     </div>
                 </div>

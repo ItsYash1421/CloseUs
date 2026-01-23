@@ -190,7 +190,10 @@ export default function PromotionsPage() {
                                 <Input
                                     value={promotionForm.title}
                                     onChange={(e) =>
-                                        setPromotionForm({ ...promotionForm, title: e.target.value })
+                                        setPromotionForm({
+                                            ...promotionForm,
+                                            title: e.target.value,
+                                        })
                                     }
                                     placeholder="e.g., Welcome Bonus"
                                     required
@@ -201,7 +204,10 @@ export default function PromotionsPage() {
                                 <Textarea
                                     value={promotionForm.description}
                                     onChange={(e) =>
-                                        setPromotionForm({ ...promotionForm, description: e.target.value })
+                                        setPromotionForm({
+                                            ...promotionForm,
+                                            description: e.target.value,
+                                        })
                                     }
                                     placeholder="Describe the promotion"
                                     rows={2}
@@ -220,15 +226,23 @@ export default function PromotionsPage() {
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="feature_unlock">Feature Unlock</SelectItem>
+                                            <SelectItem value="feature_unlock">
+                                                Feature Unlock
+                                            </SelectItem>
                                             <SelectItem value="discount">Discount</SelectItem>
-                                            <SelectItem value="special_access">Special Access</SelectItem>
-                                            <SelectItem value="premium_trial">Premium Trial</SelectItem>
+                                            <SelectItem value="special_access">
+                                                Special Access
+                                            </SelectItem>
+                                            <SelectItem value="premium_trial">
+                                                Premium Trial
+                                            </SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
                                 <div>
-                                    <Label>Value {promotionForm.type === 'discount' ? '(%)' : ''}</Label>
+                                    <Label>
+                                        Value {promotionForm.type === 'discount' ? '(%)' : ''}
+                                    </Label>
                                     <Input
                                         type="number"
                                         value={promotionForm.value}
@@ -249,7 +263,10 @@ export default function PromotionsPage() {
                                     <Select
                                         value={promotionForm.applicableTo}
                                         onValueChange={(value) =>
-                                            setPromotionForm({ ...promotionForm, applicableTo: value })
+                                            setPromotionForm({
+                                                ...promotionForm,
+                                                applicableTo: value,
+                                            })
                                         }
                                     >
                                         <SelectTrigger>
@@ -285,7 +302,10 @@ export default function PromotionsPage() {
                                         type="datetime-local"
                                         value={promotionForm.startDate}
                                         onChange={(e) =>
-                                            setPromotionForm({ ...promotionForm, startDate: e.target.value })
+                                            setPromotionForm({
+                                                ...promotionForm,
+                                                startDate: e.target.value,
+                                            })
                                         }
                                         required
                                     />
@@ -296,7 +316,10 @@ export default function PromotionsPage() {
                                         type="datetime-local"
                                         value={promotionForm.endDate}
                                         onChange={(e) =>
-                                            setPromotionForm({ ...promotionForm, endDate: e.target.value })
+                                            setPromotionForm({
+                                                ...promotionForm,
+                                                endDate: e.target.value,
+                                            })
                                         }
                                     />
                                 </div>
@@ -396,7 +419,9 @@ export default function PromotionsPage() {
                                                 {promotion.type.replace('_', ' ')}
                                             </Badge>
                                             <div className="text-sm font-medium">
-                                                {promotion.type === 'discount' ? `${promotion.value}%` : promotion.value}
+                                                {promotion.type === 'discount'
+                                                    ? `${promotion.value}%`
+                                                    : promotion.value}
                                             </div>
                                         </div>
                                     </TableCell>
@@ -404,7 +429,8 @@ export default function PromotionsPage() {
                                         <div className="space-y-1">
                                             <div className="text-sm">
                                                 {promotion.usedCount || 0}
-                                                {promotion.usageLimit > 0 && ` / ${promotion.usageLimit}`}
+                                                {promotion.usageLimit > 0 &&
+                                                    ` / ${promotion.usageLimit}`}
                                             </div>
                                             {promotion.usageLimit > 0 && (
                                                 <div className="w-24">
@@ -438,11 +464,15 @@ export default function PromotionsPage() {
                                     <TableCell>
                                         <div className="text-sm text-muted-foreground space-y-1">
                                             <div>
-                                                Start: {new Date(promotion.startDate).toLocaleDateString()}
+                                                Start:{' '}
+                                                {new Date(promotion.startDate).toLocaleDateString()}
                                             </div>
                                             {promotion.endDate && (
                                                 <div>
-                                                    End: {new Date(promotion.endDate).toLocaleDateString()}
+                                                    End:{' '}
+                                                    {new Date(
+                                                        promotion.endDate
+                                                    ).toLocaleDateString()}
                                                 </div>
                                             )}
                                         </div>

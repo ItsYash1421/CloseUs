@@ -85,7 +85,11 @@ export default function NotificationsPage() {
         setLoading(true);
 
         try {
-            const response = await apiClient.post('/admin/notifications/templates', formData, token!);
+            const response = await apiClient.post(
+                '/admin/notifications/templates',
+                formData,
+                token!
+            );
             if (response.success) {
                 toast.success('Template created successfully');
                 setIsCreateOpen(false);

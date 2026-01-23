@@ -175,11 +175,27 @@ const seedFeatureFlags = async () => {
         console.log(`📊 Total features: ${appFeatures.length}`);
 
         const featureCounts = {
-            core: appFeatures.filter(f => ['app_enabled', 'maintenance_mode'].includes(f.name)).length,
-            screens: appFeatures.filter(f => f.name.endsWith('_enabled') && !['app_enabled', 'promotions_enabled', 'campaigns_enabled'].includes(f.name)).length,
-            functional: appFeatures.filter(f => ['push_notifications', 'profile_editing', 'media_upload', 'voice_messages'].includes(f.name)).length,
-            promotional: appFeatures.filter(f => ['promotions_enabled', 'campaigns_enabled'].includes(f.name)).length,
-            beta: appFeatures.filter(f => f.rolloutPercentage === 0 && !f.name.includes('maintenance')).length,
+            core: appFeatures.filter((f) => ['app_enabled', 'maintenance_mode'].includes(f.name))
+                .length,
+            screens: appFeatures.filter(
+                (f) =>
+                    f.name.endsWith('_enabled') &&
+                    !['app_enabled', 'promotions_enabled', 'campaigns_enabled'].includes(f.name)
+            ).length,
+            functional: appFeatures.filter((f) =>
+                [
+                    'push_notifications',
+                    'profile_editing',
+                    'media_upload',
+                    'voice_messages',
+                ].includes(f.name)
+            ).length,
+            promotional: appFeatures.filter((f) =>
+                ['promotions_enabled', 'campaigns_enabled'].includes(f.name)
+            ).length,
+            beta: appFeatures.filter(
+                (f) => f.rolloutPercentage === 0 && !f.name.includes('maintenance')
+            ).length,
         };
 
         console.log(`\n📦 Core Features: ${featureCounts.core}`);

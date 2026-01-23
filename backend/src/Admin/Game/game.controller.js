@@ -112,7 +112,7 @@ const createGameQuestion = async (req, res) => {
 };
 
 // ------------------------------------------------------------------
-// Get All Game Questions (Across All Categories) 
+// Get All Game Questions (Across All Categories)
 // ------------------------------------------------------------------
 const getAllGameQuestions = async (req, res) => {
     try {
@@ -126,9 +126,7 @@ const getAllGameQuestions = async (req, res) => {
 
         const total = await GameQuestion.countDocuments();
 
-        res.json(
-            successResponse(questions)
-        );
+        res.json(successResponse(questions));
     } catch (error) {
         console.error('Get all game questions error:', error);
         res.status(500).json(errorResponse('Internal server error'));

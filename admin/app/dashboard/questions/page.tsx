@@ -78,9 +78,10 @@ export default function QuestionsPage() {
 
     const fetchQuestions = async () => {
         try {
-            const endpoint = selectedCategory === 'all'
-                ? '/admin/questions'
-                : `/admin/questions?categoryId=${selectedCategory}`;
+            const endpoint =
+                selectedCategory === 'all'
+                    ? '/admin/questions'
+                    : `/admin/questions?categoryId=${selectedCategory}`;
             const response = await apiClient.get(endpoint, token!);
             if (response.success) {
                 setQuestions(response.data.questions || []);
@@ -95,7 +96,11 @@ export default function QuestionsPage() {
         setLoading(true);
 
         try {
-            const response = await apiClient.post('/admin/questions/categories', categoryForm, token!);
+            const response = await apiClient.post(
+                '/admin/questions/categories',
+                categoryForm,
+                token!
+            );
             if (response.success) {
                 toast.success('Category created successfully');
                 setIsCreateCategoryOpen(false);
@@ -143,7 +148,9 @@ export default function QuestionsPage() {
             });
             fetchQuestions();
         } catch (error) {
-            toast.error(editingQuestion ? 'Failed to update question' : 'Failed to create question');
+            toast.error(
+                editingQuestion ? 'Failed to update question' : 'Failed to create question'
+            );
         } finally {
             setLoading(false);
         }
@@ -165,7 +172,8 @@ export default function QuestionsPage() {
     };
 
     const handleDeleteCategory = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this category? It must have no questions.')) return;
+        if (!confirm('Are you sure you want to delete this category? It must have no questions.'))
+            return;
 
         try {
             const response = await apiClient.delete(`/admin/questions/categories/${id}`, token!);
@@ -218,7 +226,10 @@ export default function QuestionsPage() {
                                     <Input
                                         value={categoryForm.emoji}
                                         onChange={(e) =>
-                                            setCategoryForm({ ...categoryForm, emoji: e.target.value })
+                                            setCategoryForm({
+                                                ...categoryForm,
+                                                emoji: e.target.value,
+                                            })
                                         }
                                         placeholder="❓"
                                         maxLength={2}
@@ -229,7 +240,10 @@ export default function QuestionsPage() {
                                     <Input
                                         value={categoryForm.name}
                                         onChange={(e) =>
-                                            setCategoryForm({ ...categoryForm, name: e.target.value })
+                                            setCategoryForm({
+                                                ...categoryForm,
+                                                name: e.target.value,
+                                            })
                                         }
                                         placeholder="Category name"
                                         required
@@ -240,7 +254,10 @@ export default function QuestionsPage() {
                                     <Textarea
                                         value={categoryForm.description}
                                         onChange={(e) =>
-                                            setCategoryForm({ ...categoryForm, description: e.target.value })
+                                            setCategoryForm({
+                                                ...categoryForm,
+                                                description: e.target.value,
+                                            })
                                         }
                                         placeholder="Category description"
                                     />
@@ -251,7 +268,10 @@ export default function QuestionsPage() {
                                         type="color"
                                         value={categoryForm.color}
                                         onChange={(e) =>
-                                            setCategoryForm({ ...categoryForm, color: e.target.value })
+                                            setCategoryForm({
+                                                ...categoryForm,
+                                                color: e.target.value,
+                                            })
                                         }
                                     />
                                 </div>
@@ -275,7 +295,9 @@ export default function QuestionsPage() {
                                     {editingQuestion ? 'Edit Question' : 'Create New Question'}
                                 </DialogTitle>
                                 <DialogDescription>
-                                    {editingQuestion ? 'Update the question details' : 'Add a new question to the database'}
+                                    {editingQuestion
+                                        ? 'Update the question details'
+                                        : 'Add a new question to the database'}
                                 </DialogDescription>
                             </DialogHeader>
                             <form onSubmit={handleCreateQuestion} className="space-y-4">
@@ -304,7 +326,10 @@ export default function QuestionsPage() {
                                     <Textarea
                                         value={questionForm.text}
                                         onChange={(e) =>
-                                            setQuestionForm({ ...questionForm, text: e.target.value })
+                                            setQuestionForm({
+                                                ...questionForm,
+                                                text: e.target.value,
+                                            })
                                         }
                                         placeholder="Enter the question"
                                         required
@@ -317,14 +342,21 @@ export default function QuestionsPage() {
                                         id="isDaily"
                                         checked={questionForm.isDaily}
                                         onChange={(e) =>
-                                            setQuestionForm({ ...questionForm, isDaily: e.target.checked })
+                                            setQuestionForm({
+                                                ...questionForm,
+                                                isDaily: e.target.checked,
+                                            })
                                         }
                                         className="rounded"
                                     />
                                     <Label htmlFor="isDaily">Mark as Daily Question</Label>
                                 </div>
                                 <Button type="submit" disabled={loading} className="w-full">
-                                    {loading ? 'Saving...' : editingQuestion ? 'Update Question' : 'Create Question'}
+                                    {loading
+                                        ? 'Saving...'
+                                        : editingQuestion
+                                          ? 'Update Question'
+                                          : 'Create Question'}
                                 </Button>
                             </form>
                         </DialogContent>

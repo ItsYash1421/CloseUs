@@ -77,9 +77,10 @@ export default function GamesPage() {
 
     const fetchQuestions = async () => {
         try {
-            const endpoint = selectedCategory === 'all'
-                ? '/admin/games/questions'
-                : `/admin/games/questions/${selectedCategory}`;
+            const endpoint =
+                selectedCategory === 'all'
+                    ? '/admin/games/questions'
+                    : `/admin/games/questions/${selectedCategory}`;
             const response = await apiClient.get(endpoint, token!);
             if (response.success) {
                 setQuestions(response.data || response.data?.questions || []);
@@ -129,7 +130,11 @@ export default function GamesPage() {
                     setEditingQuestion(null);
                 }
             } else {
-                const response = await apiClient.post('/admin/games/questions', questionForm, token!);
+                const response = await apiClient.post(
+                    '/admin/games/questions',
+                    questionForm,
+                    token!
+                );
                 if (response.success) {
                     toast.success('Game question created successfully');
                 }
@@ -142,7 +147,9 @@ export default function GamesPage() {
             fetchQuestions();
             fetchCategories();
         } catch (error) {
-            toast.error(editingQuestion ? 'Failed to update question' : 'Failed to create question');
+            toast.error(
+                editingQuestion ? 'Failed to update question' : 'Failed to create question'
+            );
         } finally {
             setLoading(false);
         }
@@ -164,7 +171,8 @@ export default function GamesPage() {
     };
 
     const handleDeleteCategory = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this category? It must have no questions.')) return;
+        if (!confirm('Are you sure you want to delete this category? It must have no questions.'))
+            return;
 
         try {
             const response = await apiClient.delete(`/admin/games/categories/${id}`, token!);
@@ -192,7 +200,8 @@ export default function GamesPage() {
                 <div>
                     <h1 className="text-3xl font-bold">Games Management</h1>
                     <p className="text-muted-foreground">
-                        Manage game categories and questions for Truth or Dare, Never Have I Ever, etc.
+                        Manage game categories and questions for Truth or Dare, Never Have I Ever,
+                        etc.
                     </p>
                 </div>
                 <div className="flex gap-2">
@@ -216,7 +225,10 @@ export default function GamesPage() {
                                     <Input
                                         value={categoryForm.emoji}
                                         onChange={(e) =>
-                                            setCategoryForm({ ...categoryForm, emoji: e.target.value })
+                                            setCategoryForm({
+                                                ...categoryForm,
+                                                emoji: e.target.value,
+                                            })
                                         }
                                         placeholder="🎮"
                                         maxLength={2}
@@ -227,7 +239,10 @@ export default function GamesPage() {
                                     <Input
                                         value={categoryForm.name}
                                         onChange={(e) =>
-                                            setCategoryForm({ ...categoryForm, name: e.target.value })
+                                            setCategoryForm({
+                                                ...categoryForm,
+                                                name: e.target.value,
+                                            })
                                         }
                                         placeholder="e.g., Funny, Romantic, Spicy"
                                         required
@@ -240,7 +255,10 @@ export default function GamesPage() {
                                         onChange={(e) =>
                                             setCategoryForm({
                                                 ...categoryForm,
-                                                tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean),
+                                                tags: e.target.value
+                                                    .split(',')
+                                                    .map((t) => t.trim())
+                                                    .filter(Boolean),
                                             })
                                         }
                                         placeholder="funny, romantic, spicy"
@@ -252,7 +270,10 @@ export default function GamesPage() {
                                         type="color"
                                         value={categoryForm.color}
                                         onChange={(e) =>
-                                            setCategoryForm({ ...categoryForm, color: e.target.value })
+                                            setCategoryForm({
+                                                ...categoryForm,
+                                                color: e.target.value,
+                                            })
                                         }
                                     />
                                 </div>
@@ -273,10 +294,14 @@ export default function GamesPage() {
                         <DialogContent>
                             <DialogHeader>
                                 <DialogTitle>
-                                    {editingQuestion ? 'Edit Game Question' : 'Create New Game Question'}
+                                    {editingQuestion
+                                        ? 'Edit Game Question'
+                                        : 'Create New Game Question'}
                                 </DialogTitle>
                                 <DialogDescription>
-                                    {editingQuestion ? 'Update the game question' : 'Add a new question to the game'}
+                                    {editingQuestion
+                                        ? 'Update the game question'
+                                        : 'Add a new question to the game'}
                                 </DialogDescription>
                             </DialogHeader>
                             <form onSubmit={handleCreateQuestion} className="space-y-4">
@@ -305,7 +330,10 @@ export default function GamesPage() {
                                     <Textarea
                                         value={questionForm.text}
                                         onChange={(e) =>
-                                            setQuestionForm({ ...questionForm, text: e.target.value })
+                                            setQuestionForm({
+                                                ...questionForm,
+                                                text: e.target.value,
+                                            })
                                         }
                                         placeholder="Enter the game question"
                                         required
@@ -313,7 +341,11 @@ export default function GamesPage() {
                                     />
                                 </div>
                                 <Button type="submit" disabled={loading} className="w-full">
-                                    {loading ? 'Saving...' : editingQuestion ? 'Update Question' : 'Create Question'}
+                                    {loading
+                                        ? 'Saving...'
+                                        : editingQuestion
+                                          ? 'Update Question'
+                                          : 'Create Question'}
                                 </Button>
                             </form>
                         </DialogContent>
@@ -387,7 +419,9 @@ export default function GamesPage() {
                         <TableBody>
                             {questions.map((question) => (
                                 <TableRow key={question._id}>
-                                    <TableCell className="font-medium max-w-md">{question.text}</TableCell>
+                                    <TableCell className="font-medium max-w-md">
+                                        {question.text}
+                                    </TableCell>
                                     <TableCell>
                                         <Badge variant="outline">
                                             {question.categoryId?.emoji} {question.categoryId?.name}

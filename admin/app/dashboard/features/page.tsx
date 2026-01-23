@@ -150,14 +150,46 @@ export default function FeaturesPage() {
 
     // Predefined feature templates for common app features
     const featureTemplates = [
-        { name: 'chat_enabled', displayName: '💬 Chat Feature', description: 'Enable/disable chat functionality' },
-        { name: 'games_enabled', displayName: '🎮 Games Feature', description: 'Enable/disable games section' },
-        { name: 'questions_enabled', displayName: '❓ Daily Questions', description: 'Enable/disable daily questions' },
-        { name: 'promotions_enabled', displayName: '🎁 Promotions', description: 'Enable/disable promotions' },
-        { name: 'maintenance_mode', displayName: '🔧 Maintenance Mode', description: 'Put app in maintenance mode' },
-        { name: 'push_notifications', displayName: '🔔 Push Notifications', description: 'Enable/disable push notifications' },
-        { name: 'profile_editing', displayName: '👤 Profile Editing', description: 'Allow users to edit profiles' },
-        { name: 'media_upload', displayName: '📷 Media Upload', description: 'Enable media upload in chat' },
+        {
+            name: 'chat_enabled',
+            displayName: '💬 Chat Feature',
+            description: 'Enable/disable chat functionality',
+        },
+        {
+            name: 'games_enabled',
+            displayName: '🎮 Games Feature',
+            description: 'Enable/disable games section',
+        },
+        {
+            name: 'questions_enabled',
+            displayName: '❓ Daily Questions',
+            description: 'Enable/disable daily questions',
+        },
+        {
+            name: 'promotions_enabled',
+            displayName: '🎁 Promotions',
+            description: 'Enable/disable promotions',
+        },
+        {
+            name: 'maintenance_mode',
+            displayName: '🔧 Maintenance Mode',
+            description: 'Put app in maintenance mode',
+        },
+        {
+            name: 'push_notifications',
+            displayName: '🔔 Push Notifications',
+            description: 'Enable/disable push notifications',
+        },
+        {
+            name: 'profile_editing',
+            displayName: '👤 Profile Editing',
+            description: 'Allow users to edit profiles',
+        },
+        {
+            name: 'media_upload',
+            displayName: '📷 Media Upload',
+            description: 'Enable media upload in chat',
+        },
     ];
 
     const quickAddFeature = async (template: any) => {
@@ -192,7 +224,9 @@ export default function FeaturesPage() {
                                 {editingFeature ? 'Edit Feature Flag' : 'Create Feature Flag'}
                             </DialogTitle>
                             <DialogDescription>
-                                {editingFeature ? 'Update the feature flag details' : 'Add a new feature flag to control app functionality'}
+                                {editingFeature
+                                    ? 'Update the feature flag details'
+                                    : 'Add a new feature flag to control app functionality'}
                             </DialogDescription>
                         </DialogHeader>
                         <form onSubmit={handleCreateFeature} className="space-y-4">
@@ -216,7 +250,10 @@ export default function FeaturesPage() {
                                 <Input
                                     value={featureForm.displayName}
                                     onChange={(e) =>
-                                        setFeatureForm({ ...featureForm, displayName: e.target.value })
+                                        setFeatureForm({
+                                            ...featureForm,
+                                            displayName: e.target.value,
+                                        })
                                     }
                                     placeholder="e.g., Chat Feature"
                                     required
@@ -227,7 +264,10 @@ export default function FeaturesPage() {
                                 <Textarea
                                     value={featureForm.description}
                                     onChange={(e) =>
-                                        setFeatureForm({ ...featureForm, description: e.target.value })
+                                        setFeatureForm({
+                                            ...featureForm,
+                                            description: e.target.value,
+                                        })
                                     }
                                     placeholder="Describe what this feature controls"
                                     rows={2}
@@ -253,7 +293,11 @@ export default function FeaturesPage() {
                                 </p>
                             </div>
                             <Button type="submit" disabled={loading} className="w-full">
-                                {loading ? 'Saving...' : editingFeature ? 'Update Feature' : 'Create Feature'}
+                                {loading
+                                    ? 'Saving...'
+                                    : editingFeature
+                                      ? 'Update Feature'
+                                      : 'Create Feature'}
                             </Button>
                         </form>
                     </DialogContent>
@@ -264,7 +308,9 @@ export default function FeaturesPage() {
             <Card>
                 <CardHeader>
                     <CardTitle>Quick Add Common Features</CardTitle>
-                    <CardDescription>Click to quickly add commonly used feature flags</CardDescription>
+                    <CardDescription>
+                        Click to quickly add commonly used feature flags
+                    </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -326,14 +372,19 @@ export default function FeaturesPage() {
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-sm">{feature.rolloutPercentage}%</span>
+                                            <span className="text-sm">
+                                                {feature.rolloutPercentage}%
+                                            </span>
                                             <input
                                                 type="range"
                                                 min="0"
                                                 max="100"
                                                 value={feature.rolloutPercentage}
                                                 onChange={(e) =>
-                                                    handleUpdateRollout(feature._id, parseInt(e.target.value))
+                                                    handleUpdateRollout(
+                                                        feature._id,
+                                                        parseInt(e.target.value)
+                                                    )
                                                 }
                                                 className="w-20"
                                             />
