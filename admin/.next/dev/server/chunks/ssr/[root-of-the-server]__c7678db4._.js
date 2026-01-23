@@ -66,6 +66,21 @@ function DashboardLayout({ children }) {
             name: 'Notifications',
             href: '/dashboard/notifications',
             icon: '🔔'
+        },
+        {
+            name: 'Features',
+            href: '/dashboard/features',
+            icon: '🏷️'
+        },
+        {
+            name: 'Campaigns',
+            href: '/dashboard/campaigns',
+            icon: '📣'
+        },
+        {
+            name: 'Promotions',
+            href: '/dashboard/promotions',
+            icon: '🎟️'
         }
     ];
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -81,12 +96,12 @@ function DashboardLayout({ children }) {
                             children: "CloseUs Admin"
                         }, void 0, false, {
                             fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/layout.tsx",
-                            lineNumber: 26,
+                            lineNumber: 29,
                             columnNumber: 21
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/layout.tsx",
-                        lineNumber: 25,
+                        lineNumber: 28,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
@@ -102,20 +117,20 @@ function DashboardLayout({ children }) {
                                         children: item.icon
                                     }, void 0, false, {
                                         fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/layout.tsx",
-                                        lineNumber: 41,
+                                        lineNumber: 44,
                                         columnNumber: 33
                                     }, this),
                                     item.name
                                 ]
                             }, item.name, true, {
                                 fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/layout.tsx",
-                                lineNumber: 33,
+                                lineNumber: 36,
                                 columnNumber: 29
                             }, this);
                         })
                     }, void 0, false, {
                         fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/layout.tsx",
-                        lineNumber: 29,
+                        lineNumber: 32,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -130,7 +145,7 @@ function DashboardLayout({ children }) {
                                             children: admin?.name
                                         }, void 0, false, {
                                             fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/layout.tsx",
-                                            lineNumber: 51,
+                                            lineNumber: 54,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -138,13 +153,13 @@ function DashboardLayout({ children }) {
                                             children: admin?.role
                                         }, void 0, false, {
                                             fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/layout.tsx",
-                                            lineNumber: 52,
+                                            lineNumber: 55,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/layout.tsx",
-                                    lineNumber: 50,
+                                    lineNumber: 53,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -154,24 +169,24 @@ function DashboardLayout({ children }) {
                                     children: "🚪"
                                 }, void 0, false, {
                                     fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/layout.tsx",
-                                    lineNumber: 54,
+                                    lineNumber: 57,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/layout.tsx",
-                            lineNumber: 49,
+                            lineNumber: 52,
                             columnNumber: 21
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/layout.tsx",
-                        lineNumber: 48,
+                        lineNumber: 51,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/layout.tsx",
-                lineNumber: 24,
+                lineNumber: 27,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -181,18 +196,18 @@ function DashboardLayout({ children }) {
                     children: children
                 }, void 0, false, {
                     fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/layout.tsx",
-                    lineNumber: 67,
+                    lineNumber: 70,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/layout.tsx",
-                lineNumber: 66,
+                lineNumber: 69,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/layout.tsx",
-        lineNumber: 22,
+        lineNumber: 25,
         columnNumber: 9
     }, this);
 }

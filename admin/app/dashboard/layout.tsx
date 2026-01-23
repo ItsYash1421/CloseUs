@@ -16,6 +16,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         { name: 'Questions', href: '/dashboard/questions', icon: '❓' },
         { name: 'Games', href: '/dashboard/games', icon: '🎮' },
         { name: 'Notifications', href: '/dashboard/notifications', icon: '🔔' },
+        { name: 'Features', href: '/dashboard/features', icon: '🏷️' },
+        { name: 'Campaigns', href: '/dashboard/campaigns', icon: '📣' },
+        { name: 'Promotions', href: '/dashboard/promotions', icon: '🎟️' },
     ];
 
     return (
@@ -33,11 +36,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                             <Link
                                 key={item.name}
                                 href={item.href}
-                                className={`flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                                    isActive
-                                        ? 'bg-blue-50 text-blue-700'
-                                        : 'text-gray-700 hover:bg-gray-50'
-                                }`}
+                                className={`flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
+                                    ? 'bg-blue-50 text-blue-700'
+                                    : 'text-gray-700 hover:bg-gray-50'
+                                    }`}
                             >
                                 <span className="mr-3 text-lg">{item.icon}</span>
                                 {item.name}

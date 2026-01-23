@@ -2,14 +2,10 @@ const mongoose = require('mongoose');
 
 const gameCategorySchema = new mongoose.Schema(
     {
-        gameType: {
-            type: String,
-            enum: ['never_have_i_ever', 'would_you_rather', 'who_more_likely'],
-            required: true,
-        },
         name: {
             type: String,
             required: true,
+            unique: true,
         },
         emoji: String,
         tags: [String],
@@ -39,6 +35,7 @@ const gameCategorySchema = new mongoose.Schema(
 // ------------------------------------------------------------------
 // Indexes
 // ------------------------------------------------------------------
-gameCategorySchema.index({ gameType: 1 });
+gameCategorySchema.index({ name: 1 });
+gameCategorySchema.index({ isActive: 1 });
 
 module.exports = mongoose.model('GameCategory', gameCategorySchema);

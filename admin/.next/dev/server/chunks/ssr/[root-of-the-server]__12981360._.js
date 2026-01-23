@@ -12,7 +12,11 @@ __turbopack_context__.s([
     "apiClient",
     ()=>apiClient
 ]);
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = ("TURBOPACK compile-time value", "http://localhost:3000/api") || 'http://localhost:3000/api';
+const handleTokenExpiration = ()=>{
+    if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+    ;
+};
 const apiClient = {
     get: async (endpoint, token)=>{
         const headers = {
@@ -28,6 +32,10 @@ const apiClient = {
         });
         console.log('Response status:', response.status);
         if (!response.ok) {
+            if (response.status === 401) {
+                handleTokenExpiration();
+                throw new Error('Token expired');
+            }
             const error = await response.text();
             console.error('API Error:', error);
             throw new Error(`API Error: ${response.statusText}`);
@@ -47,6 +55,10 @@ const apiClient = {
             body: JSON.stringify(data)
         });
         if (!response.ok) {
+            if (response.status === 401) {
+                handleTokenExpiration();
+                throw new Error('Token expired');
+            }
             throw new Error(`API Error: ${response.statusText}`);
         }
         return response.json();
@@ -64,6 +76,10 @@ const apiClient = {
             body: JSON.stringify(data)
         });
         if (!response.ok) {
+            if (response.status === 401) {
+                handleTokenExpiration();
+                throw new Error('Token expired');
+            }
             throw new Error(`API Error: ${response.statusText}`);
         }
         return response.json();
@@ -80,6 +96,10 @@ const apiClient = {
             headers
         });
         if (!response.ok) {
+            if (response.status === 401) {
+                handleTokenExpiration();
+                throw new Error('Token expired');
+            }
             throw new Error(`API Error: ${response.statusText}`);
         }
         return response.json();
@@ -149,7 +169,7 @@ function AuthProvider({ children }) {
         children: children
     }, void 0, false, {
         fileName: "[project]/Desktop/CloseUs/admin/contexts/AuthContext.tsx",
-        lineNumber: 57,
+        lineNumber: 58,
         columnNumber: 9
     }, this);
 }

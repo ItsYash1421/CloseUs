@@ -28,12 +28,12 @@ export default function UsersPage() {
         setLoading(true);
         try {
             const response = await apiClient.get(
-                `/admin/users?page=${page}&limit=20&search=${search}`,
+                `/admin/dashboard/users?page=${page}&limit=20&search=${search}`,
                 token
             );
             console.log('Users response:', response);
-            setUsers(response.data.users);
-            setTotalPages(response.data.pagination.pages);
+            setUsers(response.data.users || []);
+            setTotalPages(response.data.pagination?.pages || 1);
         } catch (error) {
             console.error('Failed to fetch users:', error);
         } finally {

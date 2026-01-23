@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { apiClient } from '@/lib/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,8 +36,9 @@ import { Bell, Plus, Send, Edit, Trash2, Power, PowerOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function NotificationsPage() {
-    const [templates, setTemplates] = useState([]);
-    const [stats, setStats] = useState(null);
+    const { token } = useAuth();
+    const [templates, setTemplates] = useState<any[]>([]);
+    const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isSendOpen, setIsSendOpen] = useState(false);
@@ -49,16 +52,17 @@ export default function NotificationsPage() {
     });
 
     useEffect(() => {
-        fetchTemplates();
-        fetchStats();
-    }, []);
+        if (token) {
+            fetchTemplates();
+            fetchStats();
+        }
+    }, [token]);
 
     const fetchTemplates = async () => {
         try {
-            const res = await fetch('/api/admin/notifications/templates');
-            const data = await res.json();
-            if (data.success) {
-                setTemplates(data.data);
+            const response = await apiClient.get('/admin/notifications/templates', token!);
+            if (response.success) {
+                setTemplates(response.data || []);
             }
         } catch (error) {
             toast.error('Failed to fetch templates');
@@ -67,29 +71,22 @@ export default function NotificationsPage() {
 
     const fetchStats = async () => {
         try {
-            const res = await fetch('/api/admin/notifications/stats');
-            const data = await res.json();
-            if (data.success) {
-                setStats(data.data);
+            const response = await apiClient.get('/admin/notifications/stats', token!);
+            if (response.success) {
+                setStats(response.data);
             }
         } catch (error) {
             console.error('Failed to fetch stats');
         }
     };
 
-    const handleCreateTemplate = async (e) => {
+    const handleCreateTemplate = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
         try {
-            const res = await fetch('/api/admin/notifications/templates', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            });
-
-            const data = await res.json();
-            if (data.success) {
+            const response = await apiClient.post('/admin/notifications/templates', formData, token!);
+            if (response.success) {
                 toast.success('Template created successfully');
                 setIsCreateOpen(false);
                 setFormData({
@@ -102,7 +99,7 @@ export default function NotificationsPage() {
                 fetchTemplates();
                 fetchStats();
             } else {
-                toast.error(data.message || 'Failed to create template');
+                toast.error(response.message || 'Failed to create template');
             }
         } catch (error) {
             toast.error('Failed to create template');
@@ -111,17 +108,16 @@ export default function NotificationsPage() {
         }
     };
 
-    const handleToggleStatus = async (id, currentStatus) => {
+    const handleToggleStatus = async (id: string, currentStatus: boolean) => {
         try {
-            const res = await fetch(`/api/admin/notifications/templates/${id}/toggle`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ isActive: !currentStatus }),
-            });
-
-            const data = await res.json();
-            if (data.success) {
-                toast.success(data.message);
+            // Note: Using PUT since apiClient doesn't have patch method yet
+            const response = await apiClient.put(
+                `/admin/notifications/templates/${id}`,
+                { isActive: !currentStatus },
+                token!
+            );
+            if (response.success) {
+                toast.success(response.message || 'Status updated');
                 fetchTemplates();
                 fetchStats();
             }
@@ -130,16 +126,12 @@ export default function NotificationsPage() {
         }
     };
 
-    const handleDeleteTemplate = async (id) => {
+    const handleDeleteTemplate = async (id: string) => {
         if (!confirm('Are you sure you want to delete this template?')) return;
 
         try {
-            const res = await fetch(`/api/admin/notifications/templates/${id}`, {
-                method: 'DELETE',
-            });
-
-            const data = await res.json();
-            if (data.success) {
+            const response = await apiClient.delete(`/admin/notifications/templates/${id}`, token!);
+            if (response.success) {
                 toast.success('Template deleted');
                 fetchTemplates();
                 fetchStats();
@@ -149,20 +141,18 @@ export default function NotificationsPage() {
         }
     };
 
-    const handleSendToAll = async (templateId) => {
+    const handleSendToAll = async (templateId: string) => {
         if (!confirm('Send this notification to ALL users?')) return;
 
         setLoading(true);
         try {
-            const res = await fetch('/api/admin/notifications/send/all', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ templateId }),
-            });
-
-            const data = await res.json();
-            if (data.success) {
-                toast.success(`Sent to ${data.data.sentCount} users`);
+            const response = await apiClient.post(
+                '/admin/notifications/send/all',
+                { templateId },
+                token!
+            );
+            if (response.success) {
+                toast.success(`Sent to ${response.data.sentCount} users`);
                 fetchTemplates();
                 fetchStats();
             }

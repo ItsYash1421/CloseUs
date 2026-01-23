@@ -20,7 +20,7 @@ export default function CouplesPage() {
 
         setLoading(true);
         try {
-            const response = await apiClient.get(`/admin/couples?page=${page}&limit=20`, token);
+            const response = await apiClient.get(`/admin/dashboard/couples?page=${page}&limit=20`, token);
             setCouples(response.data.couples);
             setTotalPages(response.data.pagination.pages);
         } catch (error) {

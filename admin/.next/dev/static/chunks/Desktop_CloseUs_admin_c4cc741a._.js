@@ -7,7 +7,14 @@ __turbopack_context__.s([
     ()=>apiClient
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = /*#__PURE__*/ __turbopack_context__.i("[project]/Desktop/CloseUs/admin/node_modules/next/dist/build/polyfills/process.js [app-client] (ecmascript)");
-const API_BASE_URL = __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = ("TURBOPACK compile-time value", "http://localhost:3000/api") || 'http://localhost:3000/api';
+const handleTokenExpiration = ()=>{
+    if ("TURBOPACK compile-time truthy", 1) {
+        localStorage.removeItem('admin_token');
+        alert('Your token has expired. Please login again.');
+        window.location.href = '/login';
+    }
+};
 const apiClient = {
     get: async (endpoint, token)=>{
         const headers = {
@@ -23,6 +30,10 @@ const apiClient = {
         });
         console.log('Response status:', response.status);
         if (!response.ok) {
+            if (response.status === 401) {
+                handleTokenExpiration();
+                throw new Error('Token expired');
+            }
             const error = await response.text();
             console.error('API Error:', error);
             throw new Error(`API Error: ${response.statusText}`);
@@ -42,6 +53,10 @@ const apiClient = {
             body: JSON.stringify(data)
         });
         if (!response.ok) {
+            if (response.status === 401) {
+                handleTokenExpiration();
+                throw new Error('Token expired');
+            }
             throw new Error(`API Error: ${response.statusText}`);
         }
         return response.json();
@@ -59,6 +74,10 @@ const apiClient = {
             body: JSON.stringify(data)
         });
         if (!response.ok) {
+            if (response.status === 401) {
+                handleTokenExpiration();
+                throw new Error('Token expired');
+            }
             throw new Error(`API Error: ${response.statusText}`);
         }
         return response.json();
@@ -75,6 +94,10 @@ const apiClient = {
             headers
         });
         if (!response.ok) {
+            if (response.status === 401) {
+                handleTokenExpiration();
+                throw new Error('Token expired');
+            }
             throw new Error(`API Error: ${response.statusText}`);
         }
         return response.json();
@@ -157,7 +180,7 @@ function AuthProvider({ children }) {
         children: children
     }, void 0, false, {
         fileName: "[project]/Desktop/CloseUs/admin/contexts/AuthContext.tsx",
-        lineNumber: 57,
+        lineNumber: 58,
         columnNumber: 9
     }, this);
 }

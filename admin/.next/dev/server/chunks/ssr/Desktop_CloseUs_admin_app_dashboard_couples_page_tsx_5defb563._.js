@@ -31,7 +31,7 @@ function CouplesPage() {
         if (!token) return;
         setLoading(true);
         try {
-            const response = await __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$lib$2f$api$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["apiClient"].get(`/admin/couples?page=${page}&limit=20`, token);
+            const response = await __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$lib$2f$api$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["apiClient"].get(`/admin/dashboard/couples?page=${page}&limit=20`, token);
             setCouples(response.data.couples);
             setTotalPages(response.data.pagination.pages);
         } catch (error) {
@@ -56,12 +56,12 @@ function CouplesPage() {
                     children: "Couples Management"
                 }, void 0, false, {
                     fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                    lineNumber: 47,
+                    lineNumber: 44,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                lineNumber: 46,
+                lineNumber: 43,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -72,12 +72,12 @@ function CouplesPage() {
                         className: "animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
                     }, void 0, false, {
                         fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                        lineNumber: 54,
+                        lineNumber: 51,
                         columnNumber: 25
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                    lineNumber: 53,
+                    lineNumber: 50,
                     columnNumber: 21
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
                     children: [
@@ -91,53 +91,53 @@ function CouplesPage() {
                                                 children: "Partner 1"
                                             }, void 0, false, {
                                                 fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                                lineNumber: 61,
+                                                lineNumber: 58,
                                                 columnNumber: 37
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                 children: "Partner 2"
                                             }, void 0, false, {
                                                 fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                                lineNumber: 62,
+                                                lineNumber: 59,
                                                 columnNumber: 37
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                 children: "Couple Tag"
                                             }, void 0, false, {
                                                 fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                                lineNumber: 63,
+                                                lineNumber: 60,
                                                 columnNumber: 37
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                 children: "Status"
                                             }, void 0, false, {
                                                 fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                                lineNumber: 64,
+                                                lineNumber: 61,
                                                 columnNumber: 37
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                 children: "Anniversary"
                                             }, void 0, false, {
                                                 fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                                lineNumber: 65,
+                                                lineNumber: 62,
                                                 columnNumber: 37
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                 children: "Created"
                                             }, void 0, false, {
                                                 fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                                lineNumber: 66,
+                                                lineNumber: 63,
                                                 columnNumber: 37
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                        lineNumber: 60,
+                                        lineNumber: 57,
                                         columnNumber: 33
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                    lineNumber: 59,
+                                    lineNumber: 56,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
@@ -148,7 +148,7 @@ function CouplesPage() {
                                                     children: couple.partner1Id?.name || 'N/A'
                                                 }, void 0, false, {
                                                     fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                                    lineNumber: 72,
+                                                    lineNumber: 69,
                                                     columnNumber: 41
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -156,7 +156,7 @@ function CouplesPage() {
                                                     children: couple.partner2Id?.name || 'Pending'
                                                 }, void 0, false, {
                                                     fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                                    lineNumber: 75,
+                                                    lineNumber: 72,
                                                     columnNumber: 41
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -165,12 +165,12 @@ function CouplesPage() {
                                                         children: couple.coupleTag
                                                     }, void 0, false, {
                                                         fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                                        lineNumber: 80,
+                                                        lineNumber: 77,
                                                         columnNumber: 49
                                                     }, this) : '-'
                                                 }, void 0, false, {
                                                     fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                                    lineNumber: 78,
+                                                    lineNumber: 75,
                                                     columnNumber: 41
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -179,19 +179,19 @@ function CouplesPage() {
                                                         children: "Paired"
                                                     }, void 0, false, {
                                                         fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                                        lineNumber: 89,
+                                                        lineNumber: 86,
                                                         columnNumber: 49
                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         className: "badge badge-warning",
                                                         children: "Pending"
                                                     }, void 0, false, {
                                                         fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                                        lineNumber: 91,
+                                                        lineNumber: 88,
                                                         columnNumber: 49
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                                    lineNumber: 87,
+                                                    lineNumber: 84,
                                                     columnNumber: 41
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -199,7 +199,7 @@ function CouplesPage() {
                                                     children: couple.anniversaryDate ? formatDate(couple.anniversaryDate) : '-'
                                                 }, void 0, false, {
                                                     fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                                    lineNumber: 94,
+                                                    lineNumber: 91,
                                                     columnNumber: 41
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -207,24 +207,24 @@ function CouplesPage() {
                                                     children: formatDate(couple.createdAt)
                                                 }, void 0, false, {
                                                     fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                                    lineNumber: 97,
+                                                    lineNumber: 96,
                                                     columnNumber: 41
                                                 }, this)
                                             ]
                                         }, couple._id, true, {
                                             fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                            lineNumber: 71,
+                                            lineNumber: 68,
                                             columnNumber: 37
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                    lineNumber: 69,
+                                    lineNumber: 66,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                            lineNumber: 58,
+                            lineNumber: 55,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -240,7 +240,7 @@ function CouplesPage() {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                    lineNumber: 107,
+                                    lineNumber: 106,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -253,7 +253,7 @@ function CouplesPage() {
                                             children: "Previous"
                                         }, void 0, false, {
                                             fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                            lineNumber: 111,
+                                            lineNumber: 110,
                                             columnNumber: 33
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -263,32 +263,32 @@ function CouplesPage() {
                                             children: "Next"
                                         }, void 0, false, {
                                             fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                            lineNumber: 118,
+                                            lineNumber: 117,
                                             columnNumber: 33
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                                    lineNumber: 110,
+                                    lineNumber: 109,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                            lineNumber: 106,
+                            lineNumber: 105,
                             columnNumber: 25
                         }, this)
                     ]
                 }, void 0, true)
             }, void 0, false, {
                 fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-                lineNumber: 51,
+                lineNumber: 48,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/couples/page.tsx",
-        lineNumber: 45,
+        lineNumber: 42,
         columnNumber: 9
     }, this);
 }

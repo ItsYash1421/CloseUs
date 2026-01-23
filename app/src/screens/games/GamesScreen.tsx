@@ -1,47 +1,61 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { GradientBackground, Card } from '../../components/common';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
-
-const GAMES = [
-  {
-    id: '1',
-    name: 'Never Have I Ever',
-    emoji: '🙈',
-    description: 'Discover new things about each other',
-    isActive: true,
-  },
-  {
-    id: '2',
-    name: 'Would You Rather',
-    emoji: '🤔',
-    description: 'Make tough choices together',
-    isActive: false,
-  },
-  {
-    id: '3',
-    name: 'Who Knows Better',
-    emoji: '🎯',
-    description: 'Test how well you know each other',
-    isActive: false,
-  },
-  {
-    id: '4',
-    name: 'Truth or Dare',
-    emoji: '💋',
-    description: 'Spice things up',
-    isActive: false,
-  },
-];
+import gamesService, { GameCategory } from '../../services/gamesService';
 
 export const GamesScreen = ({ navigation }: any) => {
+  const [categories, setCategories] = useState<GameCategory[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchGameCategories();
+  }, []);
+
+  const fetchGameCategories = async () => {
+    try {
+      setIsLoading(true);
+      const data = await gamesService.getCategories();
+      setCategories(data);
+    } catch (error) {
+      console.error('Failed to load game categories:', error);
+      Alert.alert('Error', 'Failed to load games. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGamePress = (category: GameCategory) => {
+    if (!category.isActive) return;
+
+    navigation.navigate('CategoryQuestions', {
+      categoryId: category._id,
+      categoryName: category.name,
+      categoryEmoji: category.emoji,
+      categoryColor: category.color,
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <GradientBackground variant="background">
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text style={styles.loadingText}>Loading games...</Text>
+        </View>
+      </GradientBackground>
+    );
+  }
+
   return (
     <GradientBackground variant="background">
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -55,31 +69,43 @@ export const GamesScreen = ({ navigation }: any) => {
 
         {/* Games Grid */}
         <View style={styles.gamesGrid}>
-          {GAMES.map(game => (
+          {categories.map(category => (
             <TouchableOpacity
-              key={game.id}
+              key={category._id}
               activeOpacity={0.8}
-              disabled={!game.isActive}
+              disabled={!category.isActive}
+              onPress={() => handleGamePress(category)}
             >
               <Card
                 variant="glass"
                 padding="large"
                 style={[
                   styles.gameCard,
-                  !game.isActive && styles.gameCardDisabled,
+                  !category.isActive && styles.gameCardDisabled,
                 ]}
               >
-                <Text style={styles.gameEmoji}>{game.emoji}</Text>
-                <Text style={styles.gameName}>{game.name}</Text>
-                <Text style={styles.gameDescription}>{game.description}</Text>
-                {!game.isActive && (
+                <Text style={styles.gameEmoji}>{category.emoji}</Text>
+                <Text style={styles.gameName}>{category.name}</Text>
+                <Text style={styles.gameDescription}>
+                  {category.questionCount} questions available
+                </Text>
+                {!category.isActive && (
                   <View style={styles.comingSoonBadge}>
                     <Text style={styles.comingSoonText}>Coming Soon</Text>
                   </View>
                 )}
-                {game.isActive && (
+                {category.isActive && (
                   <View style={styles.playButton}>
                     <Text style={styles.playButtonText}>Play Now →</Text>
+                  </View>
+                )}
+
+                {/* Times Played Badge */}
+                {category.timesPlayed > 0 && (
+                  <View style={styles.playedBadge}>
+                    <Text style={styles.playedText}>
+                      Played {category.timesPlayed}x
+                    </Text>
                   </View>
                 )}
               </Card>
@@ -87,18 +113,22 @@ export const GamesScreen = ({ navigation }: any) => {
           ))}
         </View>
 
-        {/* Stats */}
+        {/* Stats - Can be enhanced with real stats later */}
         <Card variant="glass" padding="large" style={styles.statsCard}>
           <Text style={styles.statsTitle}>Your Game Stats</Text>
           <View style={styles.statsRow}>
             <View style={styles.stat}>
-              <Text style={styles.statValue}>5</Text>
-              <Text style={styles.statLabel}>Games Played</Text>
+              <Text style={styles.statValue}>
+                {categories.filter(c => c.isActive).length}
+              </Text>
+              <Text style={styles.statLabel}>Games Available</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.stat}>
-              <Text style={styles.statValue}>42</Text>
-              <Text style={styles.statLabel}>Questions Answered</Text>
+              <Text style={styles.statValue}>
+                {categories.reduce((sum, c) => sum + c.questionCount, 0)}
+              </Text>
+              <Text style={styles.statLabel}>Total Questions</Text>
             </View>
           </View>
         </Card>
@@ -111,6 +141,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: THEME.spacing.lg,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: COLORS.textSecondary,
+    marginTop: THEME.spacing.md,
+    fontSize: THEME.fontSizes.md,
   },
   header: {
     marginTop: THEME.spacing.xl,
@@ -133,6 +173,7 @@ const styles = StyleSheet.create({
   },
   gameCard: {
     alignItems: 'center',
+    position: 'relative',
   },
   gameCardDisabled: {
     opacity: 0.6,
@@ -174,6 +215,20 @@ const styles = StyleSheet.create({
     fontSize: THEME.fontSizes.md,
     fontWeight: THEME.fontWeights.semibold,
     color: COLORS.white,
+  },
+  playedBadge: {
+    position: 'absolute',
+    top: THEME.spacing.sm,
+    right: THEME.spacing.sm,
+    backgroundColor: COLORS.primaryLight,
+    paddingHorizontal: THEME.spacing.sm,
+    paddingVertical: 4,
+    borderRadius: THEME.borderRadius.sm,
+  },
+  playedText: {
+    fontSize: THEME.fontSizes.xs,
+    color: COLORS.white,
+    fontWeight: THEME.fontWeights.medium,
   },
   statsCard: {
     marginBottom: THEME.spacing.xl,

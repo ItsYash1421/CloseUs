@@ -101,17 +101,17 @@ function RootLayout({ children }) {
                 children: children
             }, void 0, false, {
                 fileName: "[project]/Desktop/CloseUs/admin/app/layout.tsx",
-                lineNumber: 21,
+                lineNumber: 17,
                 columnNumber: 17
             }, this)
         }, void 0, false, {
             fileName: "[project]/Desktop/CloseUs/admin/app/layout.tsx",
-            lineNumber: 20,
+            lineNumber: 16,
             columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/Desktop/CloseUs/admin/app/layout.tsx",
-        lineNumber: 19,
+        lineNumber: 15,
         columnNumber: 9
     }, this);
 }

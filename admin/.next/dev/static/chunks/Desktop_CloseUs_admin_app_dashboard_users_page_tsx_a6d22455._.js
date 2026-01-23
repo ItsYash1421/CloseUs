@@ -43,10 +43,10 @@ function UsersPage() {
         }
         setLoading(true);
         try {
-            const response = await __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["apiClient"].get(`/admin/users?page=${page}&limit=20&search=${search}`, token);
+            const response = await __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["apiClient"].get(`/admin/dashboard/users?page=${page}&limit=20&search=${search}`, token);
             console.log('Users response:', response);
-            setUsers(response.data.users);
-            setTotalPages(response.data.pagination.pages);
+            setUsers(response.data.users || []);
+            setTotalPages(response.data.pagination?.pages || 1);
         } catch (error) {
             console.error('Failed to fetch users:', error);
         } finally{
@@ -221,7 +221,7 @@ function UsersPage() {
                                                     children: user.coupleId?.coupleTag || '-'
                                                 }, void 0, false, {
                                                     fileName: "[project]/Desktop/CloseUs/admin/app/dashboard/users/page.tsx",
-                                                    lineNumber: 101,
+                                                    lineNumber: 103,
                                                     columnNumber: 41
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$CloseUs$2f$admin$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
