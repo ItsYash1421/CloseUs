@@ -3,51 +3,82 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  FlatList,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { GradientBackground, Card } from '../../components/common';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
 import gamesService, { GameQuestion } from '../../services/gamesService';
+import { RootStackParamList } from '../../types';
 
-interface CategoryQuestionsScreenProps {
-  route: {
-    params: {
-      categoryId: string;
-      categoryName: string;
-      categoryEmoji: string;
-      categoryColor: string;
-    };
-  };
-  navigation: any;
-}
+type CategoryQuestionsScreenRouteProp = RouteProp<
+  RootStackParamList,
+  'CategoryQuestions'
+>;
+type NavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'CategoryQuestions'
+>;
 
-export const CategoryQuestionsScreen: React.FC<
-  CategoryQuestionsScreenProps
-> = ({ route, navigation }) => {
+export const CategoryQuestionsScreen = () => {
+  const navigation = useNavigation<NavigationProp>();
+  const route = useRoute<CategoryQuestionsScreenRouteProp>();
   const { categoryId, categoryName, categoryEmoji, categoryColor } =
     route.params;
+
   const [questions, setQuestions] = useState<GameQuestion[]>([]);
+  const [answeredQuestionIds, setAnsweredQuestionIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchQuestions();
-  }, [categoryId]);
+    fetchData();
+  }, []);
 
-  const fetchQuestions = async () => {
+  const fetchData = async () => {
     try {
       setIsLoading(true);
-      const data = await gamesService.getQuestionsByCategory(categoryId);
-      setQuestions(data.questions);
+
+      // Fetch questions and answered IDs in parallel
+      const [questionsData, answersData] = await Promise.all([
+        gamesService.getQuestionsByCategory(categoryId),
+        gamesService.getUserAnswers(),
+      ]);
+
+      setQuestions(questionsData.questions);
+      setAnsweredQuestionIds(answersData.answeredQuestionIds);
     } catch (error) {
       console.error('Failed to load questions:', error);
       Alert.alert('Error', 'Failed to load questions. Please try again.');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleQuestionPress = (question: GameQuestion) => {
+    // Check if question is already answered
+    const isAnswered = answeredQuestionIds.includes(question._id);
+
+    if (isAnswered) {
+      Alert.alert(
+        'Already Answered',
+        'You\'ve already answered this question!',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    navigation.navigate('GameQuestionDetail', {
+      questionId: question._id,
+      text: question.text,
+      categoryName,
+      categoryEmoji,
+      categoryColor,
+    });
   };
 
   if (isLoading) {
@@ -63,59 +94,81 @@ export const CategoryQuestionsScreen: React.FC<
 
   return (
     <GradientBackground variant="background">
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
-            <Text style={styles.backText}>← Back</Text>
+            <Text style={styles.backButtonText}>←</Text>
           </TouchableOpacity>
-
-          <Text style={styles.categoryEmoji}>{categoryEmoji}</Text>
-          <Text style={styles.title}>{categoryName}</Text>
-          <Text style={styles.subtitle}>
-            {questions.length} Questions Available
-          </Text>
+          <View>
+            <Text style={styles.headerEmoji}>{categoryEmoji}</Text>
+            <Text style={styles.headerTitle}>{categoryName}</Text>
+          </View>
         </View>
 
         {/* Questions List */}
-        <View style={styles.questionsList}>
-          {questions.map((question, index) => (
-            <Card
-              key={question._id}
-              variant="glass"
-              padding="large"
-              style={styles.questionCard}
-            >
-              <View style={styles.questionHeader}>
-                <Text style={styles.questionNumber}>#{index + 1}</Text>
-                {question.timesPlayed > 0 && (
-                  <View style={styles.playedBadge}>
-                    <Text style={styles.playedText}>
-                      Played {question.timesPlayed}x
-                    </Text>
+        <FlatList
+          data={questions}
+          keyExtractor={item => item._id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
+          renderItem={({ item, index }) => {
+            const isAnswered = answeredQuestionIds.includes(item._id);
+
+            return (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => handleQuestionPress(item)}
+                disabled={isAnswered}
+              >
+                <Card
+                  variant="glass"
+                  padding="medium"
+                  style={[
+                    styles.questionCard,
+                    isAnswered && styles.answeredCard,
+                  ]}
+                >
+                  <View style={styles.cardHeader}>
+                    <View style={styles.questionNumberBadge}>
+                      <Text style={styles.questionNumberText}>#{index + 1}</Text>
+                    </View>
+                    {isAnswered ? (
+                      <View style={styles.answeredBadge}>
+                        <Text style={styles.answeredText}>✓ Answered</Text>
+                      </View>
+                    ) : item.timesPlayed > 0 ? (
+                      <Text style={styles.playedCount}>
+                        Played {item.timesPlayed}x
+                      </Text>
+                    ) : null}
                   </View>
-                )}
-              </View>
-
-              <Text style={styles.questionText}>{question.text}</Text>
-            </Card>
-          ))}
-        </View>
-
-        {/* Empty State */}
-        {questions.length === 0 && (
-          <Card variant="glass" padding="large" style={styles.emptyCard}>
-            <Text style={styles.emptyEmoji}>🎮</Text>
-            <Text style={styles.emptyText}>No questions available yet</Text>
-            <Text style={styles.emptySubtext}>
-              Check back later for new questions!
-            </Text>
-          </Card>
-        )}
-      </ScrollView>
+                  <Text
+                    style={[
+                      styles.questionText,
+                      isAnswered && styles.answeredText
+                    ]}
+                    numberOfLines={2}
+                  >
+                    {item.text}
+                  </Text>
+                  {!isAnswered && (
+                    <Text style={styles.tapToPlay}>Tap to play →</Text>
+                  )}
+                </Card>
+              </TouchableOpacity>
+            );
+          }}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No questions found.</Text>
+            </View>
+          }
+        />
+      </View>
     </GradientBackground>
   );
 };
@@ -123,7 +176,7 @@ export const CategoryQuestionsScreen: React.FC<
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: THEME.spacing.lg,
+    paddingTop: 60, // Status bar formatting
   },
   loadingContainer: {
     flex: 1,
@@ -136,86 +189,97 @@ const styles = StyleSheet.create({
     fontSize: THEME.fontSizes.md,
   },
   header: {
-    marginTop: THEME.spacing.xl,
+    paddingHorizontal: THEME.spacing.lg,
     marginBottom: THEME.spacing.xl,
+    flexDirection: 'row',
     alignItems: 'center',
   },
   backButton: {
-    alignSelf: 'flex-start',
-    marginBottom: THEME.spacing.lg,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: THEME.spacing.md,
   },
-  backText: {
-    color: COLORS.primary,
-    fontSize: THEME.fontSizes.md,
-    fontWeight: THEME.fontWeights.semibold,
+  backButtonText: {
+    color: COLORS.white,
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: -2,
   },
-  categoryEmoji: {
-    fontSize: 80,
-    marginBottom: THEME.spacing.md,
+  headerEmoji: {
+    fontSize: 24,
+    marginBottom: 4,
   },
-  title: {
-    fontSize: THEME.fontSizes.xxxl,
+  headerTitle: {
+    fontSize: 24,
     fontWeight: THEME.fontWeights.bold,
     color: COLORS.white,
-    marginBottom: THEME.spacing.xs,
-    textAlign: 'center',
   },
-  subtitle: {
-    fontSize: THEME.fontSizes.md,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-  },
-  questionsList: {
+  listContent: {
+    paddingHorizontal: THEME.spacing.lg,
+    paddingBottom: 40,
     gap: THEME.spacing.md,
-    marginBottom: THEME.spacing.xl,
   },
   questionCard: {
-    position: 'relative',
+    marginBottom: THEME.spacing.sm,
   },
-  questionHeader: {
+  cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: THEME.spacing.sm,
   },
-  questionNumber: {
-    fontSize: THEME.fontSizes.sm,
-    fontWeight: THEME.fontWeights.bold,
-    color: COLORS.primary,
+  questionNumberBadge: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
   },
-  playedBadge: {
-    backgroundColor: COLORS.primaryLight,
-    paddingHorizontal: THEME.spacing.sm,
-    paddingVertical: 4,
-    borderRadius: THEME.borderRadius.sm,
+  questionNumberText: {
+    color: COLORS.textSecondary,
+    fontSize: 10,
+    fontWeight: 'bold',
   },
-  playedText: {
-    fontSize: THEME.fontSizes.xs,
-    color: COLORS.white,
-    fontWeight: THEME.fontWeights.medium,
+  playedCount: {
+    color: COLORS.textSecondary,
+    fontSize: 10,
   },
   questionText: {
     fontSize: THEME.fontSizes.md,
     color: COLORS.white,
-    lineHeight: 24,
-  },
-  emptyCard: {
-    alignItems: 'center',
-    padding: THEME.spacing.xxl,
-  },
-  emptyEmoji: {
-    fontSize: 64,
+    fontWeight: THEME.fontWeights.medium,
+    lineHeight: 22,
     marginBottom: THEME.spacing.md,
   },
-  emptyText: {
-    fontSize: THEME.fontSizes.lg,
-    fontWeight: THEME.fontWeights.semibold,
-    color: COLORS.white,
-    marginBottom: THEME.spacing.xs,
-  },
-  emptySubtext: {
+  tapToPlay: {
     fontSize: THEME.fontSizes.sm,
+    color: COLORS.primary,
+    fontWeight: THEME.fontWeights.bold,
+    textAlign: 'right',
+  },
+  emptyContainer: {
+    padding: THEME.spacing.xl,
+    alignItems: 'center',
+  },
+  emptyText: {
     color: COLORS.textSecondary,
-    textAlign: 'center',
+    fontSize: THEME.fontSizes.md,
+  },
+  answeredCard: {
+    opacity: 0.5,
+  },
+  answeredBadge: {
+    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  answeredText: {
+    color: '#4CAF50',
+    fontSize: 11,
+    fontWeight: 'bold',
   },
 });

@@ -65,7 +65,7 @@ class GamesService {
    */
   async getCategories(): Promise<GameCategory[]> {
     try {
-      const response = await apiClient.get('/games/categories');
+      const response = await apiClient.get('/api/games/categories');
       return response.data;
     } catch (error) {
       console.error('Failed to fetch game categories:', error);
@@ -80,7 +80,7 @@ class GamesService {
     categoryId: string,
   ): Promise<CategoryQuestionsResponse> {
     try {
-      const response = await apiClient.get(`/games/questions/${categoryId}`);
+      const response = await apiClient.get(`/api/games/questions/${categoryId}`);
       return response.data;
     } catch (error) {
       console.error('Failed to fetch category questions:', error);
@@ -93,10 +93,41 @@ class GamesService {
    */
   async getRandomGame(): Promise<RandomGameResponse> {
     try {
-      const response = await apiClient.get('/games/random-game');
+      const response = await apiClient.get('/api/games/random-game');
       return response.data;
     } catch (error) {
       console.error('Failed to fetch random game:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Save answer for a game question
+   */
+  async saveAnswer(questionId: string, answer: string): Promise<void> {
+    try {
+      await apiClient.post('/api/games/answer', {
+        questionId,
+        answer,
+      });
+    } catch (error) {
+      console.error('Failed to save answer:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get user's answered question IDs
+   */
+  async getUserAnswers(): Promise<{
+    answeredQuestionIds: string[];
+    totalAnswered: number;
+  }> {
+    try {
+      const response = await apiClient.get('/api/games/answers');
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch user answers:', error);
       throw error;
     }
   }

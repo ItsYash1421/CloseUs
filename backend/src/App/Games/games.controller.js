@@ -147,8 +147,94 @@ const getRandomGame = async (req, res) => {
     }
 };
 
+// ------------------------------------------------------------------
+// Save Game Answer (Protected - For App)
+// ------------------------------------------------------------------
+const saveAnswer = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { questionId, answer } = req.body;
+
+        if (!questionId || !answer) {
+            return res.status(400).json(errorResponse('Missing required fields', 400));
+        }
+
+        // ------------------------------------------------------------------
+        // Verify Question Exists
+        // ------------------------------------------------------------------
+        const question = await GameQuestion.findById(questionId);
+        if (!question) {
+            return res.status(404).json(errorResponse('Question not found', 404));
+        }
+
+        // ------------------------------------------------------------------
+        // Get User's Couple
+        // ------------------------------------------------------------------
+        const User = require('../../models/User');
+        const user = await User.findById(userId);
+        if (!user.coupleId) {
+            return res.status(400).json(errorResponse('User not paired', 400));
+        }
+
+        // ------------------------------------------------------------------
+        // Create or Update Answer (Upsert)
+        // ------------------------------------------------------------------
+        const GameAnswer = require('../../models/GameAnswer');
+        const gameAnswer = await GameAnswer.findOneAndUpdate(
+            { userId, questionId },
+            {
+                coupleId: user.coupleId,
+                questionId,
+                userId,
+                text: answer,
+            },
+            { upsert: true, new: true }
+        );
+
+        res.json(
+            successResponse(
+                {
+                    _id: gameAnswer._id,
+                    questionId: gameAnswer.questionId,
+                    answer: gameAnswer.text,
+                },
+                'Answer saved successfully'
+            )
+        );
+    } catch (error) {
+        console.error('Save game answer error:', error);
+        res.status(500).json(errorResponse('Internal server error'));
+    }
+};
+
+// ------------------------------------------------------------------
+// Get User's Answered Question IDs (Protected - For App)
+// ------------------------------------------------------------------
+const getUserAnswers = async (req, res) => {
+    try {
+        const userId = req.userId;
+
+        const GameAnswer = require('../../models/GameAnswer');
+        const answers = await GameAnswer.find({ userId }).select('questionId');
+
+        const answeredQuestionIds = answers.map(a => a.questionId.toString());
+
+        res.json(
+            successResponse({
+                answeredQuestionIds,
+                totalAnswered: answeredQuestionIds.length,
+            })
+        );
+    } catch (error) {
+        console.error('Get user answers error:', error);
+        res.status(500).json(errorResponse('Internal server error'));
+    }
+};
+
 module.exports = {
     getGameCategories,
     getQuestionsByCategory,
     getRandomGame,
+    saveAnswer,
+    getUserAnswers,
 };

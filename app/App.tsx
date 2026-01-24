@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { BackHandler, Alert } from 'react-native';
 import { AppNavigator } from './src/navigation/AppNavigator';
+import { reset as resetNavigation } from './src/services/navigationService';
 import notificationService from './src/services/notificationService';
 import userStateNotificationService from './src/services/userStateNotificationService';
 import reminderService from './src/services/reminderService';
@@ -12,13 +13,17 @@ import { useAuthStore } from './src/store/authStore';
 import { useCoupleStore } from './src/store/coupleStore';
 import apiClient from './src/services/apiClient';
 import { NetworkLoggerButton } from './src/components/NetworkLoggerButton';
+import { ConfirmModal } from './src/components/global/ConfirmModal';
+import { eventEmitter } from './src/utils/eventEmitter';
 
 import Toast from 'react-native-toast-message';
 
 function App() {
   const user = useAuthStore(state => state.user);
+  const logout = useAuthStore(state => state.logout);
   const couple = useCoupleStore(state => state.couple);
   const partner = useCoupleStore(state => state.partner);
+  const [showSessionExpiredModal, setShowSessionExpiredModal] = useState(false);
 
   // Handle notification that opened the app (cold start)
   useEffect(() => {
@@ -157,11 +162,44 @@ function App() {
     return () => backHandler.remove();
   }, []);
 
+  // Listen for session expiry events
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      setShowSessionExpiredModal(true);
+    };
+
+    eventEmitter.on('SESSION_EXPIRED', handleSessionExpired);
+
+    return () => {
+      eventEmitter.off('SESSION_EXPIRED', handleSessionExpired);
+    };
+  }, []);
+
+  const handleSessionExpiredConfirm = async () => {
+    setShowSessionExpiredModal(false);
+    await logout();
+
+    // Reset navigation to Welcome screen
+    setTimeout(() => {
+      resetNavigation('Welcome');
+    }, 100); // Small delay to ensure logout completes
+  };
+
   return (
     <SafeAreaProvider>
       <AppNavigator />
       <NetworkLoggerButton />
       <Toast />
+
+      {/* Session Expired Modal */}
+      <ConfirmModal
+        visible={showSessionExpiredModal}
+        title="Session Expired"
+        message="Your session has expired. Please login again to continue."
+        confirmText="Login"
+        onConfirm={handleSessionExpiredConfirm}
+        type="error"
+      />
     </SafeAreaProvider>
   );
 }

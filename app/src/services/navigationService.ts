@@ -8,6 +8,15 @@ export function navigate(name: string, params?: any) {
   }
 }
 
+export function reset(routeName: string) {
+  if (navigationRef.isReady()) {
+    navigationRef.reset({
+      index: 0,
+      routes: [{ name: routeName as never }],
+    });
+  }
+}
+
 export function getCurrentRoute() {
   if (navigationRef.isReady()) {
     return navigationRef.getCurrentRoute();

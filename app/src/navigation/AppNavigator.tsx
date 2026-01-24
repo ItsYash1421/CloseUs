@@ -23,6 +23,8 @@ import { PairingSuccessScreen } from '../screens/pairing/PairingSuccessScreen';
 import { JourneyScreen } from '../screens/home/JourneyScreen';
 import { ChatScreen } from '../screens/chat/ChatScreen';
 import { QuestionsScreen } from '../screens/questions/QuestionsScreen';
+import { CategoryQuestionsScreen } from '../screens/games/CategoryQuestionsScreen';
+import { GameQuestionDetailScreen } from '../screens/games/GameQuestionDetailScreen';
 import { TabNavigator } from './TabNavigator';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -61,6 +63,14 @@ export const AppNavigator = () => {
         <Stack.Screen name="Journey" component={JourneyScreen} />
         <Stack.Screen name="Chat" component={ChatScreen} />
         <Stack.Screen name="Questions" component={QuestionsScreen} />
+        <Stack.Screen
+          name="CategoryQuestions"
+          component={CategoryQuestionsScreen}
+        />
+        <Stack.Screen
+          name="GameQuestionDetail"
+          component={GameQuestionDetailScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

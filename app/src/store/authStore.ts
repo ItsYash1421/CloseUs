@@ -49,10 +49,8 @@ export const useAuthStore = create<AuthState>()(
         (async () => {
           try {
             await authService.logout();
-
-            // Clear couple data too
-            const { useCoupleStore } = await import('./coupleStore');
-            useCoupleStore.getState().clearCouple();
+            // NOTE: We do NOT clear couple data on logout
+            // User remains paired even after logout, they just need to login again
           } catch (error: any) {
             console.error('Logout cleanup error:', error);
           }

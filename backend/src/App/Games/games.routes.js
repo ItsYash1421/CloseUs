@@ -23,4 +23,14 @@ router.get('/questions/:categoryId', gamesController.getQuestionsByCategory);
 // ------------------------------------------------------------------
 router.get('/random-game', gamesController.getRandomGame);
 
+// ------------------------------------------------------------------
+// Save Game Answer
+// ------------------------------------------------------------------
+router.post('/answer', gamesController.saveAnswer);
+
+// ------------------------------------------------------------------
+// Get User's Answered Question IDs
+// ------------------------------------------------------------------
+router.get('/answers', gamesController.getUserAnswers);
+
 module.exports = router;

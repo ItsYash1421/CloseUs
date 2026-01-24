@@ -62,11 +62,11 @@ export const useCoupleStore = create<CoupleState>()(
       createPairingKey: async () => {
         try {
           set({ isLoading: true, error: null });
-          const { pairingKey, expiresAt } =
+          const { pairingKey, pairingKeyExpires } =
             await coupleService.createPairingKey();
           set({
             pairingKey,
-            pairingKeyExpires: new Date(expiresAt),
+            pairingKeyExpires: new Date(pairingKeyExpires),
             pairingAttempts: 0,
             isLoading: false,
           });
@@ -99,7 +99,18 @@ export const useCoupleStore = create<CoupleState>()(
         try {
           const { isPaired, couple } = await coupleService.checkPairingStatus();
           if (isPaired && couple) {
+            // User is paired - update local data
             set({ couple, pairingKey: null, pairingKeyExpires: null });
+          } else {
+            // User is NOT paired - clear local couple data
+            console.log('[CoupleStore] Backend says not paired, clearing local data');
+            set({
+              couple: null,
+              partner: null,
+              stats: null,
+              pairingKey: null,
+              pairingKeyExpires: null
+            });
           }
           return isPaired;
         } catch (error: any) {

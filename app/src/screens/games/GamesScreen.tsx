@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,35 +7,147 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  RefreshControl,
+  Dimensions,
+  Keyboard,
+  Platform,
+  KeyboardAvoidingView,
+  LayoutAnimation,
+  UIManager,
+  Animated,
 } from 'react-native';
-import { GradientBackground, Card } from '../../components/common';
+import { GradientBackground } from '../../components/common';
+import { DailyQuestionCard, StickyHeader } from '../../components/home';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
 import gamesService, { GameCategory } from '../../services/gamesService';
+import questionService, { DailyQuestionResponse } from '../../services/questionService';
+import { GamesHeader } from '../../components/games/GamesHeader';
+import { TrendingGames } from '../../components/games/TrendingGames';
+import { GamesGrid } from '../../components/games/GamesGrid';
+import { GamesStats } from '../../components/games/GamesStats';
+
+const { width } = Dimensions.get('window');
+
+// Enable LayoutAnimation for Android
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 export const GamesScreen = ({ navigation }: any) => {
   const [categories, setCategories] = useState<GameCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefresh, setIsRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Daily Question State
+  const [questionData, setQuestionData] = useState<DailyQuestionResponse | null>(null);
+  const [questionLoading, setQuestionLoading] = useState(true);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  // Scroll & Keyboard Handling
+  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const currentScrollY = useRef(0);
+  const restoreScrollY = useRef(0);
 
   useEffect(() => {
-    fetchGameCategories();
+    loadData();
   }, []);
 
-  const fetchGameCategories = async () => {
+  // Keyboard listeners
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const onKeyboardShow = () => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setKeyboardVisible(true);
+    };
+
+    const onKeyboardHide = () => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setKeyboardVisible(false);
+      // Restore scroll position after keyboard dismiss
+      setTimeout(() => {
+        if (scrollViewRef.current) {
+          scrollViewRef.current.scrollTo({
+            y: 0, // Always scroll to top since Daily Question is the only input and it's at the top
+            animated: true, // Animated true for smooth restoration
+          });
+        }
+      }, 100);
+    };
+
+    const keyboardShowListener = Keyboard.addListener(showEvent, onKeyboardShow);
+    const keyboardHideListener = Keyboard.addListener(hideEvent, onKeyboardHide);
+
+    return () => {
+      keyboardShowListener.remove();
+      keyboardHideListener.remove();
+    };
+  }, []);
+
+  const handleInputFocus = () => {
+    restoreScrollY.current = currentScrollY.current;
+  };
+
+  const loadData = async (isRefreshAction = false) => {
     try {
-      setIsLoading(true);
-      const data = await gamesService.getCategories();
-      setCategories(data);
+      if (!isRefreshAction) setIsLoading(true);
+      setError(null);
+
+      // Load both games and daily question
+      const [gamesData, dailyQData] = await Promise.all([
+        gamesService.getCategories(),
+        questionService.getDailyQuestion().catch(err => {
+          console.error('Failed to load daily question:', err);
+          return null;
+        })
+      ]);
+
+      setCategories(gamesData);
+      if (dailyQData) setQuestionData(dailyQData);
+
     } catch (error) {
-      console.error('Failed to load game categories:', error);
-      Alert.alert('Error', 'Failed to load games. Please try again.');
+      console.error('Failed to load data:', error);
+      setError('Failed to load games');
+      Alert.alert('Error', 'Failed to load content. Please try again.');
     } finally {
       setIsLoading(false);
+      setQuestionLoading(false);
+      if (isRefreshAction) setIsRefreshing(false);
+    }
+  };
+
+  const onRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    loadData(true);
+  }, []);
+
+  // Refresh only daily question (for after answering)
+  const refreshDailyQuestion = async () => {
+    try {
+      const data = await questionService.getDailyQuestion();
+      setQuestionData(data);
+    } catch (error) {
+      console.error('Failed to refresh daily question:', error);
     }
   };
 
   const handleGamePress = (category: GameCategory) => {
-    if (!category.isActive) return;
+    if (!category.isActive) {
+      Alert.alert('Coming Soon', 'This game will be available soon!');
+      return;
+    }
+
+    if (category.questionCount === 0) {
+      Alert.alert('No Questions', 'This category has no questions yet.');
+      return;
+    }
 
     navigation.navigate('CategoryQuestions', {
       categoryId: category._id,
@@ -45,6 +157,7 @@ export const GamesScreen = ({ navigation }: any) => {
     });
   };
 
+  // Loading State
   if (isLoading) {
     return (
       <GradientBackground variant="background">
@@ -56,83 +169,126 @@ export const GamesScreen = ({ navigation }: any) => {
     );
   }
 
-  return (
-    <GradientBackground variant="background">
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Couple Games</Text>
-          <Text style={styles.subtitle}>
-            Have fun and bond through interactive games
+  // Error State
+  if (error && categories.length === 0) {
+    return (
+      <GradientBackground variant="background">
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorEmoji}>😔</Text>
+          <Text style={styles.errorTitle}>Oops!</Text>
+          <Text style={styles.errorMessage}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={() => loadData()}>
+            <Text style={styles.retryButtonText}>Try Again</Text>
+          </TouchableOpacity>
+        </View>
+      </GradientBackground>
+    );
+  }
+
+  // Empty State
+  if (categories.length === 0) {
+    return (
+      <GradientBackground variant="background">
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyEmoji}>🎮</Text>
+          <Text style={styles.emptyTitle}>No Games Yet</Text>
+          <Text style={styles.emptyMessage}>
+            Games will appear here soon. Check back later!
           </Text>
         </View>
+      </GradientBackground>
+    );
+  }
 
-        {/* Games Grid */}
-        <View style={styles.gamesGrid}>
-          {categories.map(category => (
-            <TouchableOpacity
-              key={category._id}
-              activeOpacity={0.8}
-              disabled={!category.isActive}
-              onPress={() => handleGamePress(category)}
-            >
-              <Card
-                variant="glass"
-                padding="large"
-                style={[
-                  styles.gameCard,
-                  !category.isActive && styles.gameCardDisabled,
-                ]}
-              >
-                <Text style={styles.gameEmoji}>{category.emoji}</Text>
-                <Text style={styles.gameName}>{category.name}</Text>
-                <Text style={styles.gameDescription}>
-                  {category.questionCount} questions available
-                </Text>
-                {!category.isActive && (
-                  <View style={styles.comingSoonBadge}>
-                    <Text style={styles.comingSoonText}>Coming Soon</Text>
-                  </View>
-                )}
-                {category.isActive && (
-                  <View style={styles.playButton}>
-                    <Text style={styles.playButtonText}>Play Now →</Text>
-                  </View>
-                )}
+  const trendingCategories = [...categories]
+    .filter(c => c.isActive)
+    .sort((a, b) => b.timesPlayed - a.timesPlayed)
+    .slice(0, 5); // Sort by plays (descending) and take top 5
 
-                {/* Times Played Badge */}
-                {category.timesPlayed > 0 && (
-                  <View style={styles.playedBadge}>
-                    <Text style={styles.playedText}>
-                      Played {category.timesPlayed}x
-                    </Text>
-                  </View>
-                )}
-              </Card>
-            </TouchableOpacity>
-          ))}
-        </View>
+  const activeCategories = categories.filter((c) => c.isActive);
 
-        {/* Stats - Can be enhanced with real stats later */}
-        <Card variant="glass" padding="large" style={styles.statsCard}>
-          <Text style={styles.statsTitle}>Your Game Stats</Text>
-          <View style={styles.statsRow}>
-            <View style={styles.stat}>
-              <Text style={styles.statValue}>
-                {categories.filter(c => c.isActive).length}
-              </Text>
-              <Text style={styles.statLabel}>Games Available</Text>
+  // Check if daily question is completed by both
+  const isDailyQuestionCompleted = questionData?.myAnswer && questionData?.partnerAnswer;
+
+  return (
+    <GradientBackground variant="background">
+      {/* Sticky Header - Hide when keyboard is visible */}
+      {!isKeyboardVisible && (
+        <StickyHeader hashtag="Games Hub" scrollY={scrollY} />
+      )}
+
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      >
+        <Animated.ScrollView
+          ref={scrollViewRef}
+          style={styles.container}
+          contentContainerStyle={isKeyboardVisible ? styles.containerFocused : null}
+          showsVerticalScrollIndicator={false}
+          scrollEventThrottle={16}
+          keyboardShouldPersistTaps="handled"
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            {
+              useNativeDriver: true,
+              listener: (event: any) => {
+                currentScrollY.current = event.nativeEvent.contentOffset.y;
+              },
+            }
+          )}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefresh}
+              onRefresh={onRefresh}
+              tintColor={COLORS.primary}
+              colors={[COLORS.primary]}
+            />
+          }
+        >
+          {/* Header - New Component */}
+          {!isKeyboardVisible && <GamesHeader />}
+
+          {/* Daily Question Card - Only show if NOT completed by both */}
+          {!isDailyQuestionCompleted && (
+            <View style={styles.dailyQuestionContainer}>
+              <DailyQuestionCard
+                data={questionData}
+                loading={questionLoading}
+                onRefresh={refreshDailyQuestion}
+                showFullContent={false}
+                onInputFocus={handleInputFocus}
+              />
             </View>
-            <View style={styles.statDivider} />
-            <View style={styles.stat}>
-              <Text style={styles.statValue}>
-                {categories.reduce((sum, c) => sum + c.questionCount, 0)}
-              </Text>
-              <Text style={styles.statLabel}>Total Questions</Text>
-            </View>
-          </View>
-        </Card>
-      </ScrollView>
+          )}
+
+          {/* Other Content - Hide when keyboard is visible */}
+          {!isKeyboardVisible && (
+            <>
+              {/* Trending Games */}
+              {trendingCategories.length > 0 && (
+                <TrendingGames
+                  games={trendingCategories}
+                  onGamePress={handleGamePress}
+                />
+              )}
+
+              {/* All Games */}
+              <GamesGrid
+                games={categories}
+                onGamePress={handleGamePress}
+              />
+
+              {/* Stats Card */}
+              <GamesStats games={categories} />
+            </>
+          )}
+
+          {/* Bottom Spacer */}
+          <View style={{ height: 40 }} />
+        </Animated.ScrollView>
+      </KeyboardAvoidingView>
     </GradientBackground>
   );
 };
@@ -141,6 +297,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: THEME.spacing.lg,
+  },
+  containerFocused: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingBottom: 250, // Significant padding to push content up from keyboard
   },
   loadingContainer: {
     flex: 1,
@@ -152,114 +313,62 @@ const styles = StyleSheet.create({
     marginTop: THEME.spacing.md,
     fontSize: THEME.fontSizes.md,
   },
-  header: {
-    marginTop: THEME.spacing.xl,
-    marginBottom: THEME.spacing.xl,
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: THEME.spacing.xl,
   },
-  title: {
-    fontSize: THEME.fontSizes.xxxl,
+  errorEmoji: {
+    fontSize: 64,
+    marginBottom: THEME.spacing.md,
+  },
+  errorTitle: {
+    fontSize: THEME.fontSizes.xxl,
     fontWeight: THEME.fontWeights.bold,
     color: COLORS.white,
     marginBottom: THEME.spacing.sm,
   },
-  subtitle: {
+  errorMessage: {
     fontSize: THEME.fontSizes.md,
     color: COLORS.textSecondary,
-    lineHeight: 22,
-  },
-  gamesGrid: {
-    gap: THEME.spacing.lg,
+    textAlign: 'center',
     marginBottom: THEME.spacing.xl,
   },
-  gameCard: {
+  retryButton: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: THEME.spacing.xl,
+    paddingVertical: THEME.spacing.md,
+    borderRadius: THEME.borderRadius.lg,
+  },
+  retryButtonText: {
+    color: COLORS.white,
+    fontSize: THEME.fontSizes.md,
+    fontWeight: THEME.fontWeights.semibold,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
+    padding: THEME.spacing.xl,
   },
-  gameCardDisabled: {
-    opacity: 0.6,
-  },
-  gameEmoji: {
+  emptyEmoji: {
     fontSize: 64,
     marginBottom: THEME.spacing.md,
   },
-  gameName: {
-    fontSize: THEME.fontSizes.xl,
+  emptyTitle: {
+    fontSize: THEME.fontSizes.xxl,
     fontWeight: THEME.fontWeights.bold,
     color: COLORS.white,
-    marginBottom: THEME.spacing.xs,
+    marginBottom: THEME.spacing.sm,
   },
-  gameDescription: {
-    fontSize: THEME.fontSizes.sm,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: THEME.spacing.md,
-  },
-  comingSoonBadge: {
-    backgroundColor: COLORS.warning,
-    paddingHorizontal: THEME.spacing.md,
-    paddingVertical: THEME.spacing.xs,
-    borderRadius: THEME.borderRadius.full,
-  },
-  comingSoonText: {
-    fontSize: THEME.fontSizes.xs,
-    fontWeight: THEME.fontWeights.semibold,
-    color: COLORS.white,
-  },
-  playButton: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: THEME.spacing.lg,
-    paddingVertical: THEME.spacing.md,
-    borderRadius: THEME.borderRadius.md,
-  },
-  playButtonText: {
+  emptyMessage: {
     fontSize: THEME.fontSizes.md,
-    fontWeight: THEME.fontWeights.semibold,
-    color: COLORS.white,
-  },
-  playedBadge: {
-    position: 'absolute',
-    top: THEME.spacing.sm,
-    right: THEME.spacing.sm,
-    backgroundColor: COLORS.primaryLight,
-    paddingHorizontal: THEME.spacing.sm,
-    paddingVertical: 4,
-    borderRadius: THEME.borderRadius.sm,
-  },
-  playedText: {
-    fontSize: THEME.fontSizes.xs,
-    color: COLORS.white,
-    fontWeight: THEME.fontWeights.medium,
-  },
-  statsCard: {
-    marginBottom: THEME.spacing.xl,
-  },
-  statsTitle: {
-    fontSize: THEME.fontSizes.lg,
-    fontWeight: THEME.fontWeights.semibold,
-    color: COLORS.white,
-    marginBottom: THEME.spacing.lg,
-    textAlign: 'center',
-  },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  stat: {
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: THEME.fontSizes.xxxl,
-    fontWeight: THEME.fontWeights.bold,
-    color: COLORS.primary,
-    marginBottom: THEME.spacing.xs,
-  },
-  statLabel: {
-    fontSize: THEME.fontSizes.xs,
     color: COLORS.textSecondary,
     textAlign: 'center',
   },
-  statDivider: {
-    width: 1,
-    backgroundColor: COLORS.border,
+  dailyQuestionContainer: {
+    marginBottom: 0,
+    marginTop: 0,
   },
 });

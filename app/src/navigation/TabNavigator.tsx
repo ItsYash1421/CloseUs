@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { TouchableOpacity, Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useNavigation } from '@react-navigation/native';
 import { TabParamList } from '../types';
 import { CustomTabBar } from '../components/navigation/CustomTabBar';
 import { COLORS } from '../constants/colors';
 import THEME from '../constants/theme';
+import { useCoupleStore } from '../store/coupleStore';
 
 // Screens
 import { HomeScreen } from '../screens/home/HomeScreen';
@@ -16,6 +18,19 @@ import { ProfileScreen } from '../screens/profile/ProfileScreen';
 const Tab = createBottomTabNavigator<TabParamList>();
 
 export const TabNavigator = () => {
+  const navigation = useNavigation();
+  const couple = useCoupleStore(state => state.couple);
+
+  // Protection: Redirect to CreateKey if not paired
+  useEffect(() => {
+    if (!couple?.isPaired) {
+      console.log('[TabNavigator] User not paired, redirecting to CreateKey');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'CreateKey' as never }],
+      });
+    }
+  }, [couple?.isPaired, navigation]);
   return (
     <Tab.Navigator
       initialRouteName="Home"
