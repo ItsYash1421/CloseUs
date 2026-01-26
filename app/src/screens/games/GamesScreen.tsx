@@ -211,7 +211,11 @@ export const GamesScreen = ({ navigation }: any) => {
   const isDailyQuestionCompleted = questionData?.myAnswer && questionData?.partnerAnswer;
 
   return (
-    <GradientBackground variant="background">
+    <GradientBackground
+      variant="background"
+      scrollY={scrollY}
+      scrollInputRange={[0, 300]}
+    >
       {/* Sticky Header - Hide when keyboard is visible */}
       {!isKeyboardVisible && (
         <StickyHeader hashtag="Games Hub" scrollY={scrollY} />
@@ -225,14 +229,14 @@ export const GamesScreen = ({ navigation }: any) => {
         <Animated.ScrollView
           ref={scrollViewRef}
           style={styles.container}
-          contentContainerStyle={isKeyboardVisible ? styles.containerFocused : null}
+          contentContainerStyle={isKeyboardVisible ? styles.containerFocused : { paddingBottom: THEME.spacing.xl }}
           showsVerticalScrollIndicator={false}
           scrollEventThrottle={16}
           keyboardShouldPersistTaps="handled"
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
             {
-              useNativeDriver: true,
+              useNativeDriver: false, // Changed to false if using layout properties, or strictly keep true if only opacity/transform
               listener: (event: any) => {
                 currentScrollY.current = event.nativeEvent.contentOffset.y;
               },
@@ -280,13 +284,17 @@ export const GamesScreen = ({ navigation }: any) => {
                 onGamePress={handleGamePress}
               />
 
-              {/* Stats Card */}
-              <GamesStats games={categories} />
+              {/* Quote Section */}
+              <View style={styles.quoteContainer}>
+                <Text style={styles.quoteText}>
+                  "Love is not just looking at each other, it's looking in the same direction... and playing together!"
+                </Text>
+              </View>
+
+              {/* Bottom Spacer */}
+              <View style={{ height: 100 }} />
             </>
           )}
-
-          {/* Bottom Spacer */}
-          <View style={{ height: 40 }} />
         </Animated.ScrollView>
       </KeyboardAvoidingView>
     </GradientBackground>
@@ -370,5 +378,20 @@ const styles = StyleSheet.create({
   dailyQuestionContainer: {
     marginBottom: 0,
     marginTop: 0,
+  },
+  quoteContainer: {
+    marginVertical: THEME.spacing.xl,
+    paddingHorizontal: THEME.spacing.xl,
+    alignItems: 'center',
+  },
+  quoteText: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    fontWeight: '400',
+    letterSpacing: 0.3,
+    opacity: 0.8,
   },
 });

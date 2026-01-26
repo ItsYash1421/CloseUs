@@ -8,6 +8,7 @@ export interface GameCategory {
   gameType: 'never_have_i_ever' | 'would_you_rather' | 'who_more_likely';
   name: string;
   emoji: string;
+  image?: string;
   tags?: string[];
   color: string;
   isActive: boolean;

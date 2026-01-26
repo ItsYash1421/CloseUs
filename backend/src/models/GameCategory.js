@@ -8,6 +8,10 @@ const gameCategorySchema = new mongoose.Schema(
             unique: true,
         },
         emoji: String,
+        image: {
+            type: String,
+            default: 'https://raw.githubusercontent.com/ItsYash1421/Banners/main/Logo-Games-Category.png',
+        },
         tags: [String],
         color: String,
         isActive: {
