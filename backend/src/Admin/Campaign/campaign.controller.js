@@ -8,8 +8,15 @@ const { successResponse, errorResponse } = require('../../Shared/Utils');
 // ------------------------------------------------------------------
 exports.createCampaign = async (req, res) => {
     try {
+        const { schedule, ...campaignData } = req.body;
+
+        // ------------------------------------------------------------------
+        // Extract startDate and endDate from schedule object
+        // ------------------------------------------------------------------
         const campaign = new Campaign({
-            ...req.body,
+            ...campaignData,
+            startDate: schedule?.startDate,
+            endDate: schedule?.endDate,
             createdBy: req.adminId,
         });
 

@@ -87,6 +87,40 @@ const deleteCategory = async (req, res) => {
 };
 
 // ------------------------------------------------------------------
+// Get All Questions
+// ------------------------------------------------------------------
+const getAllQuestions = async (req, res) => {
+    try {
+        const { page = 1, limit = 50, categoryId } = req.query;
+
+        const query = categoryId ? { categoryId } : {};
+
+        const questions = await Question.find(query)
+            .sort({ createdAt: -1 })
+            .limit(parseInt(limit))
+            .skip((parseInt(page) - 1) * parseInt(limit))
+            .populate('categoryId', 'name emoji color');
+
+        const total = await Question.countDocuments(query);
+
+        res.json(
+            successResponse({
+                questions,
+                pagination: {
+                    page: parseInt(page),
+                    limit: parseInt(limit),
+                    total,
+                    pages: Math.ceil(total / parseInt(limit)),
+                },
+            })
+        );
+    } catch (error) {
+        console.error('Get all questions error:', error);
+        res.status(500).json(errorResponse('Internal server error'));
+    }
+};
+
+// ------------------------------------------------------------------
 // Create Question
 // ------------------------------------------------------------------
 const createQuestion = async (req, res) => {
@@ -160,6 +194,7 @@ module.exports = {
     getCategories,
     updateCategory,
     deleteCategory,
+    getAllQuestions,
     createQuestion,
     getQuestionsByCategory,
     updateQuestion,

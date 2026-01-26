@@ -81,12 +81,11 @@ class AuthService {
 
   async logout() {
     try {
-      await apiClient.post('/api/auth/logout');
-    } catch (error) {
-      console.error('Logout API error:', error);
-    } finally {
+      // Just clear local data, no API call needed
       await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'user']);
       await GoogleSignin.signOut();
+    } catch (error) {
+      console.error('Logout cleanup error:', error);
     }
   }
 

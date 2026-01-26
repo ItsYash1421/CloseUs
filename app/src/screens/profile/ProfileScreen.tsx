@@ -24,11 +24,15 @@ import { differenceInDays } from 'date-fns';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
 
+import { ConfirmModal } from '../../components/global/ConfirmModal';
+
 export const ProfileScreen = () => {
   const navigation = useNavigation();
   const { user, logout } = useAuthStore();
   const { couple, partner, stats, fetchCoupleStats } = useCoupleStore();
   const [daysTogether, setDaysTogether] = useState(0);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -44,21 +48,30 @@ export const ProfileScreen = () => {
   }, [couple]);
 
   const handleLogout = () => {
-    Alert.alert(
-      'Logout',
-      "Are you sure you want to logout? You'll need to sign in again to access your space.",
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: () => {
-            logout();
-            // Navigation will automatically handle auth state change
-          },
-        },
-      ],
-    );
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = async () => {
+    setIsLoggingOut(true);
+
+    try {
+      // Call logout to clear auth data
+      await logout();
+
+      // Close modal
+      setShowLogoutModal(false);
+
+      // Navigate to Welcome screen with reset navigation stack
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Welcome' as never }],
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      setIsLoggingOut(false);
+      setShowLogoutModal(false);
+      Alert.alert('Logout Failed', 'Please try again');
+    }
   };
 
   return (
@@ -132,35 +145,35 @@ export const ProfileScreen = () => {
           status={
             user?.relationshipStatus
               ? {
-                  dating: 'Dating',
-                  engaged: 'Engaged',
-                  married: 'Married',
-                  other: 'Other',
-                }[user.relationshipStatus] || 'Dating'
+                dating: 'Dating',
+                engaged: 'Engaged',
+                married: 'Married',
+                other: 'Other',
+              }[user.relationshipStatus] || 'Dating'
               : 'Dating'
           }
           style={
             user?.livingStyle
               ? {
-                  long_distance: 'Long Distance',
-                  same_city: 'Same City',
-                  living_together: 'Living Together',
-                }[user.livingStyle] || 'Same City'
+                long_distance: 'Long Distance',
+                same_city: 'Same City',
+                living_together: 'Living Together',
+              }[user.livingStyle] || 'Same City'
               : 'Same City'
           }
           anniversary={
             user?.anniversary
               ? new Date(user.anniversary).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })
+              : couple?.startDate
+                ? new Date(couple.startDate).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',
                   year: 'numeric',
                 })
-              : couple?.startDate
-                ? new Date(couple.startDate).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })
                 : 'Select Date'
           }
         />
@@ -182,6 +195,19 @@ export const ProfileScreen = () => {
         {/* Bottom padding for scroll */}
         <View style={{ height: 40 }} />
       </Animated.ScrollView>
+
+      {/* Logout Confirmation Modal */}
+      <ConfirmModal
+        visible={showLogoutModal}
+        title="Logout"
+        message="Are you sure you want to logout? You'll need to sign in again to access your space."
+        confirmText="Logout"
+        cancelText="Cancel"
+        onConfirm={confirmLogout}
+        onCancel={() => setShowLogoutModal(false)}
+        type="warning"
+        loading={isLoggingOut}
+      />
     </GradientBackground>
   );
 };

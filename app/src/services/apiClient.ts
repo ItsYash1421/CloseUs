@@ -57,11 +57,16 @@ class ApiClient {
 
           try {
             const refreshToken = await AsyncStorage.getItem('refreshToken');
+
+            if (!refreshToken) {
+              // No refresh token, show session expired modal
+              this.handleSessionExpired();
+              return Promise.reject(error);
+            }
+
             const response = await axios.post(
               `${API_BASE_URL}/api/auth/refresh`,
-              {
-                refreshToken,
-              },
+              { refreshToken },
             );
 
             const { accessToken } = response.data.data;
@@ -77,12 +82,7 @@ class ApiClient {
             return this.client(originalRequest);
           } catch (refreshError) {
             this.refreshing = false;
-            await AsyncStorage.multiRemove([
-              'accessToken',
-              'refreshToken',
-              'user',
-            ]);
-            // Navigate to login screen (will be handled by auth store)
+            this.handleSessionExpired();
             return Promise.reject(refreshError);
           }
         }
@@ -90,6 +90,16 @@ class ApiClient {
         return Promise.reject(error);
       },
     );
+  }
+
+  private handleSessionExpired() {
+    // Clear local data
+    AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'user']);
+
+    // Emit event for modal to show
+    import('../utils/eventEmitter').then(({ eventEmitter }) => {
+      eventEmitter.emit('SESSION_EXPIRED');
+    });
   }
 
   async get<T>(url: string, config?: AxiosRequestConfig) {

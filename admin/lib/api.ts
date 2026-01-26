@@ -1,5 +1,13 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
+const handleTokenExpiration = () => {
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem('admin_token');
+        alert('Your token has expired. Please login again.');
+        window.location.href = '/login';
+    }
+};
+
 export const apiClient = {
     get: async (endpoint: string, token?: string) => {
         const headers: HeadersInit = {
@@ -19,6 +27,10 @@ export const apiClient = {
         console.log('Response status:', response.status);
 
         if (!response.ok) {
+            if (response.status === 401) {
+                handleTokenExpiration();
+                throw new Error('Token expired');
+            }
             const error = await response.text();
             console.error('API Error:', error);
             throw new Error(`API Error: ${response.statusText}`);
@@ -42,6 +54,10 @@ export const apiClient = {
         });
 
         if (!response.ok) {
+            if (response.status === 401) {
+                handleTokenExpiration();
+                throw new Error('Token expired');
+            }
             throw new Error(`API Error: ${response.statusText}`);
         }
 
@@ -63,6 +79,10 @@ export const apiClient = {
         });
 
         if (!response.ok) {
+            if (response.status === 401) {
+                handleTokenExpiration();
+                throw new Error('Token expired');
+            }
             throw new Error(`API Error: ${response.statusText}`);
         }
 
@@ -83,6 +103,10 @@ export const apiClient = {
         });
 
         if (!response.ok) {
+            if (response.status === 401) {
+                handleTokenExpiration();
+                throw new Error('Token expired');
+            }
             throw new Error(`API Error: ${response.statusText}`);
         }
 

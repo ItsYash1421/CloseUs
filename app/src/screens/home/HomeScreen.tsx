@@ -27,11 +27,14 @@ import {
   OurJourney,
   ChatSection,
   DailyQuestionCard,
+  DailyQuestionHomeCard,
 } from '../../components/home';
 import { HomeSkeleton } from '../../components/loaders';
 import questionService, {
   DailyQuestionResponse,
 } from '../../services/questionService';
+
+import { useFocusEffect } from '@react-navigation/native';
 
 export const HomeScreen = ({ navigation }: any) => {
   const user = useAuthStore(state => state.user);
@@ -57,6 +60,27 @@ export const HomeScreen = ({ navigation }: any) => {
   const restoreScrollY = useRef(0);
 
   console.log('HomeScreen - partnerIsOnline:', partnerIsOnline);
+
+  const fetchDailyQuestion = React.useCallback(async () => {
+    try {
+      // Don't show loading spinner on background refresh, 
+      // only if we don't have data yet
+      if (!questionData) setQuestionLoading(true);
+
+      const data = await questionService.getDailyQuestion();
+      setQuestionData(data);
+    } catch (error) {
+      console.error('Fetch daily question error:', error);
+    } finally {
+      setQuestionLoading(false);
+    }
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchDailyQuestion();
+    }, [fetchDailyQuestion])
+  );
 
   useEffect(() => {
     loadData();
@@ -109,39 +133,20 @@ export const HomeScreen = ({ navigation }: any) => {
   }, []);
 
   const loadData = async () => {
-    // Enforce minimum 2 second loading delay for shimmer effect
-    const minDelay = new Promise(resolve =>
-      setTimeout(() => resolve(true), 2000),
-    );
-
     const dataPromises = Promise.all([
       fetchCoupleInfo(),
       fetchCoupleStats(),
       fetchDailyQuestion(),
     ]);
 
-    await Promise.all([minDelay, dataPromises]);
+    await dataPromises;
     setIsScreenLoading(false);
-  };
-
-  const fetchDailyQuestion = async () => {
-    try {
-      setQuestionLoading(true);
-      const data = await questionService.getDailyQuestion();
-      setQuestionData(data);
-    } catch (error) {
-      console.error('Fetch daily question error:', error);
-    } finally {
-      setQuestionLoading(false);
-    }
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
-    // Also show shimmer on pull-to-refresh if desired, or just standard refresher
-    // User asked for "always 2 sec", maybe mostly for initial load.
-    // For refresh usually spinner is better, but let's stick to standard behavior for refresh unless specified.
     await loadData();
+    await fetchDailyQuestion(); // Ensure explicit fetch
     setRefreshing(false);
   };
 
@@ -244,12 +249,9 @@ export const HomeScreen = ({ navigation }: any) => {
 
             {/* Daily Question - ALWAYS VISIBLE */}
             <View>
-              <DailyQuestionCard
+              <DailyQuestionHomeCard
                 data={questionData}
                 loading={questionLoading}
-                onRefresh={fetchDailyQuestion}
-                showFullContent={false}
-                onInputFocus={handleInputFocus}
               />
             </View>
 

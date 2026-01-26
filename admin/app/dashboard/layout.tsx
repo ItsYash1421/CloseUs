@@ -16,6 +16,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         { name: 'Questions', href: '/dashboard/questions', icon: '❓' },
         { name: 'Games', href: '/dashboard/games', icon: '🎮' },
         { name: 'Notifications', href: '/dashboard/notifications', icon: '🔔' },
+        { name: 'Features', href: '/dashboard/features', icon: '🏷️' },
+        { name: 'Campaigns', href: '/dashboard/campaigns', icon: '📣' },
+        { name: 'Promotions', href: '/dashboard/promotions', icon: '🎟️' },
     ];
 
     return (

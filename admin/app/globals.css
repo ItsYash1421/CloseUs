@@ -68,3 +68,23 @@ body {
 .badge-danger {
     @apply bg-red-100 text-red-800;
 }
+
+/* Dialog/Modal Fixes */
+[role='dialog'] {
+    background-color: white !important;
+}
+
+.dialog-content,
+[data-radix-dialog-content] {
+    background-color: white !important;
+    border-radius: 0.75rem;
+    box-shadow:
+        0 10px 15px -3px rgb(0 0 0 / 0.1),
+        0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Ensure dialog overlay is visible */
+.dialog-overlay,
+[data-radix-dialog-overlay] {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}

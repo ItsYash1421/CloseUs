@@ -104,17 +104,27 @@ export const DailyQuestionCard = ({
     return () => clearInterval(interval);
   }, []);
 
+  const handleCancel = () => {
+    Keyboard.dismiss();
+    setAnswerText('');
+    setAnswering(false);
+  };
+
   const handleSubmitAnswer = async () => {
     if (!answerText.trim() || !data?.question?.id) return;
 
     try {
       setSubmitting(true);
+      Keyboard.dismiss(); // Dismiss keyboard immediately on send
+
       const response = await questionService.answerQuestion(
         data.question.id,
         answerText,
       );
+
       setAnswerText('');
       setAnswering(false);
+
       Toast.show({
         type: 'success',
         text1: 'Success',
@@ -122,12 +132,15 @@ export const DailyQuestionCard = ({
         position: 'top',
         visibilityTime: 3000,
       });
+
+      // Refresh parent data to show the answer view
       onRefresh();
     } catch (error) {
+      console.error('Submit answer error:', error);
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2: 'Failed to submit answer',
+        text2: 'Failed to submit answer. Please try again.',
         position: 'top',
       });
     } finally {
@@ -273,15 +286,13 @@ export const DailyQuestionCard = ({
                     multiline
                     value={answerText}
                     onChangeText={setAnswerText}
+                    autoFocus
+                    onFocus={() => onInputFocus?.()}
                   />
                 </View>
                 <View style={styles.buttonRow}>
                   <TouchableOpacity
-                    onPress={() => {
-                      Keyboard.dismiss();
-                      setAnswering(false);
-                      setAnswerText('');
-                    }}
+                    onPress={handleCancel}
                     style={[styles.actionButton, styles.cancelButton]}
                   >
                     <Text style={styles.cancelButtonText}>Cancel</Text>
@@ -300,7 +311,10 @@ export const DailyQuestionCard = ({
             ) : (
               <TouchableOpacity
                 style={styles.answerButton}
-                onPress={() => setAnswering(true)}
+                onPress={() => {
+                  setAnswering(true);
+                  onInputFocus?.();
+                }}
                 activeOpacity={0.8}
               >
                 <Text style={styles.answerButtonText}>Answer Now</Text>
@@ -311,7 +325,7 @@ export const DailyQuestionCard = ({
           <Text style={styles.errorText}>Could not load today's question.</Text>
         )}
       </View>
-    </View>
+    </View >
   );
 };
 

@@ -16,6 +16,8 @@ export const SplashScreen = ({ navigation }: any) => {
   const user = useAuthStore(state => state.user);
   const isLoading = useAuthStore(state => state.isLoading);
   const fetchCoupleInfo = useCoupleStore(state => state.fetchCoupleInfo);
+  const checkPairingStatus = useCoupleStore(state => state.checkPairingStatus);
+  const couple = useCoupleStore(state => state.couple);
 
   useEffect(() => {
     // Animate logo
@@ -47,7 +49,7 @@ export const SplashScreen = ({ navigation }: any) => {
           '[SplashScreen] isOnboardingComplete:',
           user?.isOnboardingComplete,
         );
-        console.log('[SplashScreen] coupleId:', user?.coupleId);
+        console.log('[SplashScreen] couple from store:', couple);
 
         // Mark as navigated to prevent re-running
         hasNavigated.current = true;
@@ -58,19 +60,26 @@ export const SplashScreen = ({ navigation }: any) => {
               '[SplashScreen] Navigating to GenderSelection (onboarding not complete)',
             );
             navigation.replace('GenderSelection');
-          } else if (!user.coupleId) {
-            console.log('[SplashScreen] Navigating to CreateKey (no couple)');
-            navigation.replace('CreateKey');
           } else {
-            // Fetch couple data before navigating to main tabs
-            console.log('[SplashScreen] Fetching couple info');
-            try {
-              await fetchCoupleInfo();
-            } catch (error) {
-              console.error('Failed to fetch couple info:', error);
+            // Verify pairing status from backend (this will sync local data)
+            console.log('[SplashScreen] Verifying pairing status from backend');
+            const isPaired = await checkPairingStatus();
+
+            if (!isPaired) {
+              // Not paired - redirect to CreateKey
+              console.log('[SplashScreen] Navigating to CreateKey (not paired)');
+              navigation.replace('CreateKey');
+            } else {
+              // Paired - fetch fresh couple data and go to main tabs
+              console.log('[SplashScreen] Fetching couple info');
+              try {
+                await fetchCoupleInfo();
+              } catch (error) {
+                console.error('Failed to fetch couple info:', error);
+              }
+              console.log('[SplashScreen] Navigating to MainTabs');
+              navigation.replace('MainTabs');
             }
-            console.log('[SplashScreen] Navigating to MainTabs');
-            navigation.replace('MainTabs');
           }
         } else {
           console.log(
@@ -80,7 +89,7 @@ export const SplashScreen = ({ navigation }: any) => {
         }
       }, 1500);
     }
-  }, [isLoading, isAuthenticated, user]);
+  }, [isLoading, isAuthenticated, user, couple]);
 
   return (
     <GradientBackground variant="background">

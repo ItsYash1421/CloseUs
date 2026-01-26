@@ -1,28 +1,57 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import { Plus, Edit, Trash2, FolderPlus } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function QuestionsPage() {
     const { token } = useAuth();
-    const [activeTab, setActiveTab] = useState<'categories' | 'questions'>('categories');
     const [categories, setCategories] = useState<any[]>([]);
     const [questions, setQuestions] = useState<any[]>([]);
-    const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [loading, setLoading] = useState(false);
+    const [isCreateCategoryOpen, setIsCreateCategoryOpen] = useState(false);
+    const [isCreateQuestionOpen, setIsCreateQuestionOpen] = useState(false);
+    const [editingQuestion, setEditingQuestion] = useState<any>(null);
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-    // Category form
-    const [showCategoryForm, setShowCategoryForm] = useState(false);
     const [categoryForm, setCategoryForm] = useState({
         name: '',
         description: '',
-        emoji: '',
-        color: '#3b82f6',
+        emoji: '❓',
+        color: '#3B82F6',
     });
 
-    // Question form
-    const [showQuestionForm, setShowQuestionForm] = useState(false);
     const [questionForm, setQuestionForm] = useState({
         categoryId: '',
         text: '',
@@ -32,70 +61,98 @@ export default function QuestionsPage() {
     useEffect(() => {
         if (token) {
             fetchCategories();
+            fetchQuestions();
         }
-    }, [token]);
-
-    useEffect(() => {
-        if (selectedCategory && token) {
-            fetchQuestions(selectedCategory);
-        }
-    }, [selectedCategory, token]);
+    }, [token, selectedCategory]);
 
     const fetchCategories = async () => {
         try {
             const response = await apiClient.get('/admin/questions/categories', token!);
-            setCategories(response.data);
+            if (response.success) {
+                setCategories(response.data || []);
+            }
         } catch (error) {
-            console.error('Failed to fetch categories:', error);
+            toast.error('Failed to fetch categories');
         }
     };
 
-    const fetchQuestions = async (categoryId: string) => {
-        setLoading(true);
+    const fetchQuestions = async () => {
         try {
-            const response = await apiClient.get(`/admin/questions/category/${categoryId}`, token!);
-            setQuestions(response.data);
+            const endpoint =
+                selectedCategory === 'all'
+                    ? '/admin/questions'
+                    : `/admin/questions?categoryId=${selectedCategory}`;
+            const response = await apiClient.get(endpoint, token!);
+            if (response.success) {
+                setQuestions(response.data.questions || []);
+            }
         } catch (error) {
-            console.error('Failed to fetch questions:', error);
-        } finally {
-            setLoading(false);
+            toast.error('Failed to fetch questions');
         }
     };
 
     const handleCreateCategory = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
+
         try {
-            await apiClient.post('/admin/questions/categories', categoryForm, token!);
-            setShowCategoryForm(false);
-            setCategoryForm({ name: '', description: '', emoji: '', color: '#3b82f6' });
-            fetchCategories();
+            const response = await apiClient.post(
+                '/admin/questions/categories',
+                categoryForm,
+                token!
+            );
+            if (response.success) {
+                toast.success('Category created successfully');
+                setIsCreateCategoryOpen(false);
+                setCategoryForm({
+                    name: '',
+                    description: '',
+                    emoji: '❓',
+                    color: '#3B82F6',
+                });
+                fetchCategories();
+            }
         } catch (error) {
-            console.error('Failed to create category:', error);
+            toast.error('Failed to create category');
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleCreateQuestion = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
+
         try {
-            await apiClient.post('/admin/questions', questionForm, token!);
-            setShowQuestionForm(false);
-            setQuestionForm({ categoryId: '', text: '', isDaily: false });
-            if (selectedCategory) {
-                fetchQuestions(selectedCategory);
+            if (editingQuestion) {
+                const response = await apiClient.put(
+                    `/admin/questions/${editingQuestion._id}`,
+                    questionForm,
+                    token!
+                );
+                if (response.success) {
+                    toast.success('Question updated successfully');
+                    setEditingQuestion(null);
+                }
+            } else {
+                const response = await apiClient.post('/admin/questions', questionForm, token!);
+                if (response.success) {
+                    toast.success('Question created successfully');
+                }
             }
+            setIsCreateQuestionOpen(false);
+            setQuestionForm({
+                categoryId: '',
+                text: '',
+                isDaily: false,
+            });
+            fetchQuestions();
         } catch (error) {
-            console.error('Failed to create question:', error);
-        }
-    };
-
-    const handleDeleteCategory = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this category?')) return;
-
-        try {
-            await apiClient.delete(`/admin/questions/categories/${id}`, token!);
-            fetchCategories();
-        } catch (error: any) {
-            alert(error.message || 'Failed to delete category');
+            toast.error(
+                editingQuestion ? 'Failed to update question' : 'Failed to create question'
+            );
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -103,58 +160,84 @@ export default function QuestionsPage() {
         if (!confirm('Are you sure you want to delete this question?')) return;
 
         try {
-            await apiClient.delete(`/admin/questions/${id}`, token!);
-            if (selectedCategory) {
-                fetchQuestions(selectedCategory);
+            const response = await apiClient.delete(`/admin/questions/${id}`, token!);
+            if (response.success) {
+                toast.success('Question deleted');
+                fetchQuestions();
+                fetchCategories();
             }
         } catch (error) {
-            console.error('Failed to delete question:', error);
+            toast.error('Failed to delete question');
         }
     };
 
+    const handleDeleteCategory = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this category? It must have no questions.'))
+            return;
+
+        try {
+            const response = await apiClient.delete(`/admin/questions/categories/${id}`, token!);
+            if (response.success) {
+                toast.success('Category deleted');
+                fetchCategories();
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to delete category');
+        }
+    };
+
+    const handleEditQuestion = (question: any) => {
+        setEditingQuestion(question);
+        setQuestionForm({
+            categoryId: question.categoryId._id,
+            text: question.text,
+            isDaily: question.isDaily || false,
+        });
+        setIsCreateQuestionOpen(true);
+    };
+
     return (
-        <div>
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-900">Questions Management</h1>
-            </div>
-
-            {/* Tabs */}
-            <div className="flex gap-4 mb-6">
-                <button
-                    onClick={() => setActiveTab('categories')}
-                    className={activeTab === 'categories' ? 'btn-primary' : 'btn-secondary'}
-                >
-                    Categories
-                </button>
-                <button
-                    onClick={() => setActiveTab('questions')}
-                    className={activeTab === 'questions' ? 'btn-primary' : 'btn-secondary'}
-                >
-                    Questions
-                </button>
-            </div>
-
-            {/* Categories Tab */}
-            {activeTab === 'categories' && (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
                 <div>
-                    <div className="mb-4">
-                        <button
-                            onClick={() => setShowCategoryForm(!showCategoryForm)}
-                            className="btn-primary"
-                        >
-                            + Create Category
-                        </button>
-                    </div>
-
-                    {/* Category Form */}
-                    {showCategoryForm && (
-                        <div className="card mb-6">
-                            <h3 className="text-lg font-semibold mb-4">New Category</h3>
+                    <h1 className="text-3xl font-bold">Questions Management</h1>
+                    <p className="text-muted-foreground">
+                        Manage question categories and daily questions
+                    </p>
+                </div>
+                <div className="flex gap-2">
+                    <Dialog open={isCreateCategoryOpen} onOpenChange={setIsCreateCategoryOpen}>
+                        <DialogTrigger asChild>
+                            <Button variant="outline">
+                                <FolderPlus className="mr-2 h-4 w-4" />
+                                New Category
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Create Question Category</DialogTitle>
+                                <DialogDescription>
+                                    Add a new category for organizing questions
+                                </DialogDescription>
+                            </DialogHeader>
                             <form onSubmit={handleCreateCategory} className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">Name</label>
-                                    <input
-                                        type="text"
+                                    <Label>Emoji</Label>
+                                    <Input
+                                        value={categoryForm.emoji}
+                                        onChange={(e) =>
+                                            setCategoryForm({
+                                                ...categoryForm,
+                                                emoji: e.target.value,
+                                            })
+                                        }
+                                        placeholder="❓"
+                                        maxLength={2}
+                                    />
+                                </div>
+                                <div>
+                                    <Label>Name</Label>
+                                    <Input
                                         value={categoryForm.name}
                                         onChange={(e) =>
                                             setCategoryForm({
@@ -162,15 +245,13 @@ export default function QuestionsPage() {
                                                 name: e.target.value,
                                             })
                                         }
-                                        className="input"
+                                        placeholder="Category name"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">
-                                        Description
-                                    </label>
-                                    <textarea
+                                    <Label>Description</Label>
+                                    <Textarea
                                         value={categoryForm.description}
                                         onChange={(e) =>
                                             setCategoryForm({
@@ -178,130 +259,71 @@ export default function QuestionsPage() {
                                                 description: e.target.value,
                                             })
                                         }
-                                        className="input"
-                                        rows={2}
+                                        placeholder="Category description"
                                     />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2">
-                                            Emoji
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={categoryForm.emoji}
-                                            onChange={(e) =>
-                                                setCategoryForm({
-                                                    ...categoryForm,
-                                                    emoji: e.target.value,
-                                                })
-                                            }
-                                            className="input"
-                                            placeholder="💚"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2">
-                                            Color
-                                        </label>
-                                        <input
-                                            type="color"
-                                            value={categoryForm.color}
-                                            onChange={(e) =>
-                                                setCategoryForm({
-                                                    ...categoryForm,
-                                                    color: e.target.value,
-                                                })
-                                            }
-                                            className="input h-10"
-                                        />
-                                    </div>
+                                <div>
+                                    <Label>Color</Label>
+                                    <Input
+                                        type="color"
+                                        value={categoryForm.color}
+                                        onChange={(e) =>
+                                            setCategoryForm({
+                                                ...categoryForm,
+                                                color: e.target.value,
+                                            })
+                                        }
+                                    />
                                 </div>
-                                <div className="flex gap-2">
-                                    <button type="submit" className="btn-primary">
-                                        Create
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowCategoryForm(false)}
-                                        className="btn-secondary"
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
+                                <Button type="submit" disabled={loading} className="w-full">
+                                    {loading ? 'Creating...' : 'Create Category'}
+                                </Button>
                             </form>
-                        </div>
-                    )}
+                        </DialogContent>
+                    </Dialog>
 
-                    {/* Categories List */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {categories.map((category) => (
-                            <div key={category._id} className="card">
-                                <div className="flex items-start justify-between mb-2">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-2xl">{category.emoji}</span>
-                                        <div>
-                                            <h3 className="font-semibold">{category.name}</h3>
-                                            <p className="text-sm text-gray-600">
-                                                {category.questionCount} questions
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={() => handleDeleteCategory(category._id)}
-                                        className="text-red-600 hover:text-red-700"
-                                    >
-                                        🗑️
-                                    </button>
-                                </div>
-                                <p className="text-sm text-gray-600 mb-2">{category.description}</p>
-                                <div className="flex gap-2">
-                                    <div
-                                        className="w-6 h-6 rounded"
-                                        style={{ backgroundColor: category.color }}
-                                    />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Questions Tab */}
-            {activeTab === 'questions' && (
-                <div>
-                    <div className="flex gap-4 mb-6">
-                        <select
-                            value={selectedCategory}
-                            onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="input flex-1"
-                        >
-                            <option value="">Select a category...</option>
-                            {categories.map((cat) => (
-                                <option key={cat._id} value={cat._id}>
-                                    {cat.emoji} {cat.name}
-                                </option>
-                            ))}
-                        </select>
-                        <button
-                            onClick={() => setShowQuestionForm(!showQuestionForm)}
-                            disabled={!selectedCategory}
-                            className="btn-primary disabled:opacity-50"
-                        >
-                            + Add Question
-                        </button>
-                    </div>
-
-                    {/* Question Form */}
-                    {showQuestionForm && (
-                        <div className="card mb-6">
-                            <h3 className="text-lg font-semibold mb-4">New Question</h3>
+                    <Dialog open={isCreateQuestionOpen} onOpenChange={setIsCreateQuestionOpen}>
+                        <DialogTrigger asChild>
+                            <Button onClick={() => setEditingQuestion(null)}>
+                                <Plus className="mr-2 h-4 w-4" />
+                                New Question
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>
+                                    {editingQuestion ? 'Edit Question' : 'Create New Question'}
+                                </DialogTitle>
+                                <DialogDescription>
+                                    {editingQuestion
+                                        ? 'Update the question details'
+                                        : 'Add a new question to the database'}
+                                </DialogDescription>
+                            </DialogHeader>
                             <form onSubmit={handleCreateQuestion} className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">
-                                        Question Text
-                                    </label>
-                                    <textarea
+                                    <Label>Category</Label>
+                                    <Select
+                                        value={questionForm.categoryId}
+                                        onValueChange={(value) =>
+                                            setQuestionForm({ ...questionForm, categoryId: value })
+                                        }
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select category" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {categories.map((cat) => (
+                                                <SelectItem key={cat._id} value={cat._id}>
+                                                    {cat.emoji} {cat.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div>
+                                    <Label>Question Text</Label>
+                                    <Textarea
                                         value={questionForm.text}
                                         onChange={(e) =>
                                             setQuestionForm({
@@ -309,12 +331,12 @@ export default function QuestionsPage() {
                                                 text: e.target.value,
                                             })
                                         }
-                                        className="input"
-                                        rows={3}
+                                        placeholder="Enter the question"
                                         required
+                                        rows={3}
                                     />
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center space-x-2">
                                     <input
                                         type="checkbox"
                                         id="isDaily"
@@ -325,83 +347,114 @@ export default function QuestionsPage() {
                                                 isDaily: e.target.checked,
                                             })
                                         }
-                                        className="w-4 h-4"
+                                        className="rounded"
                                     />
-                                    <label htmlFor="isDaily" className="text-sm font-medium">
-                                        Set as Daily Question
-                                    </label>
+                                    <Label htmlFor="isDaily">Mark as Daily Question</Label>
                                 </div>
-                                <div className="flex gap-2">
-                                    <button
-                                        type="submit"
-                                        onClick={() =>
-                                            setQuestionForm({
-                                                ...questionForm,
-                                                categoryId: selectedCategory,
-                                            })
-                                        }
-                                        className="btn-primary"
-                                    >
-                                        Create
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowQuestionForm(false)}
-                                        className="btn-secondary"
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
+                                <Button type="submit" disabled={loading} className="w-full">
+                                    {loading
+                                        ? 'Saving...'
+                                        : editingQuestion
+                                          ? 'Update Question'
+                                          : 'Create Question'}
+                                </Button>
                             </form>
-                        </div>
-                    )}
-
-                    {/* Questions List */}
-                    {selectedCategory && (
-                        <div className="card">
-                            {loading ? (
-                                <div className="flex justify-center py-12">
-                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                                </div>
-                            ) : (
-                                <div className="space-y-3">
-                                    {questions.map((question) => (
-                                        <div
-                                            key={question._id}
-                                            className="flex justify-between items-start p-4 bg-gray-50 rounded-lg"
-                                        >
-                                            <div className="flex-1">
-                                                <p className="font-medium">{question.text}</p>
-                                                <div className="flex gap-2 mt-2">
-                                                    {question.isDaily && (
-                                                        <span className="badge badge-warning">
-                                                            Daily Question
-                                                        </span>
-                                                    )}
-                                                    <span className="text-xs text-gray-500">
-                                                        Answered {question.timesAnswered || 0} times
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={() => handleDeleteQuestion(question._id)}
-                                                className="text-red-600 hover:text-red-700 ml-4"
-                                            >
-                                                🗑️
-                                            </button>
-                                        </div>
-                                    ))}
-                                    {questions.length === 0 && (
-                                        <p className="text-center text-gray-500 py-8">
-                                            No questions yet
-                                        </p>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    )}
+                        </DialogContent>
+                    </Dialog>
                 </div>
-            )}
+            </div>
+
+            {/* Categories Grid */}
+            <div className="grid gap-4 md:grid-cols-3">
+                {categories.map((category) => (
+                    <Card key={category._id}>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                <span className="text-2xl">{category.emoji}</span>
+                                {category.name}
+                            </CardTitle>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteCategory(category._id)}
+                            >
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{category.questionCount || 0}</div>
+                            <p className="text-xs text-muted-foreground">{category.description}</p>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+
+            {/* Questions Filter */}
+            <Card>
+                <CardHeader>
+                    <div className="flex items-center justify-between">
+                        <CardTitle>All Questions</CardTitle>
+                        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                            <SelectTrigger className="w-[200px]">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Categories</SelectItem>
+                                {categories.map((cat) => (
+                                    <SelectItem key={cat._id} value={cat._id}>
+                                        {cat.emoji} {cat.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Question</TableHead>
+                                <TableHead>Category</TableHead>
+                                <TableHead>Type</TableHead>
+                                <TableHead>Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {questions.map((question) => (
+                                <TableRow key={question._id}>
+                                    <TableCell className="font-medium">{question.text}</TableCell>
+                                    <TableCell>
+                                        <Badge variant="outline">
+                                            {question.categoryId?.emoji} {question.categoryId?.name}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        {question.isDaily && <Badge>Daily</Badge>}
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => handleEditQuestion(question)}
+                                            >
+                                                <Edit className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                variant="destructive"
+                                                onClick={() => handleDeleteQuestion(question._id)}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
         </div>
     );
 }
