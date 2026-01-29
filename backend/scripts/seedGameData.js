@@ -75,7 +75,7 @@ const categories = [
             'If you could swap lives with me for a day, what would you do?',
             'What is the funniest thing that ever happened to us?',
             'If we started a band, what would we name it?',
-            'What is your guilty pleasure that you don\'t tell many people?',
+            "What is your guilty pleasure that you don't tell many people?",
             'If we won the lottery tomorrow, what is the first thing you would do?',
         ],
     },
@@ -91,7 +91,7 @@ const categories = [
             'What is something you want to improve about yourself?',
             'What does happiness mean to you?',
             'If you could change one thing about your past, what would it be?',
-            'What is one lesson life has taught you that you\'ll never forget?',
+            "What is one lesson life has taught you that you'll never forget?",
             'What motivates you to keep going when things get tough?',
             'What is your definition of a meaningful life?',
         ],
@@ -147,7 +147,9 @@ const seedGameData = async () => {
         console.log('✅ Game data seeding completed!\n');
         console.log('📊 Summary:');
         console.log(`   - Categories: ${categories.length}`);
-        console.log(`   - Questions: ${categories.reduce((sum, c) => sum + c.questions.length, 0)}`);
+        console.log(
+            `   - Questions: ${categories.reduce((sum, c) => sum + c.questions.length, 0)}`
+        );
     } catch (error) {
         console.error('❌ Seeding Error:', error);
         throw error;

@@ -66,8 +66,8 @@ export const CategoryQuestionsScreen = () => {
     if (isAnswered) {
       Alert.alert(
         'Already Answered',
-        'You\'ve already answered this question!',
-        [{ text: 'OK' }]
+        "You've already answered this question!",
+        [{ text: 'OK' }],
       );
       return;
     }
@@ -134,7 +134,9 @@ export const CategoryQuestionsScreen = () => {
                 >
                   <View style={styles.cardHeader}>
                     <View style={styles.questionNumberBadge}>
-                      <Text style={styles.questionNumberText}>#{index + 1}</Text>
+                      <Text style={styles.questionNumberText}>
+                        #{index + 1}
+                      </Text>
                     </View>
                     {isAnswered ? (
                       <View style={styles.answeredBadge}>
@@ -149,7 +151,7 @@ export const CategoryQuestionsScreen = () => {
                   <Text
                     style={[
                       styles.questionText,
-                      isAnswered && styles.answeredText
+                      isAnswered && styles.answeredText,
                     ]}
                     numberOfLines={2}
                   >

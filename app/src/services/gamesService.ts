@@ -13,7 +13,7 @@ export interface GameCategory {
   color: string;
   isActive: boolean;
   isTrending: boolean;
-  timesPlayed: number;
+  totalPlayed: number;
   questionCount: number;
   createdAt: string;
   updatedAt: string;
@@ -25,7 +25,6 @@ export interface GameQuestion {
   text: string;
   isActive: boolean;
   order: number;
-  timesPlayed: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -46,7 +45,6 @@ export interface RandomGameResponse {
   question: {
     _id: string;
     text: string;
-    timesPlayed: number;
   };
   category: {
     _id: string;
@@ -60,13 +58,25 @@ export interface RandomGameResponse {
 // ------------------------------------------------------------------
 // Games API Service
 // ------------------------------------------------------------------
+
+interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
+
+// ------------------------------------------------------------------
+// Games API Service
+// ------------------------------------------------------------------
 class GamesService {
   /**
    * Get all game categories
    */
   async getCategories(): Promise<GameCategory[]> {
     try {
-      const response = await apiClient.get('/api/games/categories');
+      const response = await apiClient.get<ApiResponse<GameCategory[]>>(
+        '/api/games/categories',
+      );
       return response.data;
     } catch (error) {
       console.error('Failed to fetch game categories:', error);
@@ -81,7 +91,9 @@ class GamesService {
     categoryId: string,
   ): Promise<CategoryQuestionsResponse> {
     try {
-      const response = await apiClient.get(`/api/games/questions/${categoryId}`);
+      const response = await apiClient.get<
+        ApiResponse<CategoryQuestionsResponse>
+      >(`/api/games/questions/${categoryId}`);
       return response.data;
     } catch (error) {
       console.error('Failed to fetch category questions:', error);
@@ -94,7 +106,9 @@ class GamesService {
    */
   async getRandomGame(): Promise<RandomGameResponse> {
     try {
-      const response = await apiClient.get('/api/games/random-game');
+      const response = await apiClient.get<ApiResponse<RandomGameResponse>>(
+        '/api/games/random-game',
+      );
       return response.data;
     } catch (error) {
       console.error('Failed to fetch random game:', error);
@@ -125,7 +139,12 @@ class GamesService {
     totalAnswered: number;
   }> {
     try {
-      const response = await apiClient.get('/api/games/answers');
+      const response = await apiClient.get<
+        ApiResponse<{
+          answeredQuestionIds: string[];
+          totalAnswered: number;
+        }>
+      >('/api/games/answers');
       return response.data;
     } catch (error) {
       console.error('Failed to fetch user answers:', error);

@@ -98,16 +98,16 @@ const getDailyQuestion = async (req, res) => {
                 },
                 myAnswer: myAnswer
                     ? {
-                        text: myAnswer.text,
-                        createdAt: myAnswer.createdAt,
-                    }
+                          text: myAnswer.text,
+                          createdAt: myAnswer.createdAt,
+                      }
                     : null,
                 partnerAnswer: partnerAnswer
                     ? {
-                        isLocked: !myAnswer, // Hide partner answer until user answers
-                        text: myAnswer ? partnerAnswer.text : null, // Only show text if user answered
-                        createdAt: partnerAnswer.createdAt,
-                    }
+                          isLocked: !myAnswer, // Hide partner answer until user answers
+                          text: myAnswer ? partnerAnswer.text : null, // Only show text if user answered
+                          createdAt: partnerAnswer.createdAt,
+                      }
                     : null,
             })
         );

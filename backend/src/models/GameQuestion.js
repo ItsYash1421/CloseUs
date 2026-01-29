@@ -19,10 +19,7 @@ const gameQuestionSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
-        timesPlayed: {
-            type: Number,
-            default: 0,
-        },
+
     },
     {
         timestamps: true,

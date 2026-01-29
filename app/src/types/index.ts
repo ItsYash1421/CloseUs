@@ -167,6 +167,7 @@ export type RootStackParamList = {
   AnswerReveal: { questionId: string };
   CategoryDetail: { categoryId: string };
   Games: undefined;
+  AllGames: undefined;
   CategoryQuestions: {
     categoryId: string;
     categoryName: string;

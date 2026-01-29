@@ -21,11 +21,14 @@ import { DailyQuestionCard, StickyHeader } from '../../components/home';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
 import gamesService, { GameCategory } from '../../services/gamesService';
-import questionService, { DailyQuestionResponse } from '../../services/questionService';
+import questionService, {
+  DailyQuestionResponse,
+} from '../../services/questionService';
 import { GamesHeader } from '../../components/games/GamesHeader';
 import { TrendingGames } from '../../components/games/TrendingGames';
 import { GamesGrid } from '../../components/games/GamesGrid';
 import { GamesStats } from '../../components/games/GamesStats';
+import { GamesSkeleton } from '../../components/loaders';
 
 const { width } = Dimensions.get('window');
 
@@ -44,7 +47,8 @@ export const GamesScreen = ({ navigation }: any) => {
   const [error, setError] = useState<string | null>(null);
 
   // Daily Question State
-  const [questionData, setQuestionData] = useState<DailyQuestionResponse | null>(null);
+  const [questionData, setQuestionData] =
+    useState<DailyQuestionResponse | null>(null);
   const [questionLoading, setQuestionLoading] = useState(true);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -60,8 +64,10 @@ export const GamesScreen = ({ navigation }: any) => {
 
   // Keyboard listeners
   useEffect(() => {
-    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
 
     const onKeyboardShow = () => {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -82,8 +88,14 @@ export const GamesScreen = ({ navigation }: any) => {
       }, 100);
     };
 
-    const keyboardShowListener = Keyboard.addListener(showEvent, onKeyboardShow);
-    const keyboardHideListener = Keyboard.addListener(hideEvent, onKeyboardHide);
+    const keyboardShowListener = Keyboard.addListener(
+      showEvent,
+      onKeyboardShow,
+    );
+    const keyboardHideListener = Keyboard.addListener(
+      hideEvent,
+      onKeyboardHide,
+    );
 
     return () => {
       keyboardShowListener.remove();
@@ -106,12 +118,11 @@ export const GamesScreen = ({ navigation }: any) => {
         questionService.getDailyQuestion().catch(err => {
           console.error('Failed to load daily question:', err);
           return null;
-        })
+        }),
       ]);
 
       setCategories(gamesData);
       if (dailyQData) setQuestionData(dailyQData);
-
     } catch (error) {
       console.error('Failed to load data:', error);
       setError('Failed to load games');
@@ -161,10 +172,7 @@ export const GamesScreen = ({ navigation }: any) => {
   if (isLoading) {
     return (
       <GradientBackground variant="background">
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={styles.loadingText}>Loading games...</Text>
-        </View>
+        <GamesSkeleton />
       </GradientBackground>
     );
   }
@@ -177,7 +185,10 @@ export const GamesScreen = ({ navigation }: any) => {
           <Text style={styles.errorEmoji}>😔</Text>
           <Text style={styles.errorTitle}>Oops!</Text>
           <Text style={styles.errorMessage}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={() => loadData()}>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={() => loadData()}
+          >
             <Text style={styles.retryButtonText}>Try Again</Text>
           </TouchableOpacity>
         </View>
@@ -202,13 +213,14 @@ export const GamesScreen = ({ navigation }: any) => {
 
   const trendingCategories = [...categories]
     .filter(c => c.isActive)
-    .sort((a, b) => b.timesPlayed - a.timesPlayed)
-    .slice(0, 5); // Sort by plays (descending) and take top 5
+    .sort((a, b) => (b.totalPlayed || 0) - (a.totalPlayed || 0))
+    .slice(0, 5);
 
-  const activeCategories = categories.filter((c) => c.isActive);
+  const activeCategories = categories.filter(c => c.isActive);
 
-  // Check if daily question is completed by both
-  const isDailyQuestionCompleted = questionData?.myAnswer && questionData?.partnerAnswer;
+
+  const isDailyQuestionCompleted =
+    questionData?.myAnswer && questionData?.partnerAnswer;
 
   return (
     <GradientBackground
@@ -229,7 +241,11 @@ export const GamesScreen = ({ navigation }: any) => {
         <Animated.ScrollView
           ref={scrollViewRef}
           style={styles.container}
-          contentContainerStyle={isKeyboardVisible ? styles.containerFocused : { paddingBottom: THEME.spacing.xl }}
+          contentContainerStyle={
+            isKeyboardVisible
+              ? styles.containerFocused
+              : { paddingBottom: THEME.spacing.xl }
+          }
           showsVerticalScrollIndicator={false}
           scrollEventThrottle={16}
           keyboardShouldPersistTaps="handled"
@@ -240,7 +256,7 @@ export const GamesScreen = ({ navigation }: any) => {
               listener: (event: any) => {
                 currentScrollY.current = event.nativeEvent.contentOffset.y;
               },
-            }
+            },
           )}
           refreshControl={
             <RefreshControl
@@ -275,19 +291,18 @@ export const GamesScreen = ({ navigation }: any) => {
                 <TrendingGames
                   games={trendingCategories}
                   onGamePress={handleGamePress}
+                  onShowAll={() => navigation.navigate('AllGames')}
                 />
               )}
 
               {/* All Games */}
-              <GamesGrid
-                games={categories}
-                onGamePress={handleGamePress}
-              />
+              <GamesGrid games={categories} onGamePress={handleGamePress} />
 
               {/* Quote Section */}
               <View style={styles.quoteContainer}>
                 <Text style={styles.quoteText}>
-                  "Love is not just looking at each other, it's looking in the same direction... and playing together!"
+                  "Love is not just looking at each other, it's looking in the
+                  same direction... and playing together!"
                 </Text>
               </View>
 

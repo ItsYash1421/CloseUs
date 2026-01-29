@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 const GameCategory = require('../src/models/GameCategory');
 require('dotenv').config();
 
-const DEFAULT_IMAGE = 'https://raw.githubusercontent.com/ItsYash1421/Banners/main/Logo-Games-Category.png';
+const DEFAULT_IMAGE =
+    'https://raw.githubusercontent.com/ItsYash1421/Banners/main/Logo-Games-Category.png';
 
 const updateGameImages = async () => {
     try {
@@ -20,7 +21,10 @@ const updateGameImages = async () => {
 
         // List all categories to verify
         const categories = await GameCategory.find({});
-        console.log('Current Categories:', categories.map(c => ({ name: c.name, image: c.image })));
+        console.log(
+            'Current Categories:',
+            categories.map((c) => ({ name: c.name, image: c.image }))
+        );
 
         await mongoose.disconnect();
         console.log('Disconnected');

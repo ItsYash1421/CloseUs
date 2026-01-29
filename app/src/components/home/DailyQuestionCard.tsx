@@ -325,7 +325,7 @@ export const DailyQuestionCard = ({
           <Text style={styles.errorText}>Could not load today's question.</Text>
         )}
       </View>
-    </View >
+    </View>
   );
 };
 

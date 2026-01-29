@@ -67,7 +67,9 @@ export const SplashScreen = ({ navigation }: any) => {
 
             if (!isPaired) {
               // Not paired - redirect to CreateKey
-              console.log('[SplashScreen] Navigating to CreateKey (not paired)');
+              console.log(
+                '[SplashScreen] Navigating to CreateKey (not paired)',
+              );
               navigation.replace('CreateKey');
             } else {
               // Paired - fetch fresh couple data and go to main tabs

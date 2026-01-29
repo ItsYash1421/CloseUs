@@ -103,13 +103,15 @@ export const useCoupleStore = create<CoupleState>()(
             set({ couple, pairingKey: null, pairingKeyExpires: null });
           } else {
             // User is NOT paired - clear local couple data
-            console.log('[CoupleStore] Backend says not paired, clearing local data');
+            console.log(
+              '[CoupleStore] Backend says not paired, clearing local data',
+            );
             set({
               couple: null,
               partner: null,
               stats: null,
               pairingKey: null,
-              pairingKeyExpires: null
+              pairingKeyExpires: null,
             });
           }
           return isPaired;

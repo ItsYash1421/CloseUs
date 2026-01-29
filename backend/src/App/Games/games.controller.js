@@ -8,7 +8,7 @@ const { successResponse, errorResponse } = require('../../Shared/Utils');
 const getGameCategories = async (req, res) => {
     try {
         const categories = await GameCategory.find({ isActive: true })
-            .sort({ order: 1, timesPlayed: -1 })
+            .sort({ order: 1, totalPlayed: -1 })
             .select('-__v');
 
         // ------------------------------------------------------------------
@@ -112,15 +112,16 @@ const getRandomGame = async (req, res) => {
         const randomQuestion = allQuestions[randomIndex];
 
         // ------------------------------------------------------------------
-        // Increment Times Played Counter
+        // Increment Times Played Counter (Optional: Logic for totalPlayed on random game?)
+        // User asked to remove timesPlayed. Assuming simple removal.
         // ------------------------------------------------------------------
-        await GameQuestion.findByIdAndUpdate(randomQuestion._id, {
-            $inc: { timesPlayed: 1 },
-        });
-
-        await GameCategory.findByIdAndUpdate(randomQuestion.categoryId._id, {
-            $inc: { timesPlayed: 1 },
-        });
+        // await GameQuestion.findByIdAndUpdate(randomQuestion._id, {
+        //     $inc: { timesPlayed: 1 },
+        // });
+        // await GameCategory.findByIdAndUpdate(randomQuestion.categoryId._id, {
+        //     $inc: { timesPlayed: 1 },
+        // });
+        // Keeping it commented out or removing entirely. Removing entirely is cleaner.
 
         // ------------------------------------------------------------------
         // Format Response
@@ -130,7 +131,7 @@ const getRandomGame = async (req, res) => {
                 question: {
                     _id: randomQuestion._id,
                     text: randomQuestion.text,
-                    timesPlayed: randomQuestion.timesPlayed + 1,
+                    // timesPlayed removed
                 },
                 category: {
                     _id: randomQuestion.categoryId._id,
@@ -180,6 +181,15 @@ const saveAnswer = async (req, res) => {
         // Create or Update Answer (Upsert)
         // ------------------------------------------------------------------
         const GameAnswer = require('../../models/GameAnswer');
+
+        // Check if answer already exists to determine if we should increment totalPlayed
+        const existingAnswer = await GameAnswer.findOne({ userId, questionId });
+        if (!existingAnswer) {
+            await GameCategory.findByIdAndUpdate(question.categoryId, {
+                $inc: { totalPlayed: 1 },
+            });
+        }
+
         const gameAnswer = await GameAnswer.findOneAndUpdate(
             { userId, questionId },
             {
@@ -217,7 +227,7 @@ const getUserAnswers = async (req, res) => {
         const GameAnswer = require('../../models/GameAnswer');
         const answers = await GameAnswer.find({ userId }).select('questionId');
 
-        const answeredQuestionIds = answers.map(a => a.questionId.toString());
+        const answeredQuestionIds = answers.map((a) => a.questionId.toString());
 
         res.json(
             successResponse({

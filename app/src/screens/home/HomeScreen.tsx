@@ -63,7 +63,7 @@ export const HomeScreen = ({ navigation }: any) => {
 
   const fetchDailyQuestion = React.useCallback(async () => {
     try {
-      // Don't show loading spinner on background refresh, 
+      // Don't show loading spinner on background refresh,
       // only if we don't have data yet
       if (!questionData) setQuestionLoading(true);
 
@@ -79,7 +79,7 @@ export const HomeScreen = ({ navigation }: any) => {
   useFocusEffect(
     React.useCallback(() => {
       fetchDailyQuestion();
-    }, [fetchDailyQuestion])
+    }, [fetchDailyQuestion]),
   );
 
   useEffect(() => {

@@ -10,7 +10,8 @@ const gameCategorySchema = new mongoose.Schema(
         emoji: String,
         image: {
             type: String,
-            default: 'https://raw.githubusercontent.com/ItsYash1421/Banners/main/Logo-Games-Category.png',
+            default:
+                'https://raw.githubusercontent.com/ItsYash1421/Banners/main/Logo-Games-Category.png',
         },
         tags: [String],
         color: String,
@@ -22,10 +23,11 @@ const gameCategorySchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
-        timesPlayed: {
+        totalPlayed: {
             type: Number,
             default: 0,
         },
+
         order: {
             type: Number,
             default: 0,

@@ -145,35 +145,35 @@ export const ProfileScreen = () => {
           status={
             user?.relationshipStatus
               ? {
-                dating: 'Dating',
-                engaged: 'Engaged',
-                married: 'Married',
-                other: 'Other',
-              }[user.relationshipStatus] || 'Dating'
+                  dating: 'Dating',
+                  engaged: 'Engaged',
+                  married: 'Married',
+                  other: 'Other',
+                }[user.relationshipStatus] || 'Dating'
               : 'Dating'
           }
           style={
             user?.livingStyle
               ? {
-                long_distance: 'Long Distance',
-                same_city: 'Same City',
-                living_together: 'Living Together',
-              }[user.livingStyle] || 'Same City'
+                  long_distance: 'Long Distance',
+                  same_city: 'Same City',
+                  living_together: 'Living Together',
+                }[user.livingStyle] || 'Same City'
               : 'Same City'
           }
           anniversary={
             user?.anniversary
               ? new Date(user.anniversary).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-              })
-              : couple?.startDate
-                ? new Date(couple.startDate).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',
                   year: 'numeric',
                 })
+              : couple?.startDate
+                ? new Date(couple.startDate).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })
                 : 'Select Date'
           }
         />

@@ -25,6 +25,7 @@ import { ChatScreen } from '../screens/chat/ChatScreen';
 import { QuestionsScreen } from '../screens/questions/QuestionsScreen';
 import { CategoryQuestionsScreen } from '../screens/games/CategoryQuestionsScreen';
 import { GameQuestionDetailScreen } from '../screens/games/GameQuestionDetailScreen';
+import { AllGamesScreen } from '../screens/games/AllGamesScreen';
 import { TabNavigator } from './TabNavigator';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -62,6 +63,8 @@ export const AppNavigator = () => {
         <Stack.Screen name="MainTabs" component={TabNavigator} />
         <Stack.Screen name="Journey" component={JourneyScreen} />
         <Stack.Screen name="Chat" component={ChatScreen} />
+        <Stack.Screen name="Games" component={TabNavigator} />
+        <Stack.Screen name="AllGames" component={AllGamesScreen} />
         <Stack.Screen name="Questions" component={QuestionsScreen} />
         <Stack.Screen
           name="CategoryQuestions"
