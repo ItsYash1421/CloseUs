@@ -63,4 +63,10 @@ router.get('/features/user', authMiddleware, getUserFeatures);
 const notificationRoutes = require('../App/Notification/notification.routes');
 router.use('/notifications', notificationRoutes);
 
+// ------------------------------------------------------------------
+// Games Routes (Public/Authenticated)
+// ------------------------------------------------------------------
+const gamesRoutes = require('../App/Games/games.routes');
+router.use('/games', gamesRoutes);
+
 module.exports = router;

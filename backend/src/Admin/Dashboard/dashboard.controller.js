@@ -78,7 +78,8 @@ const getUsers = async (req, res) => {
             .sort({ createdAt: -1 })
             .limit(parseInt(limit))
             .skip((parseInt(page) - 1) * parseInt(limit))
-            .populate('coupleId', 'coupleTag isPaired');
+            .populate('coupleId', 'coupleTag isPaired')
+            .select('-password -pushToken'); // Don't send sensitive data
 
         const total = await User.countDocuments(query);
 
@@ -94,6 +95,7 @@ const getUsers = async (req, res) => {
             })
         );
     } catch (error) {
+        console.error('Get users error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };

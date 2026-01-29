@@ -123,7 +123,7 @@ const getDailyQuestion = async (req, res) => {
 const answerDailyQuestion = async (req, res) => {
     try {
         const userId = req.userId;
-
+        const { id } = req.params;
         const { text } = req.body;
 
         if (!text) {

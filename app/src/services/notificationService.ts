@@ -59,7 +59,8 @@ class NotificationService {
 
   async getFCMToken() {
     try {
-      const token = await messaging().getToken();
+      const messagingInstance = messaging();
+      const token = await messagingInstance.getToken();
       await AsyncStorage.setItem('fcmToken', token);
       return token;
     } catch (error) {
@@ -69,7 +70,8 @@ class NotificationService {
   }
 
   setupForegroundHandler() {
-    messaging().onMessage(async remoteMessage => {
+    const messagingInstance = messaging();
+    messagingInstance.onMessage(async remoteMessage => {
       console.log('Foreground message:', remoteMessage);
 
       // Display notification using notifee
@@ -82,7 +84,8 @@ class NotificationService {
   }
 
   setupBackgroundHandler() {
-    messaging().setBackgroundMessageHandler(async remoteMessage => {
+    const messagingInstance = messaging();
+    messagingInstance.setBackgroundMessageHandler(async remoteMessage => {
       console.log('Background message:', remoteMessage);
 
       await this.displayNotification(

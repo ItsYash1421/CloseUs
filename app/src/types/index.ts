@@ -159,6 +159,7 @@ export type RootStackParamList = {
   EnterKey: undefined;
   PairingSuccess: undefined;
   MainTabs: undefined;
+  Journey: undefined;
   Home: undefined;
   Chat: undefined;
   Questions: undefined;
@@ -166,6 +167,20 @@ export type RootStackParamList = {
   AnswerReveal: { questionId: string };
   CategoryDetail: { categoryId: string };
   Games: undefined;
+  AllGames: undefined;
+  CategoryQuestions: {
+    categoryId: string;
+    categoryName: string;
+    categoryEmoji: string;
+    categoryColor: string;
+  };
+  GameQuestionDetail: {
+    questionId: string;
+    text: string;
+    categoryName: string;
+    categoryEmoji: string;
+    categoryColor: string;
+  };
   NeverHaveIEver: { gameId: string };
   Profile: undefined;
   EditProfile: undefined;

@@ -61,6 +61,24 @@ exports.updateFeatureFlag = async (req, res) => {
 };
 
 // ------------------------------------------------------------------
+// Delete Feature Flag
+// ------------------------------------------------------------------
+exports.deleteFeatureFlag = async (req, res) => {
+    try {
+        const featureFlag = await FeatureFlag.findByIdAndDelete(req.params.id);
+
+        if (!featureFlag) {
+            return res.status(404).json(errorResponse('Feature flag not found', 404));
+        }
+
+        res.json(successResponse(null, 'Feature flag deleted'));
+    } catch (error) {
+        console.error('Error deleting feature flag:', error);
+        res.status(500).json(errorResponse('Failed to delete feature flag'));
+    }
+};
+
+// ------------------------------------------------------------------
 // Toggle Feature Flag
 // ------------------------------------------------------------------
 exports.toggleFeatureFlag = async (req, res) => {

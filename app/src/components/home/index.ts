@@ -3,3 +3,4 @@ export { OurJourney } from './OurJourney';
 export { StickyHeader } from './StickyHeader';
 export { ChatSection } from './ChatSection';
 export { DailyQuestionCard } from './DailyQuestionCard';
+export { DailyQuestionHomeCard } from './DailyQuestionHomeCard';

@@ -12,6 +12,7 @@ import { GradientBackground, Button } from '../../components/common';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
 import { useAuthStore } from '../../store/authStore';
+import { useCoupleStore } from '../../store/coupleStore';
 import { getErrorMessage } from '../../utils/errorHandler';
 
 // Custom Toast Config
@@ -28,6 +29,9 @@ export const WelcomeScreen = ({ navigation }: any) => {
   const [loading, setLoading] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const login = useAuthStore(state => state.login);
+  const couple = useCoupleStore(state => state.couple);
+  const fetchCoupleInfo = useCoupleStore(state => state.fetchCoupleInfo);
+  const checkPairingStatus = useCoupleStore(state => state.checkPairingStatus);
 
   const handleGoogleSignIn = async () => {
     // Check if user agreed to terms
@@ -53,12 +57,22 @@ export const WelcomeScreen = ({ navigation }: any) => {
       if (!loggedInUser?.isOnboardingComplete) {
         // New user - go to onboarding
         navigation.replace('GenderSelection');
-      } else if (!loggedInUser?.coupleId) {
-        // Onboarded but not paired
-        navigation.replace('CreateKey');
       } else {
-        // Fully set up user - go to main app
-        navigation.replace('MainTabs');
+        // Verify pairing status from backend (syncs local data)
+        const isPaired = await checkPairingStatus();
+
+        if (!isPaired) {
+          // Onboarded but not paired
+          navigation.replace('CreateKey');
+        } else {
+          // Fully set up user - fetch fresh couple data and go to main app
+          try {
+            await fetchCoupleInfo();
+          } catch (error) {
+            console.error('Failed to fetch couple info:', error);
+          }
+          navigation.replace('MainTabs');
+        }
       }
     } catch (error: any) {
       setLoading(false);

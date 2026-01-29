@@ -24,13 +24,19 @@ ios/.xcode.env.local
 # Android/IntelliJ
 build/
 .idea
-.gradle
+.gradle/
 local.properties
 *.iml
 *.hprof
 .cxx/
 *.keystore
 !debug.keystore
+
+# Android Gradle cache
+android/.gradle/
+android/app/.cxx/
+android/build/
+android/app/build/
 
 # node.js
 node_modules/

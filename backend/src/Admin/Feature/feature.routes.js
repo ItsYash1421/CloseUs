@@ -11,6 +11,7 @@ router.use(adminAuthMiddleware);
 router.post('/', featureController.createFeatureFlag);
 router.get('/', featureController.getFeatureFlags);
 router.put('/:id', featureController.updateFeatureFlag);
+router.delete('/:id', featureController.deleteFeatureFlag);
 router.post('/:id/toggle', featureController.toggleFeatureFlag);
 router.put('/:id/rollout', featureController.updateRollout);
 

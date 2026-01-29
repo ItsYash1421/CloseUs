@@ -7,10 +7,9 @@ const { successResponse, errorResponse } = require('../../Shared/Utils');
 // ------------------------------------------------------------------
 const createGameCategory = async (req, res) => {
     try {
-        const { gameType, name, emoji, tags, color } = req.body;
+        const { name, emoji, tags, color } = req.body;
 
         const category = await GameCategory.create({
-            gameType,
             name,
             emoji,
             tags: tags || [],
@@ -29,10 +28,7 @@ const createGameCategory = async (req, res) => {
 // ------------------------------------------------------------------
 const getGameCategories = async (req, res) => {
     try {
-        const { gameType } = req.query;
-        const query = gameType ? { gameType } : {};
-
-        const categories = await GameCategory.find(query).sort({ order: 1, timesPlayed: -1 });
+        const categories = await GameCategory.find().sort({ order: 1, timesPlayed: -1 });
 
         // ------------------------------------------------------------------
         // Count Questions Per Category
@@ -116,6 +112,28 @@ const createGameQuestion = async (req, res) => {
 };
 
 // ------------------------------------------------------------------
+// Get All Game Questions (Across All Categories)
+// ------------------------------------------------------------------
+const getAllGameQuestions = async (req, res) => {
+    try {
+        const { page = 1, limit = 100 } = req.query;
+
+        const questions = await GameQuestion.find()
+            .populate('categoryId', 'name emoji color')
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(Number(limit));
+
+        const total = await GameQuestion.countDocuments();
+
+        res.json(successResponse(questions));
+    } catch (error) {
+        console.error('Get all game questions error:', error);
+        res.status(500).json(errorResponse('Internal server error'));
+    }
+};
+
+// ------------------------------------------------------------------
 // Get Game Questions by Category
 // ------------------------------------------------------------------
 const getGameQuestions = async (req, res) => {
@@ -170,6 +188,7 @@ module.exports = {
     updateGameCategory,
     deleteGameCategory,
     createGameQuestion,
+    getAllGameQuestions,
     getGameQuestions,
     updateGameQuestion,
     deleteGameQuestion,

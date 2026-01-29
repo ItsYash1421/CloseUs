@@ -50,3 +50,12 @@ mobile/node_modules/
 mobile/ios/Pods/
 mobile/android/build/
 /Private Files/
+# admin next build/cache
+admin/.next/
+admin/out/
+# app (react native) build/cache
+app/.expo/
+app/.expo-shared/
+app/android/build/
+app/android/app/build/
+app/ios/Pods/
