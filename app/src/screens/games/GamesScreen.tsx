@@ -218,7 +218,6 @@ export const GamesScreen = ({ navigation }: any) => {
 
   const activeCategories = categories.filter(c => c.isActive);
 
-
   const isDailyQuestionCompleted =
     questionData?.myAnswer && questionData?.partnerAnswer;
 
