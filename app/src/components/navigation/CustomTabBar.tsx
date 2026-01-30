@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -6,6 +6,7 @@ import {
   Platform,
   Animated,
   Dimensions,
+  Keyboard,
 } from 'react-native';
 import { BlurView } from '@react-native-community/blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -111,7 +112,14 @@ export const CustomTabBar: React.FC<TabBarProps> = ({
   };
 
   return (
-    <View style={[styles.wrapper, { paddingBottom: insets.bottom + 10 }]}>
+    <View
+      style={[
+        styles.wrapper,
+        {
+          paddingBottom: insets.bottom + 10,
+        }
+      ]}
+    >
       <View style={styles.container}>
         {/* Glass Background - Use BlurView for both iOS and Android */}
         <BlurView

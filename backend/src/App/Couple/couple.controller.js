@@ -308,21 +308,20 @@ const devPair = async (req, res) => {
     try {
         const userId = req.userId;
 
-        const existingCouple = await Couple.findOne({
+        const existingCouples = await Couple.find({
             $or: [{ partner1Id: userId }, { partner2Id: userId }],
-            isActive: true,
         });
 
-        if (existingCouple) {
-            const partner1Id = existingCouple.partner1Id;
-            const partner2Id = existingCouple.partner2Id;
+        for (const c of existingCouples) {
+            const p1 = c.partner1Id;
+            const p2 = c.partner2Id;
 
-            await User.findByIdAndUpdate(partner1Id, { coupleId: null });
-            if (partner2Id) {
-                await User.findByIdAndUpdate(partner2Id, { coupleId: null });
+            await User.findByIdAndUpdate(p1, { coupleId: null });
+            if (p2) {
+                await User.findByIdAndUpdate(p2, { coupleId: null });
             }
 
-            await Couple.findByIdAndDelete(existingCouple._id);
+            await Couple.findByIdAndDelete(c._id);
         }
 
         let dummyPartner = await User.findOne({ email: 'dummy@closeus.app' });

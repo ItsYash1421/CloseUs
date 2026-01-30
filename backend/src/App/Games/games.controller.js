@@ -1,5 +1,6 @@
 const GameCategory = require('../../models/GameCategory');
 const GameQuestion = require('../../models/GameQuestion');
+const Couple = require('../../models/Couple');
 const { successResponse, errorResponse } = require('../../Shared/Utils');
 
 // ------------------------------------------------------------------
@@ -37,9 +38,13 @@ const getGameCategories = async (req, res) => {
 // ------------------------------------------------------------------
 // Get Questions by Category (Public - For App)
 // ------------------------------------------------------------------
+// ------------------------------------------------------------------
+// Get Questions by Category (Protected - For App)
+// ------------------------------------------------------------------
 const getQuestionsByCategory = async (req, res) => {
     try {
         const { categoryId } = req.params;
+        const userId = req.userId; // Middleware should populate this
 
         // ------------------------------------------------------------------
         // Verify Category Exists
@@ -48,6 +53,13 @@ const getQuestionsByCategory = async (req, res) => {
         if (!category) {
             return res.status(404).json(errorResponse('Category not found', 404));
         }
+
+        // ------------------------------------------------------------------
+        // Get User and Couple Info
+        // ------------------------------------------------------------------
+        const User = require('../../models/User');
+        const user = await User.findById(userId);
+        const coupleId = user.coupleId;
 
         // ------------------------------------------------------------------
         // Get Active Questions
@@ -59,6 +71,48 @@ const getQuestionsByCategory = async (req, res) => {
             .sort({ order: 1 })
             .select('-__v');
 
+        // ------------------------------------------------------------------
+        // Get Answers for Couple
+        // ------------------------------------------------------------------
+        const GameAnswer = require('../../models/GameAnswer');
+        let answers = [];
+        if (coupleId) {
+            answers = await GameAnswer.find({
+                coupleId,
+                questionId: { $in: questions.map(q => q._id) }
+            });
+        }
+
+        // ------------------------------------------------------------------
+        // Map Questions with Status
+        // ------------------------------------------------------------------
+        let userAnsweredCount = 0;
+        let partnerAnsweredCount = 0;
+        let bothAnsweredCount = 0;
+        const totalQuestions = questions.length;
+
+        const questionsWithStatus = questions.map(question => {
+            const questionAnswers = answers.filter(a => a.questionId.toString() === question._id.toString());
+
+            const userAnswer = questionAnswers.find(a => a.userId.toString() === userId.toString());
+            const partnerAnswer = questionAnswers.find(a => a.userId.toString() !== userId.toString());
+
+            const isAnsweredByUser = !!userAnswer;
+            const isAnsweredByPartner = !!partnerAnswer;
+
+            if (isAnsweredByUser) userAnsweredCount++;
+            if (isAnsweredByPartner) partnerAnsweredCount++;
+            if (isAnsweredByUser && isAnsweredByPartner) bothAnsweredCount++;
+
+            return {
+                ...question.toObject(),
+                isAnsweredByUser,
+                isAnsweredByPartner,
+                // userResponse: isAnsweredByUser ? userAnswer.text : null, // Optional: if we want to show it immediately
+            };
+        });
+
+
         res.json(
             successResponse({
                 category: {
@@ -68,8 +122,13 @@ const getQuestionsByCategory = async (req, res) => {
                     gameType: category.gameType,
                     color: category.color,
                 },
-                questions,
-                totalQuestions: questions.length,
+                questions: questionsWithStatus,
+                stats: {
+                    totalQuestions,
+                    userAnsweredCount,
+                    partnerAnsweredCount,
+                    bothAnsweredCount
+                }
             })
         );
     } catch (error) {
@@ -211,6 +270,48 @@ const saveAnswer = async (req, res) => {
                 'Answer saved successfully'
             )
         );
+
+        // ------------------------------------------------------------------
+        // Dev Mode: Auto-Answer for Partner
+        // ------------------------------------------------------------------
+        const couple = await Couple.findById(user.coupleId);
+        if (couple && couple.isDevPartner) {
+            const partnerId = couple.partner1Id.toString() === userId.toString()
+                ? couple.partner2Id
+                : couple.partner1Id;
+            setTimeout(async () => {
+                try {
+                    const existingPartnerAnswer = await GameAnswer.findOne({
+                        userId: partnerId,
+                        questionId
+                    });
+
+                    if (!existingPartnerAnswer) {
+                        const dummyAnswers = [
+                            "That's a really interesting question! I think...",
+                            "I'd have to say yes to this one ❤️",
+                            "For me, it's definitely about the little moments.",
+                            "I love that you asked this!",
+                            "My answer is: Absolutely!",
+                            "Hmm, let me think... I'd choose the second option.",
+                            "You know me so well! 😊",
+                            "I was thinking the same thing!"
+                        ];
+                        const randomAnswer = dummyAnswers[Math.floor(Math.random() * dummyAnswers.length)];
+
+                        await GameAnswer.create({
+                            coupleId: user.coupleId,
+                            questionId,
+                            userId: partnerId,
+                            text: randomAnswer,
+                        });
+                        console.log(`[DevMode] Auto-answered question ${questionId} for partner ${partnerId}`);
+                    }
+                } catch (err) {
+                    console.error('[DevMode] Auto-answer error:', err);
+                }
+            }, 120000);
+        }
     } catch (error) {
         console.error('Save game answer error:', error);
         res.status(500).json(errorResponse('Internal server error'));

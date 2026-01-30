@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,14 +8,24 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  Image,
+  Dimensions,
+  Animated,
 } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { GradientBackground, Card } from '../../components/common';
+import { GradientBackground, Header, Card } from '../../components/common';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
 import gamesService, { GameQuestion } from '../../services/gamesService';
 import { RootStackParamList } from '../../types';
+import { useAuthStore } from '../../store/authStore';
+import { useCoupleStore } from '../../store/coupleStore';
+import { BlurView } from '@react-native-community/blur';
+import { BLUR_CONFIG } from '../../constants/blur';
+
+const { width } = Dimensions.get('window');
+const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
 type CategoryQuestionsScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -25,15 +36,33 @@ type NavigationProp = StackNavigationProp<
   'CategoryQuestions'
 >;
 
+interface GamesStats {
+  totalQuestions: number;
+  userAnsweredCount: number;
+  partnerAnsweredCount: number;
+  bothAnsweredCount: number;
+}
+
 export const CategoryQuestionsScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<CategoryQuestionsScreenRouteProp>();
   const { categoryId, categoryName, categoryEmoji, categoryColor } =
     route.params;
 
+  // Store Data
+  const user = useAuthStore(state => state.user);
+  const partner = useCoupleStore(state => state.partner);
+
+  // State
   const [questions, setQuestions] = useState<GameQuestion[]>([]);
-  const [answeredQuestionIds, setAnsweredQuestionIds] = useState<string[]>([]);
+  const [stats, setStats] = useState<GamesStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'available' | 'completed'>(
+    'available',
+  );
+
+  // Animation
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     fetchData();
@@ -42,15 +71,9 @@ export const CategoryQuestionsScreen = () => {
   const fetchData = async () => {
     try {
       setIsLoading(true);
-
-      // Fetch questions and answered IDs in parallel
-      const [questionsData, answersData] = await Promise.all([
-        gamesService.getQuestionsByCategory(categoryId),
-        gamesService.getUserAnswers(),
-      ]);
-
-      setQuestions(questionsData.questions);
-      setAnsweredQuestionIds(answersData.answeredQuestionIds);
+      const data = await gamesService.getQuestionsByCategory(categoryId);
+      setQuestions(data.questions);
+      setStats(data.stats);
     } catch (error) {
       console.error('Failed to load questions:', error);
       Alert.alert('Error', 'Failed to load questions. Please try again.');
@@ -60,25 +83,88 @@ export const CategoryQuestionsScreen = () => {
   };
 
   const handleQuestionPress = (question: GameQuestion) => {
-    // Check if question is already answered
-    const isAnswered = answeredQuestionIds.includes(question._id);
-
-    if (isAnswered) {
-      Alert.alert(
-        'Already Answered',
-        "You've already answered this question!",
-        [{ text: 'OK' }],
-      );
-      return;
+    if (activeTab === 'completed') {
+      // Logic for completed tab
+      if (question.isAnsweredByPartner) {
+        // Navigate to reveal/detail screen
+        // Assuming 'GameQuestionDetail' handles showing answers
+        navigation.navigate('GameQuestionDetail', {
+          questionId: question._id,
+          text: question.text,
+          categoryName,
+          categoryEmoji,
+          categoryColor,
+        });
+      } else {
+        // Waiting for partner
+        Alert.alert(
+          'Waiting for Partner',
+          'Your partner hasn\'t answered this question yet. Nudge them to play!',
+        );
+      }
+    } else {
+      // Logic for available tab (Play)
+      navigation.navigate('GameQuestionDetail', {
+        questionId: question._id,
+        text: question.text,
+        categoryName,
+        categoryEmoji,
+        categoryColor,
+      });
     }
+  };
 
-    navigation.navigate('GameQuestionDetail', {
-      questionId: question._id,
-      text: question.text,
-      categoryName,
-      categoryEmoji,
-      categoryColor,
-    });
+  const filteredQuestions = questions.filter(q => {
+    if (activeTab === 'available') return !q.isAnsweredByUser;
+    return q.isAnsweredByUser;
+  });
+
+  const renderStatsCard = () => {
+    // Determine which logo to show based on user's gender
+    const userLogo =
+      user?.gender === 'male'
+        ? require('../../assets/images/Logo-Male-2.png')
+        : require('../../assets/images/Logo-Female-2.png');
+
+    // Partner sees opposite gender logo
+    const partnerLogo =
+      user?.gender === 'male'
+        ? require('../../assets/images/Logo-Female-2.png')
+        : require('../../assets/images/Logo-Male-2.png');
+
+    return (
+      <View style={styles.statsCard}>
+        {/* User Stat */}
+        <View style={styles.statItem}>
+          <View style={styles.avatarContainer}>
+            <Image source={userLogo} style={styles.avatar} resizeMode="cover" />
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{stats?.userAnsweredCount || 0}</Text>
+            </View>
+          </View>
+          <Text style={styles.statLabel}>{user?.name || 'You'}</Text>
+        </View>
+
+        {/* Center Broad Stat */}
+        <View style={styles.centerStat}>
+          <Text style={styles.centerStatValue}>{stats?.bothAnsweredCount || 0}</Text>
+          <Text style={styles.centerStatLabel}>Both Answered</Text>
+        </View>
+
+        {/* Partner Stat */}
+        <View style={styles.statItem}>
+          <View style={styles.avatarContainer}>
+            <Image source={partnerLogo} style={styles.avatar} resizeMode="cover" />
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
+                {stats?.partnerAnsweredCount || 0}
+              </Text>
+            </View>
+          </View>
+          <Text style={styles.statLabel}>{partner?.name || 'Partner'}</Text>
+        </View>
+      </View>
+    );
   };
 
   if (isLoading) {
@@ -86,87 +172,124 @@ export const CategoryQuestionsScreen = () => {
       <GradientBackground variant="background">
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={styles.loadingText}>Loading questions...</Text>
         </View>
       </GradientBackground>
     );
   }
 
   return (
-    <GradientBackground variant="background">
+    <GradientBackground variant="background" scrollY={scrollY}>
+      <Header title={categoryName} showBack onBack={() => navigation.goBack()} />
+
       <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <Text style={styles.backButtonText}>←</Text>
-          </TouchableOpacity>
-          <View>
-            <Text style={styles.headerEmoji}>{categoryEmoji}</Text>
-            <Text style={styles.headerTitle}>{categoryName}</Text>
-          </View>
-        </View>
-
-        {/* Questions List */}
-        <FlatList
-          data={questions}
-          keyExtractor={item => item._id}
-          showsVerticalScrollIndicator={false}
+        <AnimatedFlatList
+          data={filteredQuestions}
+          keyExtractor={(item: any) => item._id}
           contentContainerStyle={styles.listContent}
-          renderItem={({ item, index }) => {
-            const isAnswered = answeredQuestionIds.includes(item._id);
+          showsVerticalScrollIndicator={false}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: true }
+          )}
+          scrollEventThrottle={16}
+          ListHeaderComponent={
+            <View>
+              {renderStatsCard()}
 
-            return (
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => handleQuestionPress(item)}
-                disabled={isAnswered}
-              >
-                <Card
-                  variant="glass"
-                  padding="medium"
-                  style={[
-                    styles.questionCard,
-                    isAnswered && styles.answeredCard,
-                  ]}
-                >
-                  <View style={styles.cardHeader}>
-                    <View style={styles.questionNumberBadge}>
-                      <Text style={styles.questionNumberText}>
-                        #{index + 1}
+              {/* Tabs */}
+              <View style={styles.tabsContainerWrapper}>
+                <View style={styles.tabsContainer}>
+                  {/* Glass Background */}
+                  <BlurView
+                    style={StyleSheet.absoluteFill}
+                    blurType={BLUR_CONFIG.blurType}
+                    blurAmount={BLUR_CONFIG.blurAmount}
+                    reducedTransparencyFallbackColor={BLUR_CONFIG.fallbackColor}
+                  />
+                  {/* Tint Overlay */}
+                  <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(255,255,255,0.05)' }} />
+
+                  <View style={styles.tabsContent}>
+                    <TouchableOpacity
+                      style={[
+                        styles.tab,
+                        activeTab === 'available' && styles.activeTab,
+                      ]}
+                      onPress={() => setActiveTab('available')}
+                    >
+                      <Text
+                        style={[
+                          styles.tabText,
+                          activeTab === 'available' && styles.activeTabText,
+                        ]}
+                      >
+                        Available
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        styles.tab,
+                        activeTab === 'completed' && styles.activeTab,
+                      ]}
+                      onPress={() => setActiveTab('completed')}
+                    >
+                      <Text
+                        style={[
+                          styles.tabText,
+                          activeTab === 'completed' && styles.activeTabText,
+                        ]}
+                      >
+                        Completed
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </View>
+          }
+          renderItem={({ item, index }) => (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => handleQuestionPress(item)}
+              style={styles.cardWrapper}
+            >
+              <View style={styles.questionCard}>
+                <View style={styles.cardHeader}>
+                  {/* Status Badges for Completed Tab */}
+                  {activeTab === 'completed' && (
+                    <View style={[
+                      styles.statusBadge,
+                      item.isAnsweredByPartner ? styles.statusSuccess : styles.statusWaiting
+                    ]}>
+                      <Text style={[
+                        styles.statusText,
+                        item.isAnsweredByPartner ? styles.textSuccess : styles.textWaiting
+                      ]}>
+                        {item.isAnsweredByPartner ? '✓ See Answers' : '⏳ Waiting'}
                       </Text>
                     </View>
-                    {isAnswered ? (
-                      <View style={styles.answeredBadge}>
-                        <Text style={styles.answeredText}>✓ Answered</Text>
-                      </View>
-                    ) : item.timesPlayed > 0 ? (
-                      <Text style={styles.playedCount}>
-                        Played {item.timesPlayed}x
-                      </Text>
-                    ) : null}
-                  </View>
-                  <Text
-                    style={[
-                      styles.questionText,
-                      isAnswered && styles.answeredText,
-                    ]}
-                    numberOfLines={2}
-                  >
-                    {item.text}
-                  </Text>
-                  {!isAnswered && (
-                    <Text style={styles.tapToPlay}>Tap to play →</Text>
                   )}
-                </Card>
-              </TouchableOpacity>
-            );
-          }}
+                </View>
+
+                <Text style={styles.questionText} numberOfLines={3}>
+                  {item.text}
+                </Text>
+
+                {activeTab === 'available' && (
+                  <View style={styles.playButton}>
+                    <Text style={styles.playButtonText}>Tap to play</Text>
+                  </View>
+                )}
+              </View>
+            </TouchableOpacity>
+          )}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No questions found.</Text>
+              <Text style={styles.emptyText}>
+                {activeTab === 'available'
+                  ? "You've answered all questions!"
+                  : "No answered questions yet."}
+              </Text>
             </View>
           }
         />
@@ -178,110 +301,198 @@ export const CategoryQuestionsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 60, // Status bar formatting
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  loadingText: {
-    color: COLORS.textSecondary,
-    marginTop: THEME.spacing.md,
-    fontSize: THEME.fontSizes.md,
-  },
-  header: {
-    paddingHorizontal: THEME.spacing.lg,
-    marginBottom: THEME.spacing.xl,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: THEME.spacing.md,
-  },
-  backButtonText: {
-    color: COLORS.white,
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginTop: -2,
-  },
-  headerEmoji: {
-    fontSize: 24,
-    marginBottom: 4,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: THEME.fontWeights.bold,
-    color: COLORS.white,
-  },
   listContent: {
     paddingHorizontal: THEME.spacing.lg,
+    paddingTop: 100,
     paddingBottom: 40,
-    gap: THEME.spacing.md,
   },
-  questionCard: {
-    marginBottom: THEME.spacing.sm,
-  },
-  cardHeader: {
+  // Stats Card
+  statsCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: THEME.spacing.sm,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 24,
+    padding: 20,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  avatarContainer: {
+    width: 80,
+    height: 80,
+    marginBottom: 8,
+    position: 'relative',
+    backgroundColor: 'rgba(128, 128, 128, 0.15)',
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatar: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 40,
+  },
+  badge: {
+    position: 'absolute',
+    bottom: -4,
+    right: -4,
+    backgroundColor: COLORS.white,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#000',
+    zIndex: 10,
+  },
+  badgeText: {
+    color: '#000',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  statLabel: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  centerStat: {
+    alignItems: 'center',
+  },
+  centerStatValue: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: COLORS.white,
+    marginBottom: 4,
+  },
+  centerStatLabel: {
+    fontSize: 10,
+    color: COLORS.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  // Tabs
+  tabsContainerWrapper: {
+    marginBottom: 24,
+    borderRadius: 30,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  tabsContainer: {
+    backgroundColor: 'transparent',
+    position: 'relative',
+  },
+  tabsContent: {
+    flexDirection: 'row',
+    padding: 4,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 26, // Slightly less than container
+  },
+  activeTab: {
+    backgroundColor: COLORS.white,
+  },
+  tabText: {
+    color: COLORS.textSecondary,
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  activeTabText: {
+    color: '#1F1F1F',
+    fontWeight: '700',
+  },
+  // Card Styles
+  cardWrapper: {
+    marginBottom: 16,
+  },
+  questionCard: {
+    minHeight: 120,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 24,
+    overflow: 'hidden',
+    padding: 20,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-start',
+    marginBottom: 12,
   },
   questionNumberBadge: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.08)',
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
+    paddingVertical: 4,
+    borderRadius: 6,
   },
   questionNumberText: {
     color: COLORS.textSecondary,
-    fontSize: 10,
-    fontWeight: 'bold',
+    fontSize: 11,
+    fontWeight: '700',
   },
-  playedCount: {
-    color: COLORS.textSecondary,
-    fontSize: 10,
-  },
-  questionText: {
-    fontSize: THEME.fontSizes.md,
-    color: COLORS.white,
-    fontWeight: THEME.fontWeights.medium,
-    lineHeight: 22,
-    marginBottom: THEME.spacing.md,
-  },
-  tapToPlay: {
-    fontSize: THEME.fontSizes.sm,
-    color: COLORS.primary,
-    fontWeight: THEME.fontWeights.bold,
-    textAlign: 'right',
-  },
-  emptyContainer: {
-    padding: THEME.spacing.xl,
-    alignItems: 'center',
-  },
-  emptyText: {
-    color: COLORS.textSecondary,
-    fontSize: THEME.fontSizes.md,
-  },
-  answeredCard: {
-    opacity: 0.5,
-  },
-  answeredBadge: {
-    backgroundColor: 'rgba(76, 175, 80, 0.2)',
-    paddingHorizontal: 8,
+  statusBadge: {
+    paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
   },
-  answeredText: {
+  statusSuccess: {
+    backgroundColor: 'rgba(76, 175, 80, 0.15)',
+  },
+  statusWaiting: {
+    backgroundColor: 'rgba(255, 152, 0, 0.15)',
+  },
+  textSuccess: {
     color: '#4CAF50',
+  },
+  textWaiting: {
+    color: '#FF9800',
+  },
+  statusText: {
     fontSize: 11,
-    fontWeight: 'bold',
+    fontWeight: '700',
+  },
+  questionText: {
+    fontSize: 16,
+    color: COLORS.white,
+    fontWeight: '500',
+    lineHeight: 24,
+    marginBottom: 16,
+  },
+  playButton: {
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 12,
+    alignSelf: 'flex-end',
+    marginTop: 8,
+  },
+  playButtonText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1F1F1F',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    padding: 40,
+  },
+  emptyText: {
+    color: COLORS.textSecondary,
+    fontSize: 16,
+    textAlign: 'center',
   },
 });

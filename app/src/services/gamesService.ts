@@ -25,6 +25,8 @@ export interface GameQuestion {
   text: string;
   isActive: boolean;
   order: number;
+  isAnsweredByUser: boolean;
+  isAnsweredByPartner: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -38,7 +40,12 @@ export interface CategoryQuestionsResponse {
     color: string;
   };
   questions: GameQuestion[];
-  totalQuestions: number;
+  stats: {
+    totalQuestions: number;
+    userAnsweredCount: number;
+    partnerAnsweredCount: number;
+    bothAnsweredCount: number;
+  };
 }
 
 export interface RandomGameResponse {

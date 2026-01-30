@@ -32,7 +32,6 @@ const coupleSchema = new mongoose.Schema(
         startDate: Date,
         coupleTag: {
             type: String,
-            unique: true,
             sparse: true,
         },
 

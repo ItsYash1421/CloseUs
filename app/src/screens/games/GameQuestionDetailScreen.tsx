@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,8 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   Alert,
+  Animated,
+  ScrollView,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
@@ -20,6 +22,10 @@ import gamesService from '../../services/gamesService';
 import THEME from '../../constants/theme';
 import { COLORS } from '../../constants/colors';
 import { RootStackParamList } from '../../types';
+import { BlurView } from '@react-native-community/blur';
+import { BLUR_CONFIG } from '../../constants/blur';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useKeyboardAnimation } from '../../hooks/useKeyboardAnimation';
 
 type GameQuestionDetailScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -54,6 +60,8 @@ export const GameQuestionDetailScreen = () => {
 
       // Save answer via API
       await gamesService.saveAnswer(questionId, answer.trim());
+      // Dismiss keyboard immediately
+      Keyboard.dismiss();
 
       Toast.show({
         type: 'success',
@@ -78,127 +86,167 @@ export const GameQuestionDetailScreen = () => {
     }
   };
 
+  // Animated values from custom hook
+  const {
+    translateY,
+    imageOpacity,
+    imageScale,
+    buttonOpacity,
+    buttonScale
+  } = useKeyboardAnimation();
+
   const handleClose = () => {
     navigation.goBack();
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <View style={styles.container}>
-          {/* Top Section with GIF */}
-          <View style={styles.topSection}>
-            {/* Using same GIF style as EnterKeyScreen for consistency */}
-            <FastImage
-              source={require('../../assets/gifs/EnterKey.gif')}
-              style={styles.gifImage}
-              resizeMode={FastImage.resizeMode.cover}
-            />
+    <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={0}
+        >
+          <Animated.View
+            style={[
+              { flex: 1 },
+              { transform: [{ translateY }] }
+            ]}
+          >
+            {/* Top Section */}
+            <View style={styles.topSection}>
+              <Animated.View style={{
+                flex: 1,
+                opacity: imageOpacity,
+                transform: [{ scale: imageScale }]
+              }}>
+                <FastImage
+                  source={require('../../assets/gifs/EnterKey.gif')}
+                  style={styles.gifImage}
+                  resizeMode={FastImage.resizeMode.cover}
+                />
+              </Animated.View>
 
-            {/* Close Button */}
-            <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
-              <Text style={styles.closeIcon}>✕</Text>
-            </TouchableOpacity>
+              <TouchableOpacity style={styles.closeButtonWrapper} onPress={handleClose}>
+                <BlurView
+                  style={StyleSheet.absoluteFill}
+                  blurType={BLUR_CONFIG.blurType}
+                  blurAmount={BLUR_CONFIG.blurAmount}
+                  reducedTransparencyFallbackColor={BLUR_CONFIG.fallbackColor}
+                />
+                <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16 }} />
+                <Icon name="close" size={20} color="#FFFFFF" style={{ zIndex: 1 }} />
+              </TouchableOpacity>
 
-            {/* Category Pill on top of Image */}
-            <View style={styles.categoryBadge}>
-              <Text style={styles.categoryBadgeText}>
-                {categoryEmoji} {categoryName}
-              </Text>
-            </View>
-          </View>
-
-          <Toast />
-
-          {/* Content Card with Bottom Sheet effect */}
-          <View style={styles.contentCard}>
-            {/* Question Title */}
-            <Text style={styles.title}>Question</Text>
-
-            {/* Question Text */}
-            <Text style={styles.questionText}>{text}</Text>
-
-            <View style={styles.divider} />
-
-            {/* Answer Input */}
-            <Text style={styles.inputLabel}>Your Answer</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={answer}
-                onChangeText={setAnswer}
-                placeholder="Type your answer here..."
-                placeholderTextColor="rgba(255, 255, 255, 0.5)"
-                multiline
-                numberOfLines={3}
-                textAlignVertical="top"
-              />
+              <View style={styles.categoryBadgeWrapper}>
+                <BlurView
+                  style={StyleSheet.absoluteFill}
+                  blurType={BLUR_CONFIG.blurType}
+                  blurAmount={BLUR_CONFIG.blurAmount}
+                  reducedTransparencyFallbackColor={BLUR_CONFIG.fallbackColor}
+                />
+                <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16 }} />
+                <Text style={styles.categoryBadgeText}>
+                  {categoryName}
+                </Text>
+              </View>
             </View>
 
-            {/* Submit Button */}
-            <TouchableOpacity
-              style={[
-                styles.submitButton,
-                isLoading && styles.submitButtonDisabled,
-              ]}
-              onPress={handleSubmit}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <Spinner size="small" color="#000000" />
-              ) : (
-                <Text style={styles.submitButtonText}>Submit Answer</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        </View>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+            {/* Content Card */}
+            <View style={styles.contentCard}>
+              <ScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollContent}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+              >
+                <Text style={styles.title}>Question</Text>
+                <Text style={styles.questionText}>{text}</Text>
+                <View style={styles.divider} />
+                <Text style={styles.inputLabel}>Your Answer</Text>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.input}
+                    value={answer}
+                    onChangeText={setAnswer}
+                    placeholder="Type your answer here..."
+                    placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                    multiline
+                    numberOfLines={3}
+                    textAlignVertical="top"
+                    onFocus={() => {
+                      // Optional: extra trigger for focus effects
+                    }}
+                    returnKeyType="done"
+                    onSubmitEditing={Keyboard.dismiss}
+                    blurOnSubmit={true}
+                  />
+                </View>
+
+                <Animated.View style={{
+                  opacity: buttonOpacity,
+                  transform: [{ scale: buttonScale }]
+                }}>
+                  <TouchableOpacity
+                    style={[
+                      styles.submitButton,
+                      isLoading && styles.submitButtonDisabled,
+                    ]}
+                    onPress={handleSubmit}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <Spinner size="small" color="#000000" />
+                    ) : (
+                      <Text style={styles.submitButtonText}>Submit Answer</Text>
+                    )}
+                  </TouchableOpacity>
+                </Animated.View>
+              </ScrollView>
+            </View>
+          </Animated.View>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
+      <Toast />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A0E2E',
   },
   topSection: {
-    height: '45%',
+    height: '40%', // Fixed ratio
     width: '100%',
     position: 'relative',
     backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
   },
   gifImage: {
     width: '100%',
     height: '100%',
   },
-  closeButton: {
+  closeButtonWrapper: {
     position: 'absolute',
-    top: 50, // Adjusted for status bar area safe zone approx
+    top: 50,
     right: 20,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  closeIcon: {
-    fontSize: 24,
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  categoryBadge: {
+  categoryBadgeWrapper: {
     position: 'absolute',
     top: 50,
     left: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
+    overflow: 'hidden',
   },
   categoryBadgeText: {
     color: 'white',
@@ -207,38 +255,45 @@ const styles = StyleSheet.create({
   },
   contentCard: {
     flex: 1,
-    backgroundColor: '#1A0E2E', // Dark purple theme
+    backgroundColor: '#1A0E2E',
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
+    marginTop: -32,
+    overflow: 'hidden',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
     paddingHorizontal: THEME.spacing.xl,
     paddingTop: 40,
-    paddingBottom: 30,
-    marginTop: -32, // Negative margin for overlap effect
+    paddingBottom: 20, // Reduced padding
+    flexGrow: 1,
   },
   title: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: COLORS.primary, // Accent color
+    color: COLORS.primary,
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   questionText: {
-    fontSize: 24,
+    fontSize: 22, // Slightly smaller for better fit
     fontWeight: '800',
     color: '#FFFFFF',
-    marginBottom: 24,
-    lineHeight: 32,
+    marginBottom: 20,
+    lineHeight: 28,
   },
   divider: {
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.1)',
-    marginBottom: 24,
+    marginBottom: 20,
   },
   inputLabel: {
     fontSize: 14,
     color: '#B8B8D1',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   inputContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -246,14 +301,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
     paddingHorizontal: 20,
-    paddingVertical: 16,
-    marginBottom: 30, // Space before button
-    minHeight: 120,
+    paddingVertical: 12,
+    marginBottom: 12,
+    minHeight: 80,
   },
   input: {
     fontSize: 16,
     color: '#FFFFFF',
-    height: '100%', // Take full container height
+    minHeight: 60,
   },
   submitButton: {
     backgroundColor: '#FFFFFF',
@@ -261,6 +316,8 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     alignItems: 'center',
     width: '100%',
+    marginTop: 24,
+    marginBottom: 0,
   },
   submitButtonDisabled: {
     opacity: 0.6,

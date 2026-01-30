@@ -5,16 +5,13 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  ActivityIndicator,
   Alert,
   RefreshControl,
   Dimensions,
+  Animated,
   Keyboard,
   Platform,
   KeyboardAvoidingView,
-  LayoutAnimation,
-  UIManager,
-  Animated,
 } from 'react-native';
 import { GradientBackground } from '../../components/common';
 import { DailyQuestionCard, StickyHeader } from '../../components/home';
@@ -29,16 +26,9 @@ import { TrendingGames } from '../../components/games/TrendingGames';
 import { GamesGrid } from '../../components/games/GamesGrid';
 import { GamesStats } from '../../components/games/GamesStats';
 import { GamesSkeleton } from '../../components/loaders';
+import { useKeyboardAnimation } from '../../hooks/useKeyboardAnimation';
 
 const { width } = Dimensions.get('window');
-
-// Enable LayoutAnimation for Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 export const GamesScreen = ({ navigation }: any) => {
   const [categories, setCategories] = useState<GameCategory[]>([]);
@@ -52,59 +42,52 @@ export const GamesScreen = ({ navigation }: any) => {
   const [questionLoading, setQuestionLoading] = useState(true);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
-  // Scroll & Keyboard Handling
+  // Scroll Handling
   const scrollViewRef = useRef<ScrollView>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
   const currentScrollY = useRef(0);
   const restoreScrollY = useRef(0);
 
+  // Custom Animation Hook
+  const {
+    translateY,
+    imageOpacity,
+  } = useKeyboardAnimation({
+    translateYValue: -50,
+  });
+
   useEffect(() => {
     loadData();
   }, []);
 
-  // Keyboard listeners
+  // Keyboard listeners for state
   useEffect(() => {
-    const showEvent =
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent =
-      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
 
-    const onKeyboardShow = () => {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    const onShow = () => {
       setKeyboardVisible(true);
     };
 
-    const onKeyboardHide = () => {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    const onHide = () => {
       setKeyboardVisible(false);
-      // Restore scroll position after keyboard dismiss
-      setTimeout(() => {
-        if (scrollViewRef.current) {
-          scrollViewRef.current.scrollTo({
-            y: 0, // Always scroll to top since Daily Question is the only input and it's at the top
-            animated: true, // Animated true for smooth restoration
-          });
-        }
-      }, 100);
     };
 
-    const keyboardShowListener = Keyboard.addListener(
-      showEvent,
-      onKeyboardShow,
-    );
-    const keyboardHideListener = Keyboard.addListener(
-      hideEvent,
-      onKeyboardHide,
-    );
+    const sub1 = Keyboard.addListener(showEvent, onShow);
+    const sub2 = Keyboard.addListener(hideEvent, onHide);
 
     return () => {
-      keyboardShowListener.remove();
-      keyboardHideListener.remove();
+      sub1.remove();
+      sub2.remove();
     };
   }, []);
 
   const handleInputFocus = () => {
     restoreScrollY.current = currentScrollY.current;
+    // Scroll to top to ensure daily question is in view
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({ y: 0, animated: true });
+    }
   };
 
   const loadData = async (isRefreshAction = false) => {
@@ -112,7 +95,6 @@ export const GamesScreen = ({ navigation }: any) => {
       if (!isRefreshAction) setIsLoading(true);
       setError(null);
 
-      // Load both games and daily question
       const [gamesData, dailyQData] = await Promise.all([
         gamesService.getCategories(),
         questionService.getDailyQuestion().catch(err => {
@@ -139,7 +121,6 @@ export const GamesScreen = ({ navigation }: any) => {
     loadData(true);
   }, []);
 
-  // Refresh only daily question (for after answering)
   const refreshDailyQuestion = async () => {
     try {
       const data = await questionService.getDailyQuestion();
@@ -168,7 +149,6 @@ export const GamesScreen = ({ navigation }: any) => {
     });
   };
 
-  // Loading State
   if (isLoading) {
     return (
       <GradientBackground variant="background">
@@ -177,7 +157,6 @@ export const GamesScreen = ({ navigation }: any) => {
     );
   }
 
-  // Error State
   if (error && categories.length === 0) {
     return (
       <GradientBackground variant="background">
@@ -196,7 +175,6 @@ export const GamesScreen = ({ navigation }: any) => {
     );
   }
 
-  // Empty State
   if (categories.length === 0) {
     return (
       <GradientBackground variant="background">
@@ -227,31 +205,26 @@ export const GamesScreen = ({ navigation }: any) => {
       scrollY={scrollY}
       scrollInputRange={[0, 300]}
     >
-      {/* Sticky Header - Hide when keyboard is visible */}
-      {!isKeyboardVisible && (
-        <StickyHeader hashtag="Games Hub" scrollY={scrollY} />
-      )}
+      {/* Sticky Header */}
+      <Animated.View style={{ opacity: imageOpacity, zIndex: 10 }}>
+        {!isKeyboardVisible && (
+          <StickyHeader hashtag="Games Hub" scrollY={scrollY} />
+        )}
+      </Animated.View>
 
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
-      >
+      {/* Main content with smooth animations - no KeyboardAvoidingView needed */}
+      <Animated.View style={{ flex: 1, transform: [{ translateY }] }}>
         <Animated.ScrollView
           ref={scrollViewRef}
           style={styles.container}
-          contentContainerStyle={
-            isKeyboardVisible
-              ? styles.containerFocused
-              : { paddingBottom: THEME.spacing.xl }
-          }
+          contentContainerStyle={{ paddingBottom: THEME.spacing.xl }}
           showsVerticalScrollIndicator={false}
           scrollEventThrottle={16}
           keyboardShouldPersistTaps="handled"
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
             {
-              useNativeDriver: false, // Changed to false if using layout properties, or strictly keep true if only opacity/transform
+              useNativeDriver: false,
               listener: (event: any) => {
                 currentScrollY.current = event.nativeEvent.contentOffset.y;
               },
@@ -266,10 +239,12 @@ export const GamesScreen = ({ navigation }: any) => {
             />
           }
         >
-          {/* Header - New Component */}
-          {!isKeyboardVisible && <GamesHeader />}
+          {/* Header */}
+          <Animated.View style={{ opacity: imageOpacity }}>
+            <GamesHeader />
+          </Animated.View>
 
-          {/* Daily Question Card - Only show if NOT completed by both */}
+          {/* Daily Question Card */}
           {!isDailyQuestionCompleted && (
             <View style={styles.dailyQuestionContainer}>
               <DailyQuestionCard
@@ -278,39 +253,35 @@ export const GamesScreen = ({ navigation }: any) => {
                 onRefresh={refreshDailyQuestion}
                 showFullContent={false}
                 onInputFocus={handleInputFocus}
+                isKeyboardVisible={isKeyboardVisible}
               />
             </View>
           )}
 
-          {/* Other Content - Hide when keyboard is visible */}
-          {!isKeyboardVisible && (
-            <>
-              {/* Trending Games */}
-              {trendingCategories.length > 0 && (
-                <TrendingGames
-                  games={trendingCategories}
-                  onGamePress={handleGamePress}
-                  onShowAll={() => navigation.navigate('AllGames')}
-                />
-              )}
+          {/* Other Content */}
+          <Animated.View style={{ opacity: imageOpacity }}>
+            {trendingCategories.length > 0 && (
+              <TrendingGames
+                games={trendingCategories}
+                onGamePress={handleGamePress}
+                onShowAll={() => navigation.navigate('AllGames')}
+              />
+            )}
 
-              {/* All Games */}
-              <GamesGrid games={categories} onGamePress={handleGamePress} />
+            <GamesGrid games={categories} onGamePress={handleGamePress} />
 
-              {/* Quote Section */}
-              <View style={styles.quoteContainer}>
-                <Text style={styles.quoteText}>
-                  "Love is not just looking at each other, it's looking in the
-                  same direction... and playing together!"
-                </Text>
-              </View>
+            <View style={styles.quoteContainer}>
+              <Text style={styles.quoteText}>
+                "Love is not just looking at each other, it's looking in the
+                same direction... and playing together!"
+              </Text>
+            </View>
 
-              {/* Bottom Spacer */}
-              <View style={{ height: 100 }} />
-            </>
-          )}
+            <View style={{ height: 100 }} />
+          </Animated.View>
+
         </Animated.ScrollView>
-      </KeyboardAvoidingView>
+      </Animated.View>
     </GradientBackground>
   );
 };
@@ -319,11 +290,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: THEME.spacing.lg,
-  },
-  containerFocused: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingBottom: 250, // Significant padding to push content up from keyboard
   },
   loadingContainer: {
     flex: 1,
@@ -392,6 +358,9 @@ const styles = StyleSheet.create({
   dailyQuestionContainer: {
     marginBottom: 0,
     marginTop: 0,
+    zIndex: 100,
+    elevation: 100,
+    position: 'relative',
   },
   quoteContainer: {
     marginVertical: THEME.spacing.xl,

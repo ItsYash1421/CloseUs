@@ -29,6 +29,7 @@ interface DailyQuestionCardProps {
   onRefresh: () => void;
   showFullContent?: boolean;
   onInputFocus?: () => void;
+  isKeyboardVisible?: boolean;
 }
 
 export const DailyQuestionCard = ({
@@ -37,6 +38,7 @@ export const DailyQuestionCard = ({
   onRefresh,
   showFullContent = false,
   onInputFocus,
+  isKeyboardVisible = false,
 }: DailyQuestionCardProps) => {
   const navigation = useNavigation();
   const user = useAuthStore(state => state.user);
@@ -51,6 +53,7 @@ export const DailyQuestionCard = ({
   // Animation refs
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(-20)).current;
+  const cardTranslateY = useRef(new Animated.Value(0)).current; // Changed from marginTop to translateY
 
   const revealAnswer = () => {
     setRevealed(true);
@@ -104,6 +107,16 @@ export const DailyQuestionCard = ({
     return () => clearInterval(interval);
   }, []);
 
+  // Animate translateY based on keyboard visibility - USING NATIVE DRIVER for performance
+  React.useEffect(() => {
+    Animated.spring(cardTranslateY, {
+      toValue: isKeyboardVisible ? -20 : 0, // Move up 20px when keyboard visible
+      tension: 60,
+      friction: 9,
+      useNativeDriver: true, // CRITICAL: GPU acceleration for smooth 60fps
+    }).start();
+  }, [isKeyboardVisible]);
+
   const handleCancel = () => {
     Keyboard.dismiss();
     setAnswerText('');
@@ -153,7 +166,7 @@ export const DailyQuestionCard = ({
   }
 
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, { transform: [{ translateY: cardTranslateY }] }]}>
       {/* Logo on Top Border */}
       <View style={styles.logoTopContainer}>
         <View style={styles.logoWrapper}>
@@ -325,7 +338,7 @@ export const DailyQuestionCard = ({
           <Text style={styles.errorText}>Could not load today's question.</Text>
         )}
       </View>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -334,6 +347,8 @@ const styles = StyleSheet.create({
     marginTop: -50,
     marginBottom: THEME.spacing.lg,
     position: 'relative',
+    overflow: 'visible',
+    zIndex: 100,
   },
   logoTopContainer: {
     alignItems: 'center',
@@ -357,8 +372,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
     padding: THEME.spacing.lg,
-    paddingTop: 60,
+    paddingTop: 60, // Reduced from 60 to tighten spacing
     position: 'relative',
+    overflow: 'visible',
   },
   timerBadge: {
     position: 'absolute',
