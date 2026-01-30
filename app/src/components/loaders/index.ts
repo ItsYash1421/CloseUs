@@ -1,6 +1,7 @@
-export { GamesSkeleton } from './GamesSkeleton';
-export { HomeSkeleton } from './HomeSkeleton';
-export { ChatSkeleton } from './ChatSkeleton';
-export { JourneySkeleton } from './JourneySkeleton';
-export { QuestionSkeleton } from './QuestionSkeleton';
-export { CategoryQuestionsSkeleton } from './CategoryQuestionsSkeleton';
+export * from './HomeSkeleton';
+export * from './QuestionSkeleton';
+export * from './GamesSkeleton';
+export * from './CategoryQuestionsSkeleton';
+export * from './ChatSkeleton';
+export * from './JourneySkeleton';
+export * from './ProfileSkeleton';

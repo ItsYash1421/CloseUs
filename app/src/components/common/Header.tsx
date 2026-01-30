@@ -12,6 +12,7 @@ import { BlurView } from '@react-native-community/blur';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
 import { BLUR_CONFIG } from '../../constants/blur';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface HeaderProps {
   title: string;
@@ -86,10 +87,14 @@ export const Header: React.FC<HeaderProps> = ({
             {showChat ? (
               <TouchableOpacity onPress={handleChat} style={styles.button}>
                 <View style={styles.chatIconWrapper}>
-                  <Text style={styles.chatIconText}>💬</Text>
-                  <View style={styles.heartBadge}>
+                  <Icon
+                    name="chat-bubble-outline"
+                    size={24}
+                    color={COLORS.white}
+                  />
+                  {/* <View style={styles.heartBadge}>
                     <Text style={styles.heartText}>♥</Text>
-                  </View>
+                  </View> */}
                 </View>
               </TouchableOpacity>
             ) : (

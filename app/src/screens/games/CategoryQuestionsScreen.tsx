@@ -210,7 +210,11 @@ export const CategoryQuestionsScreen = () => {
   }
 
   return (
-    <GradientBackground variant="background" scrollY={scrollY}>
+    <GradientBackground
+      variant="background"
+      scrollY={scrollY}
+      scrollInputRange={[0, 400]}
+    >
       <Header
         title={categoryName}
         showBack
@@ -336,12 +340,25 @@ export const CategoryQuestionsScreen = () => {
           )}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
+              <Text style={styles.emptyTitle}>
+                {activeTab === 'available' ? 'All Caught Up!' : 'No History'}
+              </Text>
               <Text style={styles.emptyText}>
                 {activeTab === 'available'
-                  ? "You've answered all questions!"
-                  : 'No answered questions yet.'}
+                  ? 'New Questions will be coming soon'
+                  : 'No question completed yet'}
               </Text>
             </View>
+          }
+          ListFooterComponent={
+            activeTab === 'available' && filteredQuestions.length > 0 ? (
+              <View style={styles.quoteContainer}>
+                <Text style={styles.quoteText}>
+                  "True intimacy is built on deep understanding. Discover where
+                  your hearts align, one question at a time."
+                </Text>
+              </View>
+            ) : null
           }
         />
       </View>
@@ -540,10 +557,33 @@ const styles = StyleSheet.create({
   emptyContainer: {
     alignItems: 'center',
     padding: 40,
+    marginTop: 40,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.white,
+    marginBottom: 8,
+    textAlign: 'center',
   },
   emptyText: {
     color: COLORS.textSecondary,
-    fontSize: 16,
+    fontSize: 14,
     textAlign: 'center',
+    lineHeight: 20,
+  },
+  quoteContainer: {
+    paddingVertical: 32,
+    paddingHorizontal: 24,
+    opacity: 0.8,
+  },
+  quoteText: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    fontWeight: '400',
+    letterSpacing: 0.3,
   },
 });
