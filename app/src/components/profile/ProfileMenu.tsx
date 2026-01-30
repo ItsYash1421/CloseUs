@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/text';
 import THEME from '../../constants/theme';
 import {
   EditProfileSheet,
@@ -114,6 +115,7 @@ const styles = StyleSheet.create({
     marginTop: 32, // mt-8
   },
   sectionTitle: {
+    fontFamily: FONTS.headers,
     fontSize: 12, // text-xs
     fontWeight: '700', // font-bold
     color: COLORS.profileSectionTitle, // White section title
@@ -147,6 +149,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menuTitle: {
+    fontFamily: FONTS.profile.menuItem,
     fontSize: 16, // text-base
     fontWeight: '500', // font-medium
     color: COLORS.zinc50, // text-text-primary

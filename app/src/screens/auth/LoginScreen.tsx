@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import { GradientBackground, Button } from '../../components/common';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/text';
 import THEME from '../../constants/theme';
 import { useAuthStore } from '../../store/authStore';
 import { getErrorMessage } from '../../utils/errorHandler';
@@ -85,6 +86,7 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.xl,
   },
   title: {
+    fontFamily: FONTS.auth.title,
     fontSize: THEME.fontSizes.xxxl,
     fontWeight: THEME.fontWeights.bold,
     color: COLORS.white,
@@ -92,6 +94,7 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.md,
   },
   subtitle: {
+    fontFamily: FONTS.onboarding.subtitle,
     fontSize: THEME.fontSizes.md,
     color: COLORS.textSecondary,
     textAlign: 'center',

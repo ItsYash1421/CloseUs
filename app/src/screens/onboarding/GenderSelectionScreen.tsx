@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { GradientBackground } from '../../components/common';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/text';
 import THEME from '../../constants/theme';
 import { useOnboardingStore } from '../../store/onboardingStore';
 
@@ -115,6 +116,7 @@ const styles = StyleSheet.create({
     paddingTop: THEME.spacing.xxl,
   },
   title: {
+    fontFamily: FONTS.onboarding.title,
     fontSize: THEME.fontSizes.xxxl,
     fontWeight: THEME.fontWeights.bold,
     color: COLORS.white,
@@ -122,6 +124,7 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.md,
   },
   subtitle: {
+    fontFamily: FONTS.onboarding.subtitle,
     fontSize: THEME.fontSizes.md,
     color: COLORS.textSecondary,
     textAlign: 'center',
@@ -153,6 +156,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
   },
   optionLabel: {
+    fontFamily: FONTS.onboarding.button,
     fontSize: THEME.fontSizes.lg,
     fontWeight: THEME.fontWeights.semibold,
     color: COLORS.white,
@@ -174,6 +178,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   nextButtonText: {
+    fontFamily: FONTS.buttons,
     fontSize: THEME.fontSizes.md,
     fontWeight: THEME.fontWeights.semibold,
     color: '#1F1F1F',

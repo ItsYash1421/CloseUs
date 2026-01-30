@@ -21,6 +21,7 @@ import { Spinner } from '../../components/common';
 import gamesService from '../../services/gamesService';
 import THEME from '../../constants/theme';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/text';
 import { RootStackParamList } from '../../types';
 import { BlurView } from '@react-native-community/blur';
 import { BLUR_CONFIG } from '../../constants/blur';
@@ -261,9 +262,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   categoryBadgeText: {
+    fontFamily: FONTS.hashtags,
+    // ...TEXT_STYLES.hashtag,
     color: 'white',
-    fontWeight: 'bold',
     fontSize: 12,
+    fontWeight: THEME.fontWeights.bold,
   },
   contentCard: {
     flex: 1,
@@ -283,19 +286,24 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   title: {
+    fontFamily: FONTS.games.stats, // Using stats/label-like font
+    // ...TEXT_STYLES.hashtag,
     fontSize: 14,
-    fontWeight: 'bold',
     color: COLORS.primary,
     marginBottom: 8,
-    textTransform: 'uppercase',
     letterSpacing: 1,
+    fontWeight: THEME.fontWeights.bold,
+    textTransform: 'uppercase',
   },
   questionText: {
-    fontSize: 22, // Slightly smaller for better fit
-    fontWeight: '800',
-    color: '#FFFFFF',
+    fontFamily: FONTS.games.question,
+    // ...TEXT_STYLES.questionBig,
+    fontSize: 22,
     marginBottom: 20,
     lineHeight: 28,
+    fontWeight: THEME.fontWeights.bold,
+    color: COLORS.white,
+    textAlign: 'center',
   },
   divider: {
     height: 1,
@@ -303,9 +311,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   inputLabel: {
+    fontFamily: FONTS.headers,
+    // ...TEXT_STYLES.label,
     fontSize: 14,
     color: '#B8B8D1',
     marginBottom: 10,
+    textTransform: 'none',
+    fontWeight: THEME.fontWeights.semibold,
+    letterSpacing: 0.5,
   },
   inputContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -318,9 +331,12 @@ const styles = StyleSheet.create({
     minHeight: 80,
   },
   input: {
+    fontFamily: FONTS.games.answer,
+    // ...TEXT_STYLES.body,
     fontSize: 16,
     color: '#FFFFFF',
     minHeight: 60,
+    lineHeight: 24,
   },
   submitButton: {
     backgroundColor: '#FFFFFF',
@@ -335,8 +351,13 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   submitButtonText: {
+    fontFamily: FONTS.buttons,
+    // ...TEXT_STYLES.label,
     fontSize: 16,
-    fontWeight: 'bold',
     color: '#000000',
+    marginBottom: 0,
+    textTransform: 'none',
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
 });

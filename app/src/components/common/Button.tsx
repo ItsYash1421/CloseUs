@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { COLORS, GRADIENTS } from '../../constants/colors';
+import { FONTS } from '../../constants/text';
 import THEME from '../../constants/theme';
 
 interface ButtonProps {
@@ -130,6 +131,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   text: {
+    fontFamily: FONTS.buttons,
     color: COLORS.white,
     fontWeight: THEME.fontWeights.semibold,
   },

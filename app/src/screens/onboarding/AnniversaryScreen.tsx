@@ -13,6 +13,7 @@ import {
 import { TouchableOpacity } from 'react-native';
 import { GradientBackground, Spinner } from '../../components/common';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/text';
 import THEME from '../../constants/theme';
 import { useOnboardingStore } from '../../store/onboardingStore';
 import { useAuthStore } from '../../store/authStore';
@@ -487,7 +488,7 @@ export const AnniversaryScreen = ({ navigation }: any) => {
               style={[
                 styles.nextButton,
                 (!day || !month || !year || !partnerName || loading) &&
-                  styles.nextButtonDisabled,
+                styles.nextButtonDisabled,
               ]}
               onPress={handleContinue}
               disabled={!day || !month || !year || !partnerName || loading}
@@ -530,6 +531,7 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.xl,
   },
   title: {
+    fontFamily: FONTS.onboarding.title,
     fontSize: THEME.fontSizes.xxxl,
     fontWeight: THEME.fontWeights.bold,
     color: COLORS.white,
@@ -537,6 +539,7 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.sm,
   },
   subtitle: {
+    fontFamily: FONTS.onboarding.subtitle,
     fontSize: THEME.fontSizes.md,
     color: COLORS.textSecondary,
     textAlign: 'center',
@@ -556,12 +559,14 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.lg,
   },
   inputLabel: {
+    fontFamily: FONTS.auth.label,
     fontSize: THEME.fontSizes.md,
     fontWeight: THEME.fontWeights.semibold,
     color: COLORS.white,
     marginBottom: THEME.spacing.sm,
   },
   textInput: {
+    fontFamily: FONTS.auth.input,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: THEME.borderRadius.md,
     borderWidth: 1,
@@ -591,11 +596,13 @@ const styles = StyleSheet.create({
     padding: THEME.spacing.md,
   },
   dateInput: {
+    fontFamily: FONTS.auth.input,
     fontSize: THEME.fontSizes.md,
     color: COLORS.white,
     textAlign: 'center',
   },
   note: {
+    fontFamily: FONTS.onboarding.subtitle,
     fontSize: THEME.fontSizes.sm,
     color: COLORS.textSecondary,
     textAlign: 'center',
@@ -619,6 +626,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   nextButtonText: {
+    fontFamily: FONTS.buttons,
     fontSize: THEME.fontSizes.md,
     fontWeight: THEME.fontWeights.semibold,
     color: '#1F1F1F',

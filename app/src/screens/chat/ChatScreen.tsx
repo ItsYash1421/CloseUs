@@ -12,6 +12,7 @@ import {
 import { GradientBackground, Avatar, Header } from '../../components/common';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
+import { FONTS } from '../../constants/text';
 import { useChatStore } from '../../store/chatStore';
 import { useAuthStore } from '../../store/authStore';
 import { Message } from '../../types';
@@ -149,6 +150,7 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.border,
   },
   headerTitle: {
+    fontFamily: FONTS.chat.headerTitle,
     fontSize: THEME.fontSizes.xxl,
     fontWeight: THEME.fontWeights.bold,
     color: COLORS.white,
@@ -165,6 +167,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   statusText: {
+    fontFamily: FONTS.chat.timestamp, // Using timestamp/caption font
     fontSize: THEME.fontSizes.xs,
     color: COLORS.textSecondary,
   },
@@ -189,11 +192,13 @@ const styles = StyleSheet.create({
     borderColor: COLORS.glassBorder,
   },
   messageText: {
+    fontFamily: FONTS.chat.messageBody,
     fontSize: THEME.fontSizes.md,
     color: COLORS.white,
     marginBottom: THEME.spacing.xs,
   },
   messageTime: {
+    fontFamily: FONTS.chat.timestamp,
     fontSize: THEME.fontSizes.xs,
     color: COLORS.textSecondary,
     alignSelf: 'flex-end',
@@ -202,6 +207,7 @@ const styles = StyleSheet.create({
     padding: THEME.spacing.md,
   },
   typingText: {
+    fontFamily: FONTS.chat.timestamp,
     fontSize: THEME.fontSizes.sm,
     color: COLORS.textSecondary,
     fontStyle: 'italic',
@@ -233,6 +239,7 @@ const styles = StyleSheet.create({
     fontSize: THEME.fontSizes.md,
     color: COLORS.white,
     maxHeight: 100,
+    fontFamily: FONTS.chat.input,
   },
   sendButton: {
     width: 40,
