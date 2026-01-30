@@ -2,24 +2,30 @@ import apiClient from './apiClient';
 import { Message, ApiResponse, PaginatedResponse } from '../types';
 
 class ChatService {
-  async getMessages(
-    page: number = 1,
-    limit: number = 50,
-  ): Promise<PaginatedResponse<Message>> {
+  // Get latest 10 messages for initial load
+  async getRecentMessages(): Promise<Message[]> {
     const response = await apiClient.get<ApiResponse<{ messages: Message[] }>>(
-      `/api/chat/messages?limit=${limit}${page > 1 ? `&before=${new Date().toISOString()}` : ''}`,
-      // Note: Pagination needs cursor, passing simplified for now
+      '/api/chat/messages/recent',
+    );
+    return (response.data as any).messages || [];
+  }
+
+  // Get older messages with cursor-based pagination
+  async getOlderMessages(
+    before: string,
+    limit: number = 20,
+  ): Promise<PaginatedResponse<Message>> {
+    const response = await apiClient.get<ApiResponse<{ messages: Message[], hasMore: boolean }>>(
+      `/api/chat/messages/older?before=${before}&limit=${limit}`,
     );
 
-    const messages = (response.data as any).messages || [];
-
-    // Construct PaginatedResponse
+    const data = response.data as any;
     return {
-      data: messages,
-      page: page,
+      data: data.messages || [],
+      page: 1,
       limit: limit,
-      total: 0, // Not returned by backend
-      hasMore: messages.length === limit,
+      total: 0,
+      hasMore: data.hasMore || false,
     };
   }
 

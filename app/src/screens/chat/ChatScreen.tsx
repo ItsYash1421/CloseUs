@@ -4,138 +4,179 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  TextInput,
-  TouchableOpacity,
-  KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { GradientBackground, Avatar, Header } from '../../components/common';
-import { COLORS } from '../../constants/colors';
+import { GradientBackground } from '../../components/common';
+import { ChatHeader } from '../../components/chat/ChatHeader';
+import { MessageBubble } from '../../components/chat/MessageBubble';
+import { ChatInput } from '../../components/chat/ChatInput';
 import THEME from '../../constants/theme';
-import { FONTS } from '../../constants/text';
 import { useChatStore } from '../../store/chatStore';
 import { useAuthStore } from '../../store/authStore';
+import { useCoupleStore } from '../../store/coupleStore';
 import { Message } from '../../types';
-import { format } from 'date-fns';
 import notificationService from '../../services/notificationService';
 import reminderService from '../../services/reminderService';
+import { setKeyboardMode } from '../../utils/keyboardMode';
 
 export const ChatScreen = () => {
   const [inputText, setInputText] = useState('');
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const user = useAuthStore(state => state.user);
+  const { partner, partnerIsOnline } = useCoupleStore();
   const {
     messages,
     isTyping,
     isConnected,
+    hasMore,
+    page,
     loadMessages,
     sendTextMessage,
     connectSocket,
   } = useChatStore();
 
   useEffect(() => {
-    loadMessages();
+    // Set keyboard mode to adjustResize for chat screen
+    setKeyboardMode('adjustResize');
+
+    // Don't await - let screen render immediately
+    loadMessages(1);
     connectSocket();
 
     // Clear badge and cancel inactivity reminder when viewing chat
     notificationService.clearBadge();
     reminderService.cancelInactivityReminder();
+
+    // Reset to adjustPan when leaving chat screen
+    return () => {
+      setKeyboardMode('adjustPan');
+    };
   }, []);
 
-  const handleSend = () => {
-    if (inputText.trim()) {
-      sendTextMessage(inputText.trim());
-      setInputText('');
+  const handleLoadMore = async () => {
+    if (isLoadingMore || !hasMore) return;
+
+    setIsLoadingMore(true);
+    try {
+      await loadMessages(page + 1);
+    } finally {
+      setIsLoadingMore(false);
     }
   };
 
-  const renderMessage = ({ item }: { item: Message }) => {
-    const isMe = item.senderId === user?._id;
+  const handleSend = () => {
+    const textToSend = inputText.trim();
+    if (textToSend) {
+      // 1. Clear input immediately for instant UI feedback
+      setInputText('');
+
+      // 2. Schedule the heavy lifting (store update/socket) for the next frame
+      // This prevents the keypress/touch from dropping a frame due to synchronous storage/logic
+      requestAnimationFrame(() => {
+        sendTextMessage(textToSend);
+      });
+    }
+  };
+
+  const renderMessage = ({ item, index }: { item: Message; index: number }) => {
+    console.log('Message:', {
+      messageId: item._id,
+      senderId: item.senderId,
+      userId: user?._id,
+      isMe: item.senderId === user?._id
+    });
+
+    // Handle both populated senderId (object) and non-populated (string)
+    const senderId = typeof item.senderId === 'string'
+      ? item.senderId
+      : (item.senderId as any)?._id || (item.senderId as any)?.id;
+
+    const isMe = senderId === user?._id;
+
+    // Show avatar with every message
+    const showAvatar = true;
+
+    // For INVERTED FlatList:
+    // - Index 0 = Newest message (bottom of screen)
+    // - Index - 1 = Previous message (below current on screen, newer in time)
+    // Show time only if:
+    // 1. It's the newest message (index === 0), OR
+    // 2. Previous message (index - 1) is from different sender, OR
+    // 3. Previous message is more than 1 minute apart
+    const prevMessage = index > 0 ? messages[index - 1] : null;
+    const showTime = !prevMessage ||
+      (typeof prevMessage.senderId === 'string'
+        ? prevMessage.senderId
+        : (prevMessage.senderId as any)?._id || (prevMessage.senderId as any)?.id) !== senderId ||
+      (new Date(item.createdAt).getTime() - new Date(prevMessage.createdAt).getTime()) > 60000;
+
     return (
-      <View
-        style={[
-          styles.messageBubble,
-          isMe ? styles.myMessage : styles.partnerMessage,
-        ]}
-      >
-        <Text style={styles.messageText}>{item.content}</Text>
-        <Text style={styles.messageTime}>
-          {format(new Date(item.createdAt), 'HH:mm')}
-        </Text>
-      </View>
+      <MessageBubble
+        message={item}
+        isMe={isMe}
+        showAvatar={showAvatar}
+        showTime={showTime}
+        partner={partner}
+        currentUser={user}
+      />
     );
   };
 
   return (
     <GradientBackground variant="background">
-      <Header title="Chat" showChat={false} />
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
-      >
-        {/* Connection Status */}
-        <View
-          style={[
-            styles.connectionStatus,
-            { padding: THEME.spacing.sm, justifyContent: 'center' },
-          ]}
-        >
-          <View
-            style={[
-              styles.statusDot,
-              { backgroundColor: isConnected ? COLORS.success : COLORS.error },
-            ]}
-          />
-          <Text style={styles.statusText}>
-            {isConnected ? 'Connected' : 'Connecting...'}
-          </Text>
-        </View>
+      <ChatHeader
+        user={user}
+        partner={partner}
+        isOnline={partnerIsOnline}
+        isConnected={isConnected}
+      />
 
-        {/* Messages */}
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          renderItem={renderMessage}
-          keyExtractor={item => item._id}
-          contentContainerStyle={styles.messagesList}
-          onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
-          showsVerticalScrollIndicator={false}
-        />
+      <View style={styles.container}>
+        {/* Loading State - Show loader during initial load */}
+        {messages.length === 0 && isConnected === false ? (
+          <View style={styles.centerLoader}>
+            <Text style={styles.loadingText}>Loading messages...</Text>
+          </View>
+        ) : (
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            renderItem={renderMessage}
+            keyExtractor={(item, index) => `${item._id}-${index}`}
+            contentContainerStyle={styles.messagesList}
+            showsVerticalScrollIndicator={false}
+            inverted={true}
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.1}
+            ListFooterComponent={
+              isLoadingMore ? (
+                <View style={styles.loadingMore}>
+                  <Text style={styles.loadingText}>Loading...</Text>
+                </View>
+              ) : null
+            }
+          />
+        )}
 
         {/* Typing Indicator */}
         {isTyping && (
           <View style={styles.typingContainer}>
-            <Text style={styles.typingText}>Partner is typing...</Text>
+            <Text style={styles.typingText}>
+              {partner?.name || 'Partner'} is typing...
+            </Text>
           </View>
         )}
+      </View>
 
-        {/* Input */}
-        <View style={styles.inputContainer}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Text style={styles.iconButtonText}>📷</Text>
-          </TouchableOpacity>
-          <TextInput
-            style={styles.input}
-            placeholder="Type a message..."
-            placeholderTextColor={COLORS.textMuted}
-            value={inputText}
-            onChangeText={setInputText}
-            multiline
-            maxLength={500}
-          />
-          <TouchableOpacity
-            style={[
-              styles.sendButton,
-              !inputText.trim() && styles.sendButtonDisabled,
-            ]}
-            onPress={handleSend}
-            disabled={!inputText.trim()}
-          >
-            <Text style={styles.sendButtonText}>➤</Text>
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
+      {/* Chat Input */}
+      <ChatInput
+        value={inputText}
+        onChangeText={setInputText}
+        onSend={handleSend}
+        placeholder="Type a message..."
+        maxLength={500}
+      />
     </GradientBackground>
   );
 };
@@ -144,116 +185,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    padding: THEME.spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  headerTitle: {
-    fontFamily: FONTS.chat.headerTitle,
-    fontSize: THEME.fontSizes.xxl,
-    fontWeight: THEME.fontWeights.bold,
-    color: COLORS.white,
-    marginBottom: THEME.spacing.xs,
-  },
-  connectionStatus: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: THEME.spacing.xs,
-  },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  statusText: {
-    fontFamily: FONTS.chat.timestamp, // Using timestamp/caption font
-    fontSize: THEME.fontSizes.xs,
-    color: COLORS.textSecondary,
-  },
   messagesList: {
-    padding: THEME.spacing.lg,
-    gap: THEME.spacing.sm,
-  },
-  messageBubble: {
-    maxWidth: '75%',
-    padding: THEME.spacing.md,
-    borderRadius: THEME.borderRadius.lg,
-    marginBottom: THEME.spacing.xs,
-  },
-  myMessage: {
-    alignSelf: 'flex-end',
-    backgroundColor: COLORS.primary,
-  },
-  partnerMessage: {
-    alignSelf: 'flex-start',
-    backgroundColor: COLORS.glass,
-    borderWidth: 1,
-    borderColor: COLORS.glassBorder,
-  },
-  messageText: {
-    fontFamily: FONTS.chat.messageBody,
-    fontSize: THEME.fontSizes.md,
-    color: COLORS.white,
-    marginBottom: THEME.spacing.xs,
-  },
-  messageTime: {
-    fontFamily: FONTS.chat.timestamp,
-    fontSize: THEME.fontSizes.xs,
-    color: COLORS.textSecondary,
-    alignSelf: 'flex-end',
+    paddingHorizontal: THEME.spacing.md,
+    paddingTop: 80,
+    paddingBottom: 20,
+    gap: 2,
   },
   typingContainer: {
-    padding: THEME.spacing.md,
+    paddingHorizontal: THEME.spacing.lg,
+    paddingVertical: THEME.spacing.sm,
   },
   typingText: {
-    fontFamily: FONTS.chat.timestamp,
     fontSize: THEME.fontSizes.sm,
-    color: COLORS.textSecondary,
+    color: 'rgba(255, 255, 255, 0.6)',
     fontStyle: 'italic',
   },
-  inputContainer: {
-    flexDirection: 'row',
+  loadingMore: {
+    paddingVertical: 16,
     alignItems: 'center',
-    padding: THEME.spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-    backgroundColor: COLORS.backgroundCard,
-    gap: THEME.spacing.sm,
   },
-  iconButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+  loadingText: {
+    color: 'rgba(255, 255, 255, 0.5)',
+    fontSize: THEME.fontSizes.sm,
   },
-  iconButtonText: {
-    fontSize: 24,
-  },
-  input: {
+  centerLoader: {
     flex: 1,
-    backgroundColor: COLORS.glass,
-    borderRadius: THEME.borderRadius.lg,
-    paddingHorizontal: THEME.spacing.md,
-    paddingVertical: THEME.spacing.sm,
-    fontSize: THEME.fontSizes.md,
-    color: COLORS.white,
-    maxHeight: 100,
-    fontFamily: FONTS.chat.input,
-  },
-  sendButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
     justifyContent: 'center',
-  },
-  sendButtonDisabled: {
-    opacity: 0.5,
-  },
-  sendButtonText: {
-    fontSize: 20,
-    color: COLORS.white,
+    alignItems: 'center',
   },
 });

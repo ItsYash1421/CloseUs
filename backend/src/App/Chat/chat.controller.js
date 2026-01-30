@@ -41,12 +41,11 @@ const sendMessage = async (req, res) => {
 };
 
 // ------------------------------------------------------------------
-// Get Message History
+// Get Recent Messages (Latest 10 only - for initial load)
 // ------------------------------------------------------------------
-const getMessages = async (req, res) => {
+const getRecentMessages = async (req, res) => {
     try {
         const userId = req.userId;
-        const { limit = 50, before } = req.query;
 
         const couple = await Couple.findOne({
             $or: [{ partner1Id: userId }, { partner2Id: userId }],
@@ -57,19 +56,55 @@ const getMessages = async (req, res) => {
             return res.status(404).json(errorResponse('Couple not found', 404));
         }
 
-        const query = { coupleId: couple._id };
-        if (before) {
-            query.createdAt = { $lt: new Date(before) };
+        // Get only the latest 10 messages
+        const messages = await Message.find({ coupleId: couple._id })
+            .sort({ createdAt: -1 })
+            .limit(10)
+            .populate('senderId', 'name photoUrl gender isOnline');
+
+        res.json(successResponse({ messages }, 'Recent messages retrieved'));
+    } catch (error) {
+        console.error('Get recent messages error:', error);
+        res.status(500).json(errorResponse('Internal server error'));
+    }
+};
+
+// ------------------------------------------------------------------
+// Get Older Messages (Cursor-based pagination for infinite scroll)
+// ------------------------------------------------------------------
+const getOlderMessages = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { before, limit = 20 } = req.query;
+
+        if (!before) {
+            return res.status(400).json(errorResponse('before timestamp required', 400));
         }
 
-        const messages = await Message.find(query)
+        const couple = await Couple.findOne({
+            $or: [{ partner1Id: userId }, { partner2Id: userId }],
+            isActive: true,
+        });
+
+        if (!couple) {
+            return res.status(404).json(errorResponse('Couple not found', 404));
+        }
+
+        // Get messages older than the 'before' timestamp
+        const messages = await Message.find({
+            coupleId: couple._id,
+            createdAt: { $lt: new Date(before) }
+        })
             .sort({ createdAt: -1 })
             .limit(parseInt(limit))
-            .populate('senderId', 'name photoUrl');
+            .populate('senderId', 'name photoUrl gender isOnline');
 
-        res.json(successResponse({ messages }, 'Messages retrieved'));
+        res.json(successResponse({
+            messages,
+            hasMore: messages.length === parseInt(limit)
+        }, 'Older messages retrieved'));
     } catch (error) {
-        console.error('Get messages error:', error);
+        console.error('Get older messages error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
@@ -96,6 +131,7 @@ const markAsRead = async (req, res) => {
 
 module.exports = {
     sendMessage,
-    getMessages,
+    getRecentMessages,
+    getOlderMessages,
     markAsRead,
 };

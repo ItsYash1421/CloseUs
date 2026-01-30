@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -87,8 +87,41 @@ export const CustomTabBar: React.FC<TabBarProps> = ({
   navigation,
 }) => {
   const insets = useSafeAreaInsets();
+  const translateY = useRef(new Animated.Value(0)).current;
+  const opacity = useRef(new Animated.Value(1)).current;
 
-  // Hide tab bar on Chat screen
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const onShow = (e: any) => {
+      // Just fade out instantly, no movement
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 0,
+        useNativeDriver: true,
+      }).start();
+    };
+
+    const onHide = () => {
+      // Fade in smoothly
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
+    };
+
+    const showListener = Keyboard.addListener(showEvent, onShow);
+    const hideListener = Keyboard.addListener(hideEvent, onHide);
+
+    return () => {
+      showListener.remove();
+      hideListener.remove();
+    };
+  }, [insets.bottom]);
+
+  // Hide tab bar only on Chat screen
   const currentRoute = state.routes[state.index];
   if (currentRoute.name === 'Chat') {
     return null;
@@ -112,11 +145,12 @@ export const CustomTabBar: React.FC<TabBarProps> = ({
   };
 
   return (
-    <View
+    <Animated.View
       style={[
         styles.wrapper,
         {
           paddingBottom: insets.bottom + 10,
+          opacity,
         },
       ]}
     >
@@ -172,7 +206,7 @@ export const CustomTabBar: React.FC<TabBarProps> = ({
           })}
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -185,7 +219,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent',
-    pointerEvents: 'box-none', // Allow touches to pass through wrapper
+    pointerEvents: 'box-none',
+    zIndex: 9999,
   },
   container: {
     width: TAB_BAR_WIDTH,
@@ -196,8 +231,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 16,
-    elevation: 16,
-    pointerEvents: 'auto', // Tab bar itself should handle touches
+    elevation: 999,
+    pointerEvents: 'auto',
   },
   tintOverlay: {
     position: 'absolute',
