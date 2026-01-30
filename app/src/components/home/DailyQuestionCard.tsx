@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
+import { FONTS } from '../../constants/text';
 import { BlurView } from '@react-native-community/blur';
 import { BLUR_CONFIG } from '../../constants/blur';
 import questionService, {
@@ -393,10 +394,13 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   timerText: {
+    fontFamily: FONTS.games.timer,
+    // ...TEXT_STYLES.label,
     fontSize: 13,
-    fontWeight: '700',
     color: COLORS.white,
     letterSpacing: 0.3,
+    marginBottom: 0,
+    fontWeight: THEME.fontWeights.semibold,
   },
   dailyBadge: {
     backgroundColor: '#1A1A2E',
@@ -409,18 +413,22 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.md,
   },
   dailyBadgeText: {
+    fontFamily: FONTS.hashtags,
+    // ...TEXT_STYLES.hashtag,
     fontSize: 11,
-    fontWeight: '700',
     color: COLORS.white,
     letterSpacing: 0.5,
+    fontWeight: THEME.fontWeights.bold,
   },
   dailyQuestion: {
+    fontFamily: FONTS.home.dailyQuestion,
+    // ...TEXT_STYLES.questionBig,
     fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.white,
     lineHeight: 26,
     marginBottom: THEME.spacing.lg,
+    fontWeight: THEME.fontWeights.bold,
     textAlign: 'center',
+    color: COLORS.white,
   },
   answerButton: {
     backgroundColor: COLORS.white,
@@ -434,6 +442,8 @@ const styles = StyleSheet.create({
   },
 
   answerButtonText: {
+    fontFamily: FONTS.buttons,
+    // ...TEXT_STYLES.name,
     fontSize: 16,
     fontWeight: '700',
     color: COLORS.black,
@@ -462,22 +472,30 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   answerLabel: {
-    fontSize: THEME.fontSizes.sm,
+    fontFamily: FONTS.names,
+    // ...TEXT_STYLES.nameSmall,
     color: COLORS.primary,
     marginBottom: 6,
     fontWeight: '700',
+    fontSize: THEME.fontSizes.sm,
   },
   answerText: {
-    fontSize: THEME.fontSizes.md,
+    fontFamily: FONTS.games.answer,
+    // ...TEXT_STYLES.body,
     color: COLORS.white,
     lineHeight: 22,
+    fontSize: THEME.fontSizes.md,
   },
   waitingText: {
+    fontFamily: FONTS.body,
+    // ...TEXT_STYLES.body,
     fontSize: THEME.fontSizes.sm,
     color: COLORS.textSecondary,
     fontStyle: 'italic',
   },
   partnerAnswerHint: {
+    fontFamily: FONTS.body,
+    // ...TEXT_STYLES.body,
     fontSize: THEME.fontSizes.sm,
     color: COLORS.textSecondary,
     fontStyle: 'italic',
@@ -503,6 +521,7 @@ const styles = StyleSheet.create({
     minHeight: 80,
     textAlignVertical: 'top',
     backgroundColor: 'transparent',
+    fontFamily: FONTS.home.dailyQuestion,
   },
   buttonRow: {
     flexDirection: 'row',
@@ -521,16 +540,26 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   cancelButtonText: {
+    fontFamily: FONTS.buttons,
+    // ...TEXT_STYLES.label,
     color: COLORS.white,
     fontWeight: '600',
     fontSize: THEME.fontSizes.sm,
+    marginBottom: 0,
+    textTransform: 'none',
   },
   submitButtonText: {
+    fontFamily: FONTS.buttons,
+    // ...TEXT_STYLES.label,
     color: COLORS.black,
     fontWeight: '700',
     fontSize: THEME.fontSizes.sm,
+    marginBottom: 0,
+    textTransform: 'none',
   },
   errorText: {
+    fontFamily: FONTS.body,
+    // ...TEXT_STYLES.body,
     color: COLORS.error,
     textAlign: 'center',
     fontSize: THEME.fontSizes.md,

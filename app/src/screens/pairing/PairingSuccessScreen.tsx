@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { GradientBackground, Button } from '../../components/common';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/text';
 import THEME from '../../constants/theme';
 import { useCoupleStore } from '../../store/coupleStore';
 
@@ -108,6 +109,7 @@ const styles = StyleSheet.create({
     fontSize: 120,
   },
   title: {
+    fontFamily: FONTS.pairing.title,
     fontSize: THEME.fontSizes.huge,
     fontWeight: THEME.fontWeights.bold,
     color: COLORS.white,
@@ -115,6 +117,7 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.sm,
   },
   subtitle: {
+    fontFamily: FONTS.pairing.instruction,
     fontSize: THEME.fontSizes.lg,
     color: COLORS.textSecondary,
     textAlign: 'center',
@@ -125,11 +128,13 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.xxl,
   },
   tagLabel: {
+    fontFamily: FONTS.pairing.instruction,
     fontSize: THEME.fontSizes.sm,
     color: COLORS.textSecondary,
     marginBottom: THEME.spacing.xs,
   },
   tag: {
+    fontFamily: FONTS.pairing.title,
     fontSize: THEME.fontSizes.xxxl,
     fontWeight: THEME.fontWeights.bold,
     color: COLORS.primary,
@@ -146,6 +151,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   featureText: {
+    fontFamily: FONTS.medium,
     fontSize: THEME.fontSizes.md,
     color: COLORS.white,
     fontWeight: THEME.fontWeights.medium,

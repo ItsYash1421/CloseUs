@@ -15,6 +15,7 @@ import {
 import FastImage from 'react-native-fast-image';
 import { GradientBackground } from '../../components/common';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/text';
 import THEME from '../../constants/theme';
 import { useCoupleStore } from '../../store/coupleStore';
 import { useAuthStore } from '../../store/authStore';
@@ -243,7 +244,7 @@ export const CreateKeyScreen = ({ navigation }: any) => {
             <Text style={styles.gotKeyText}>Got a Key?</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={() => { }}>
             <Text style={styles.whyPairText}>Why to Pair?</Text>
           </TouchableOpacity>
         </View>
@@ -263,6 +264,7 @@ const styles = StyleSheet.create({
     paddingBottom: THEME.spacing.xl,
   },
   infoText: {
+    fontFamily: FONTS.pairing.instruction,
     fontSize: THEME.fontSizes.xs,
     color: '#666',
     textAlign: 'center',
@@ -289,11 +291,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   badgeText: {
+    fontFamily: FONTS.bold,
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
   },
   title: {
+    fontFamily: FONTS.pairing.title,
     fontSize: 24,
     fontWeight: '800',
     color: '#1A1A1A',
@@ -310,10 +314,12 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   keyLabel: {
+    fontFamily: FONTS.pairing.instruction,
     fontSize: THEME.fontSizes.sm,
     color: '#666',
   },
   keyValue: {
+    fontFamily: FONTS.pairing.code,
     fontSize: THEME.fontSizes.lg,
     fontWeight: 'bold',
     color: '#FF6B9D',
@@ -329,11 +335,13 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   refreshText: {
+    fontFamily: FONTS.buttons,
     fontSize: THEME.fontSizes.xs,
     color: COLORS.textMuted,
     textDecorationLine: 'underline',
   },
   attemptsText: {
+    fontFamily: FONTS.body,
     fontSize: THEME.fontSizes.xs,
     color: COLORS.textMuted,
     marginTop: 4,
@@ -365,6 +373,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   shareLabel: {
+    fontFamily: FONTS.buttons,
     fontSize: THEME.fontSizes.xs,
     color: '#666',
     marginTop: 6,
@@ -381,6 +390,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   orText: {
+    fontFamily: FONTS.bold,
     fontSize: THEME.fontSizes.md,
     color: '#FFFFFF',
     marginBottom: THEME.spacing.md,
@@ -393,11 +403,13 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.md,
   },
   gotKeyText: {
+    fontFamily: FONTS.buttons,
     fontSize: THEME.fontSizes.md,
     fontWeight: '600',
     color: '#1A1A1A',
   },
   whyPairText: {
+    fontFamily: FONTS.body,
     fontSize: THEME.fontSizes.sm,
     color: '#FFFFFF',
     textDecorationLine: 'underline',

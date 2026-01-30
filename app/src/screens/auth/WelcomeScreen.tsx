@@ -10,6 +10,7 @@ import {
 import Toast from 'react-native-toast-message';
 import { GradientBackground, Button } from '../../components/common';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/text';
 import THEME from '../../constants/theme';
 import { useAuthStore } from '../../store/authStore';
 import { useCoupleStore } from '../../store/coupleStore';
@@ -152,6 +153,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   tagline: {
+    fontFamily: FONTS.onboarding.subtitle,
     fontSize: THEME.fontSizes.lg,
     fontWeight: THEME.fontWeights.semibold,
     color: COLORS.white,
@@ -179,6 +181,7 @@ const styles = StyleSheet.create({
     color: '#4285F4',
   },
   googleButtonText: {
+    fontFamily: FONTS.auth.button,
     fontSize: THEME.fontSizes.md,
     fontWeight: THEME.fontWeights.semibold,
     color: '#1F1F1F',
@@ -215,12 +218,14 @@ const styles = StyleSheet.create({
     fontWeight: THEME.fontWeights.bold,
   },
   checkboxText: {
+    fontFamily: FONTS.auth.label,
     flex: 1,
     fontSize: THEME.fontSizes.sm,
     color: COLORS.textSecondary,
     lineHeight: 20,
   },
   link: {
+    fontFamily: FONTS.auth.label,
     color: COLORS.primary,
     fontWeight: THEME.fontWeights.semibold,
     textDecorationLine: 'underline',

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/text';
 import THEME from '../../constants/theme';
 
 interface RelationshipInfoProps {
@@ -66,6 +67,7 @@ const styles = StyleSheet.create({
     marginTop: 32, // mt-8 (32px)
   },
   sectionTitle: {
+    fontFamily: FONTS.headers,
     fontSize: 12, // text-xs
     fontWeight: '700', // font-bold
     color: COLORS.profileSectionTitle, // White section title
@@ -92,12 +94,14 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   label: {
+    fontFamily: FONTS.profile.statLabel,
     fontSize: 10, // text-[10px]
     fontWeight: '700', // font-bold
     color: COLORS.zinc400, // text-text-muted
     textTransform: 'uppercase', // uppercase
   },
   value: {
+    fontFamily: FONTS.profile.statValue,
     fontSize: 12, // text-xs
     fontWeight: '600', // font-semibold
     color: COLORS.white, // text-white

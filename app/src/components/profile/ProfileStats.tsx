@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/text';
 import THEME from '../../constants/theme';
 import { BlurView } from '@react-native-community/blur';
 import { BLUR_CONFIG } from '../../constants/blur';
@@ -117,11 +118,13 @@ const styles = StyleSheet.create({
     paddingLeft: 8, // Shift text slightly to the right
   },
   daysValue: {
+    fontFamily: FONTS.profile.statValue,
     fontSize: 36, // text-4xl
     fontWeight: '900', // font-black
     color: COLORS.black, // Black text
   },
   daysLabel: {
+    fontFamily: FONTS.profile.statLabel,
     fontSize: 12, // text-xs
     fontWeight: '600', // font-semibold
     color: COLORS.textMuted, // Muted black text
@@ -164,12 +167,14 @@ const styles = StyleSheet.create({
     // shadow-inner equivalent - handled by styling or simple background opacity
   },
   statValue: {
+    fontFamily: FONTS.profile.statValue,
     fontSize: 24, // text-2xl
     fontWeight: '700', // font-bold
     color: COLORS.white, // text-white
     textAlign: 'center',
   },
   statLabel: {
+    fontFamily: FONTS.profile.statLabel,
     fontSize: 12, // text-xs
     fontWeight: '500', // font-medium
     color: COLORS.zinc400, // text-text-muted

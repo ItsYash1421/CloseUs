@@ -19,6 +19,7 @@ import { useAuthStore } from '../../store/authStore';
 import Toast from 'react-native-toast-message';
 import THEME from '../../constants/theme';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/text';
 import { getErrorMessage } from '../../utils/errorHandler';
 
 export const EnterKeyScreen = ({ navigation }: any) => {
@@ -234,6 +235,7 @@ const styles = StyleSheet.create({
     marginTop: -32, // Overlap with top section for seamless look
   },
   title: {
+    fontFamily: FONTS.pairing.title,
     fontSize: 28,
     fontWeight: '800',
     color: '#FFFFFF', // White text on dark background
@@ -244,6 +246,7 @@ const styles = StyleSheet.create({
     color: '#FF6B9D',
   },
   subtitle: {
+    fontFamily: FONTS.pairing.instruction,
     fontSize: THEME.fontSizes.md,
     color: '#B8B8D1',
     textAlign: 'center',
@@ -265,6 +268,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   input: {
+    fontFamily: FONTS.pairing.code,
     flex: 1,
     fontSize: THEME.fontSizes.lg,
     color: '#FFFFFF',
@@ -281,6 +285,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   unlockButtonText: {
+    fontFamily: FONTS.buttons,
     fontSize: THEME.fontSizes.md,
     fontWeight: '600',
     color: '#000000',
@@ -295,6 +300,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   devButtonText: {
+    fontFamily: FONTS.buttons,
     fontSize: THEME.fontSizes.sm,
     fontWeight: '500',
     color: '#B8B8D1',

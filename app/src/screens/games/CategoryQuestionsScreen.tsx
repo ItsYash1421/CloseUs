@@ -24,6 +24,7 @@ import { CategoryQuestionsSkeleton } from '../../components/loaders';
 import { useKeyboardAnimation } from '../../hooks/useKeyboardAnimation';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
+import { FONTS } from '../../constants/text';
 import gamesService, { GameQuestion } from '../../services/gamesService';
 import { RootStackParamList } from '../../types';
 import { useAuthStore } from '../../store/authStore';
@@ -430,22 +431,32 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   statLabel: {
+    fontFamily: FONTS.games.stats,
+    // ...TEXT_STYLES.nameSmall,
     color: COLORS.textSecondary,
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: THEME.fontWeights.medium,
   },
   centerStat: {
     alignItems: 'center',
   },
   centerStatValue: {
+    fontFamily: FONTS.games.stats,
+    // ...TEXT_STYLES.headerTitle,
     fontSize: 32,
     fontWeight: '800',
     color: COLORS.white,
     marginBottom: 4,
+    textAlign: 'center',
+    letterSpacing: 0.5,
   },
   centerStatLabel: {
+    fontFamily: FONTS.games.stats,
+    // ...TEXT_STYLES.label,
     fontSize: 10,
+    fontWeight: THEME.fontWeights.semibold,
     color: COLORS.textSecondary,
+    marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
@@ -475,9 +486,14 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   tabText: {
+    fontFamily: FONTS.tabs,
+    // ...TEXT_STYLES.label,
+    fontWeight: THEME.fontWeights.semibold,
     color: COLORS.textSecondary,
-    fontWeight: '600',
     fontSize: 14,
+    marginBottom: 0,
+    textTransform: 'none',
+    letterSpacing: 0.5,
   },
   activeTabText: {
     color: '#1F1F1F',
@@ -531,15 +547,22 @@ const styles = StyleSheet.create({
     color: '#FF9800',
   },
   statusText: {
+    fontFamily: FONTS.games.stats,
+    // ...TEXT_STYLES.cardStatus,
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: THEME.fontWeights.bold,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   questionText: {
+    fontFamily: FONTS.games.question,
+    // ...TEXT_STYLES.questionMedium,
     fontSize: 16,
+    fontWeight: THEME.fontWeights.semibold,
     color: COLORS.white,
-    fontWeight: '500',
     lineHeight: 24,
     marginBottom: 16,
+    textAlign: 'left',
   },
   playButton: {
     backgroundColor: COLORS.white,
@@ -550,6 +573,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   playButtonText: {
+    fontFamily: FONTS.buttons,
     fontSize: 14,
     fontWeight: '700',
     color: '#1F1F1F',
@@ -560,13 +584,18 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   emptyTitle: {
+    fontFamily: FONTS.headers,
+    // ...TEXT_STYLES.headerTitle,
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: THEME.fontWeights.bold,
     color: COLORS.white,
-    marginBottom: 8,
     textAlign: 'center',
+    letterSpacing: 0.5,
+    marginBottom: 8,
   },
   emptyText: {
+    fontFamily: FONTS.body,
+    // ...TEXT_STYLES.body,
     color: COLORS.textSecondary,
     fontSize: 14,
     textAlign: 'center',
@@ -578,12 +607,15 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   quoteText: {
-    fontSize: 14,
+    fontFamily: FONTS.quotes,
+    // ...TEXT_STYLES.quote,
+    fontSize: THEME.fontSizes.sm,
     lineHeight: 22,
     color: COLORS.textSecondary,
     textAlign: 'center',
     fontStyle: 'italic',
     fontWeight: '400',
     letterSpacing: 0.3,
+    opacity: 0.9,
   },
 });

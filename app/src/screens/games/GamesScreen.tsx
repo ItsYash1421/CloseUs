@@ -121,11 +121,15 @@ export const GamesScreen = ({ navigation }: any) => {
         }),
       ]);
 
-      setCategories(gamesData);
+      setCategories(gamesData || []);
       if (dailyQData) setQuestionData(dailyQData);
     } catch (error) {
       console.error('Failed to load data:', error);
       setError('Failed to load games');
+      // Keep existing categories if refresh failed
+      if (categories.length === 0) {
+        setCategories([]);
+      }
       Alert.alert('Error', 'Failed to load content. Please try again.');
     } finally {
       if (showLoader) setIsLoading(false);
@@ -136,6 +140,7 @@ export const GamesScreen = ({ navigation }: any) => {
 
   const onRefresh = useCallback(() => {
     setIsRefreshing(true);
+    setError(null);
     loadData(false); // Don't show main loader, usage of RefreshControl is handled by isRefresh state
   }, []);
 

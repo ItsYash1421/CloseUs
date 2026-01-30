@@ -17,6 +17,7 @@ import {
 } from '../../components/profile';
 import { ProfileSkeleton } from '../../components/loaders';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/text';
 import THEME from '../../constants/theme';
 import { useAuthStore } from '../../store/authStore';
 import { useCoupleStore } from '../../store/coupleStore';
@@ -179,35 +180,35 @@ export const ProfileScreen = () => {
               status={
                 user?.relationshipStatus
                   ? {
-                      dating: 'Dating',
-                      engaged: 'Engaged',
-                      married: 'Married',
-                      other: 'Other',
-                    }[user.relationshipStatus] || 'Dating'
+                    dating: 'Dating',
+                    engaged: 'Engaged',
+                    married: 'Married',
+                    other: 'Other',
+                  }[user.relationshipStatus] || 'Dating'
                   : 'Dating'
               }
               style={
                 user?.livingStyle
                   ? {
-                      long_distance: 'Long Distance',
-                      same_city: 'Same City',
-                      living_together: 'Living Together',
-                    }[user.livingStyle] || 'Same City'
+                    long_distance: 'Long Distance',
+                    same_city: 'Same City',
+                    living_together: 'Living Together',
+                  }[user.livingStyle] || 'Same City'
                   : 'Same City'
               }
               anniversary={
                 user?.anniversary
                   ? new Date(user.anniversary).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })
+                  : couple?.startDate
+                    ? new Date(couple.startDate).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
                       year: 'numeric',
                     })
-                  : couple?.startDate
-                    ? new Date(couple.startDate).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })
                     : 'Select Date'
               }
             />
@@ -308,6 +309,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   names: {
+    fontFamily: FONTS.profile.name,
     fontSize: 24, // text-2xl
     fontWeight: '800', // font-extrabold
     color: COLORS.white,
@@ -325,6 +327,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   tag: {
+    fontFamily: FONTS.profile.statLabel,
     fontSize: 14,
     fontWeight: '600',
     color: COLORS.blue300,
@@ -346,6 +349,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   logoutText: {
+    fontFamily: FONTS.buttons,
     color: COLORS.error,
     fontSize: 16,
     fontWeight: '700',

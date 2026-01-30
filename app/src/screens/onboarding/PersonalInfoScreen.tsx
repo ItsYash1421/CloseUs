@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { GradientBackground } from '../../components/common';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/text';
 import THEME from '../../constants/theme';
 import { launchImageLibrary } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
@@ -441,6 +442,7 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.xl,
   },
   title: {
+    fontFamily: FONTS.onboarding.title,
     fontSize: THEME.fontSizes.xxxl,
     fontWeight: THEME.fontWeights.bold,
     color: COLORS.white,
@@ -448,6 +450,7 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.sm,
   },
   subtitle: {
+    fontFamily: FONTS.onboarding.subtitle,
     fontSize: THEME.fontSizes.md,
     color: COLORS.textSecondary,
     textAlign: 'center',
@@ -474,6 +477,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatarPlaceholderText: {
+    fontFamily: FONTS.bold,
     fontSize: 48,
     color: COLORS.white,
   },
@@ -499,12 +503,14 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.lg,
   },
   inputLabel: {
+    fontFamily: FONTS.auth.label,
     fontSize: THEME.fontSizes.md,
     fontWeight: THEME.fontWeights.semibold,
     color: COLORS.white,
     marginBottom: THEME.spacing.sm,
   },
   textInput: {
+    fontFamily: FONTS.auth.input,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: THEME.borderRadius.md,
     borderWidth: 1,
@@ -534,6 +540,7 @@ const styles = StyleSheet.create({
     padding: THEME.spacing.md,
   },
   dateInput: {
+    fontFamily: FONTS.auth.input,
     fontSize: THEME.fontSizes.md,
     color: COLORS.white,
     textAlign: 'center',
@@ -555,6 +562,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   nextButtonText: {
+    fontFamily: FONTS.buttons,
     fontSize: THEME.fontSizes.md,
     fontWeight: THEME.fontWeights.semibold,
     color: '#1F1F1F',
