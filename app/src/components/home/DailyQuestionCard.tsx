@@ -166,7 +166,12 @@ export const DailyQuestionCard = ({
   }
 
   return (
-    <Animated.View style={[styles.container, { transform: [{ translateY: cardTranslateY }] }]}>
+    <Animated.View
+      style={[
+        styles.container,
+        { transform: [{ translateY: cardTranslateY }] },
+      ]}
+    >
       {/* Logo on Top Border */}
       <View style={styles.logoTopContainer}>
         <View style={styles.logoWrapper}>

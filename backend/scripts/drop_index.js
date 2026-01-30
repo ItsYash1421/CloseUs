@@ -25,7 +25,6 @@ const dropIndex = async () => {
                 console.error('Error dropping index:', err);
             }
         }
-
     } catch (error) {
         console.error('Script error:', error);
     } finally {

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   View,
@@ -12,7 +11,12 @@ import {
   Dimensions,
   Animated,
 } from 'react-native';
-import { RouteProp, useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
+import {
+  RouteProp,
+  useNavigation,
+  useRoute,
+  useFocusEffect,
+} from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { GradientBackground, Header, Card } from '../../components/common';
 import { GamesStats } from '../../components/games/GamesStats';
@@ -83,9 +87,11 @@ export const CategoryQuestionsScreen = () => {
         return;
       }
 
-      console.log('[CategoryQuestionsScreen] Screen focused, silent refresh...');
+      console.log(
+        '[CategoryQuestionsScreen] Screen focused, silent refresh...',
+      );
       fetchData(false); // Silent refresh without skeleton
-    }, [categoryId])
+    }, [categoryId]),
   );
 
   const fetchData = async (showLoader = true) => {
@@ -154,7 +160,9 @@ export const CategoryQuestionsScreen = () => {
           <View style={styles.avatarContainer}>
             <Image source={userLogo} style={styles.avatar} resizeMode="cover" />
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>{stats?.userAnsweredCount || 0}</Text>
+              <Text style={styles.badgeText}>
+                {stats?.userAnsweredCount || 0}
+              </Text>
             </View>
           </View>
           <Text style={styles.statLabel}>{user?.name || 'You'}</Text>
@@ -162,14 +170,20 @@ export const CategoryQuestionsScreen = () => {
 
         {/* Center Broad Stat */}
         <View style={styles.centerStat}>
-          <Text style={styles.centerStatValue}>{stats?.bothAnsweredCount || 0}</Text>
+          <Text style={styles.centerStatValue}>
+            {stats?.bothAnsweredCount || 0}
+          </Text>
           <Text style={styles.centerStatLabel}>Both Answered</Text>
         </View>
 
         {/* Partner Stat */}
         <View style={styles.statItem}>
           <View style={styles.avatarContainer}>
-            <Image source={partnerLogo} style={styles.avatar} resizeMode="cover" />
+            <Image
+              source={partnerLogo}
+              style={styles.avatar}
+              resizeMode="cover"
+            />
             <View style={styles.badge}>
               <Text style={styles.badgeText}>
                 {stats?.partnerAnsweredCount || 0}
@@ -185,7 +199,11 @@ export const CategoryQuestionsScreen = () => {
   if (isLoading) {
     return (
       <GradientBackground variant="background">
-        <Header title={categoryName} showBack onBack={() => navigation.goBack()} />
+        <Header
+          title={categoryName}
+          showBack
+          onBack={() => navigation.goBack()}
+        />
         <CategoryQuestionsSkeleton />
       </GradientBackground>
     );
@@ -193,7 +211,11 @@ export const CategoryQuestionsScreen = () => {
 
   return (
     <GradientBackground variant="background" scrollY={scrollY}>
-      <Header title={categoryName} showBack onBack={() => navigation.goBack()} />
+      <Header
+        title={categoryName}
+        showBack
+        onBack={() => navigation.goBack()}
+      />
 
       <View style={styles.container}>
         <AnimatedFlatList
@@ -203,7 +225,7 @@ export const CategoryQuestionsScreen = () => {
           showsVerticalScrollIndicator={false}
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: true }
+            { useNativeDriver: true },
           )}
           scrollEventThrottle={16}
           ListHeaderComponent={
@@ -221,7 +243,12 @@ export const CategoryQuestionsScreen = () => {
                     reducedTransparencyFallbackColor={BLUR_CONFIG.fallbackColor}
                   />
                   {/* Tint Overlay */}
-                  <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(255,255,255,0.05)' }} />
+                  <View
+                    style={{
+                      ...StyleSheet.absoluteFillObject,
+                      backgroundColor: 'rgba(255,255,255,0.05)',
+                    }}
+                  />
 
                   <View style={styles.tabsContent}>
                     <TouchableOpacity
@@ -271,15 +298,25 @@ export const CategoryQuestionsScreen = () => {
                 <View style={styles.cardHeader}>
                   {/* Status Badges for Completed Tab */}
                   {activeTab === 'completed' && (
-                    <View style={[
-                      styles.statusBadge,
-                      item.isAnsweredByPartner ? styles.statusSuccess : styles.statusWaiting
-                    ]}>
-                      <Text style={[
-                        styles.statusText,
-                        item.isAnsweredByPartner ? styles.textSuccess : styles.textWaiting
-                      ]}>
-                        {item.isAnsweredByPartner ? '✓ See Answers' : '⏳ Waiting'}
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        item.isAnsweredByPartner
+                          ? styles.statusSuccess
+                          : styles.statusWaiting,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.statusText,
+                          item.isAnsweredByPartner
+                            ? styles.textSuccess
+                            : styles.textWaiting,
+                        ]}
+                      >
+                        {item.isAnsweredByPartner
+                          ? '✓ See Answers'
+                          : '⏳ Waiting'}
                       </Text>
                     </View>
                   )}
@@ -302,7 +339,7 @@ export const CategoryQuestionsScreen = () => {
               <Text style={styles.emptyText}>
                 {activeTab === 'available'
                   ? "You've answered all questions!"
-                  : "No answered questions yet."}
+                  : 'No answered questions yet.'}
               </Text>
             </View>
           }

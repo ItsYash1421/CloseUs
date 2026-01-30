@@ -50,10 +50,7 @@ export const GamesScreen = ({ navigation }: any) => {
   const restoreScrollY = useRef(0);
 
   // Custom Animation Hook
-  const {
-    translateY,
-    imageOpacity,
-  } = useKeyboardAnimation({
+  const { translateY, imageOpacity } = useKeyboardAnimation({
     translateYValue: -50,
   });
 
@@ -67,13 +64,15 @@ export const GamesScreen = ({ navigation }: any) => {
       // Refresh game categories to update counts and status
       console.log('[GamesScreen] Screen focused, refreshing data...');
       loadData();
-    }, [])
+    }, []),
   );
 
   // Keyboard listeners for state
   useEffect(() => {
-    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
 
     const onShow = () => {
       setKeyboardVisible(true);
@@ -289,7 +288,6 @@ export const GamesScreen = ({ navigation }: any) => {
 
             <View style={{ height: 100 }} />
           </Animated.View>
-
         </Animated.ScrollView>
       </Animated.View>
     </GradientBackground>

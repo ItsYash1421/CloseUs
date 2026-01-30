@@ -79,7 +79,7 @@ const getQuestionsByCategory = async (req, res) => {
         if (coupleId) {
             answers = await GameAnswer.find({
                 coupleId,
-                questionId: { $in: questions.map(q => q._id) }
+                questionId: { $in: questions.map((q) => q._id) },
             });
         }
 
@@ -91,11 +91,17 @@ const getQuestionsByCategory = async (req, res) => {
         let bothAnsweredCount = 0;
         const totalQuestions = questions.length;
 
-        const questionsWithStatus = questions.map(question => {
-            const questionAnswers = answers.filter(a => a.questionId.toString() === question._id.toString());
+        const questionsWithStatus = questions.map((question) => {
+            const questionAnswers = answers.filter(
+                (a) => a.questionId.toString() === question._id.toString()
+            );
 
-            const userAnswer = questionAnswers.find(a => a.userId.toString() === userId.toString());
-            const partnerAnswer = questionAnswers.find(a => a.userId.toString() !== userId.toString());
+            const userAnswer = questionAnswers.find(
+                (a) => a.userId.toString() === userId.toString()
+            );
+            const partnerAnswer = questionAnswers.find(
+                (a) => a.userId.toString() !== userId.toString()
+            );
 
             const isAnsweredByUser = !!userAnswer;
             const isAnsweredByPartner = !!partnerAnswer;
@@ -112,7 +118,6 @@ const getQuestionsByCategory = async (req, res) => {
             };
         });
 
-
         res.json(
             successResponse({
                 category: {
@@ -127,8 +132,8 @@ const getQuestionsByCategory = async (req, res) => {
                     totalQuestions,
                     userAnsweredCount,
                     partnerAnsweredCount,
-                    bothAnsweredCount
-                }
+                    bothAnsweredCount,
+                },
             })
         );
     } catch (error) {
@@ -276,14 +281,15 @@ const saveAnswer = async (req, res) => {
         // ------------------------------------------------------------------
         const couple = await Couple.findById(user.coupleId);
         if (couple && couple.isDevPartner) {
-            const partnerId = couple.partner1Id.toString() === userId.toString()
-                ? couple.partner2Id
-                : couple.partner1Id;
+            const partnerId =
+                couple.partner1Id.toString() === userId.toString()
+                    ? couple.partner2Id
+                    : couple.partner1Id;
             setTimeout(async () => {
                 try {
                     const existingPartnerAnswer = await GameAnswer.findOne({
                         userId: partnerId,
-                        questionId
+                        questionId,
                     });
 
                     if (!existingPartnerAnswer) {
@@ -291,13 +297,14 @@ const saveAnswer = async (req, res) => {
                             "That's a really interesting question! I think...",
                             "I'd have to say yes to this one ❤️",
                             "For me, it's definitely about the little moments.",
-                            "I love that you asked this!",
-                            "My answer is: Absolutely!",
+                            'I love that you asked this!',
+                            'My answer is: Absolutely!',
                             "Hmm, let me think... I'd choose the second option.",
-                            "You know me so well! 😊",
-                            "I was thinking the same thing!"
+                            'You know me so well! 😊',
+                            'I was thinking the same thing!',
                         ];
-                        const randomAnswer = dummyAnswers[Math.floor(Math.random() * dummyAnswers.length)];
+                        const randomAnswer =
+                            dummyAnswers[Math.floor(Math.random() * dummyAnswers.length)];
 
                         await GameAnswer.create({
                             coupleId: user.coupleId,
@@ -305,7 +312,9 @@ const saveAnswer = async (req, res) => {
                             userId: partnerId,
                             text: randomAnswer,
                         });
-                        console.log(`[DevMode] Auto-answered question ${questionId} for partner ${partnerId}`);
+                        console.log(
+                            `[DevMode] Auto-answered question ${questionId} for partner ${partnerId}`
+                        );
                     }
                 } catch (err) {
                     console.error('[DevMode] Auto-answer error:', err);
@@ -381,14 +390,14 @@ const getQuestionWithAnswers = async (req, res) => {
         const GameAnswer = require('../../models/GameAnswer');
         const answers = await GameAnswer.find({
             coupleId: user.coupleId,
-            questionId: questionId
+            questionId: questionId,
         });
 
         // ------------------------------------------------------------------
         // Separate User and Partner Answers
         // ------------------------------------------------------------------
-        const userAnswer = answers.find(a => a.userId.toString() === userId.toString());
-        const partnerAnswer = answers.find(a => a.userId.toString() !== userId.toString());
+        const userAnswer = answers.find((a) => a.userId.toString() === userId.toString());
+        const partnerAnswer = answers.find((a) => a.userId.toString() !== userId.toString());
 
         // ------------------------------------------------------------------
         // Format Response
@@ -407,14 +416,18 @@ const getQuestionWithAnswers = async (req, res) => {
                     gameType: category.gameType,
                     color: category.color,
                 },
-                userAnswer: userAnswer ? {
-                    answer: userAnswer.text,
-                    answeredAt: userAnswer.createdAt,
-                } : null,
-                partnerAnswer: partnerAnswer ? {
-                    answer: partnerAnswer.text,
-                    answeredAt: partnerAnswer.createdAt,
-                } : null,
+                userAnswer: userAnswer
+                    ? {
+                          answer: userAnswer.text,
+                          answeredAt: userAnswer.createdAt,
+                      }
+                    : null,
+                partnerAnswer: partnerAnswer
+                    ? {
+                          answer: partnerAnswer.text,
+                          answeredAt: partnerAnswer.createdAt,
+                      }
+                    : null,
             })
         );
     } catch (error) {

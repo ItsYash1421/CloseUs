@@ -117,7 +117,7 @@ export const CustomTabBar: React.FC<TabBarProps> = ({
         styles.wrapper,
         {
           paddingBottom: insets.bottom + 10,
-        }
+        },
       ]}
     >
       <View style={styles.container}>

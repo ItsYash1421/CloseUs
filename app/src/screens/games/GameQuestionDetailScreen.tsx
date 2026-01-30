@@ -87,13 +87,8 @@ export const GameQuestionDetailScreen = () => {
   };
 
   // Animated values from custom hook
-  const {
-    translateY,
-    imageOpacity,
-    imageScale,
-    buttonOpacity,
-    buttonScale
-  } = useKeyboardAnimation();
+  const { translateY, imageOpacity, imageScale, buttonOpacity, buttonScale } =
+    useKeyboardAnimation();
 
   const handleClose = () => {
     navigation.goBack();
@@ -107,19 +102,16 @@ export const GameQuestionDetailScreen = () => {
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           keyboardVerticalOffset={0}
         >
-          <Animated.View
-            style={[
-              { flex: 1 },
-              { transform: [{ translateY }] }
-            ]}
-          >
+          <Animated.View style={[{ flex: 1 }, { transform: [{ translateY }] }]}>
             {/* Top Section */}
             <View style={styles.topSection}>
-              <Animated.View style={{
-                flex: 1,
-                opacity: imageOpacity,
-                transform: [{ scale: imageScale }]
-              }}>
+              <Animated.View
+                style={{
+                  flex: 1,
+                  opacity: imageOpacity,
+                  transform: [{ scale: imageScale }],
+                }}
+              >
                 <FastImage
                   source={require('../../assets/gifs/EnterKey.gif')}
                   style={styles.gifImage}
@@ -127,15 +119,29 @@ export const GameQuestionDetailScreen = () => {
                 />
               </Animated.View>
 
-              <TouchableOpacity style={styles.closeButtonWrapper} onPress={handleClose}>
+              <TouchableOpacity
+                style={styles.closeButtonWrapper}
+                onPress={handleClose}
+              >
                 <BlurView
                   style={StyleSheet.absoluteFill}
                   blurType={BLUR_CONFIG.blurType}
                   blurAmount={BLUR_CONFIG.blurAmount}
                   reducedTransparencyFallbackColor={BLUR_CONFIG.fallbackColor}
                 />
-                <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16 }} />
-                <Icon name="close" size={20} color="#FFFFFF" style={{ zIndex: 1 }} />
+                <View
+                  style={{
+                    ...StyleSheet.absoluteFillObject,
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    borderRadius: 16,
+                  }}
+                />
+                <Icon
+                  name="close"
+                  size={20}
+                  color="#FFFFFF"
+                  style={{ zIndex: 1 }}
+                />
               </TouchableOpacity>
 
               <View style={styles.categoryBadgeWrapper}>
@@ -145,10 +151,14 @@ export const GameQuestionDetailScreen = () => {
                   blurAmount={BLUR_CONFIG.blurAmount}
                   reducedTransparencyFallbackColor={BLUR_CONFIG.fallbackColor}
                 />
-                <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16 }} />
-                <Text style={styles.categoryBadgeText}>
-                  {categoryName}
-                </Text>
+                <View
+                  style={{
+                    ...StyleSheet.absoluteFillObject,
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    borderRadius: 16,
+                  }}
+                />
+                <Text style={styles.categoryBadgeText}>{categoryName}</Text>
               </View>
             </View>
 
@@ -183,10 +193,12 @@ export const GameQuestionDetailScreen = () => {
                   />
                 </View>
 
-                <Animated.View style={{
-                  opacity: buttonOpacity,
-                  transform: [{ scale: buttonScale }]
-                }}>
+                <Animated.View
+                  style={{
+                    opacity: buttonOpacity,
+                    transform: [{ scale: buttonScale }],
+                  }}
+                >
                   <TouchableOpacity
                     style={[
                       styles.submitButton,
