@@ -13,6 +13,7 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { GradientBackground } from '../../components/common';
 import { DailyQuestionCard, StickyHeader } from '../../components/home';
 import { COLORS } from '../../constants/colors';
@@ -59,6 +60,15 @@ export const GamesScreen = ({ navigation }: any) => {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Auto-refresh when screen comes into focus (after user completes question)
+  useFocusEffect(
+    useCallback(() => {
+      // Refresh game categories to update counts and status
+      console.log('[GamesScreen] Screen focused, refreshing data...');
+      loadData();
+    }, [])
+  );
 
   // Keyboard listeners for state
   useEffect(() => {

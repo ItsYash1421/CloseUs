@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -12,9 +12,12 @@ import {
   Dimensions,
   Animated,
 } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { GradientBackground, Header, Card } from '../../components/common';
+import { GamesStats } from '../../components/games/GamesStats';
+import { CategoryQuestionsSkeleton } from '../../components/loaders';
+import { useKeyboardAnimation } from '../../hooks/useKeyboardAnimation';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
 import gamesService, { GameQuestion } from '../../services/gamesService';
@@ -61,16 +64,37 @@ export const CategoryQuestionsScreen = () => {
     'available',
   );
 
+  // Track if this is the initial load to prevent white flash on focus
+  const isInitialLoad = useRef(true);
+
   // Animation
   const scrollY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    fetchData();
+    fetchData(true); // Initial load with skeleton
   }, []);
 
-  const fetchData = async () => {
+  // Auto-refresh when returning from GameQuestionDetailScreen - SILENT refresh
+  useFocusEffect(
+    useCallback(() => {
+      // Skip refresh on initial mount (already handled by useEffect)
+      if (isInitialLoad.current) {
+        isInitialLoad.current = false;
+        return;
+      }
+
+      console.log('[CategoryQuestionsScreen] Screen focused, silent refresh...');
+      fetchData(false); // Silent refresh without skeleton
+    }, [categoryId])
+  );
+
+  const fetchData = async (showLoader = true) => {
     try {
-      setIsLoading(true);
+      // Only show loading skeleton on initial load, not on focus refresh
+      if (showLoader) {
+        setIsLoading(true);
+      }
+
       const data = await gamesService.getQuestionsByCategory(categoryId);
       setQuestions(data.questions);
       setStats(data.stats);
@@ -78,7 +102,9 @@ export const CategoryQuestionsScreen = () => {
       console.error('Failed to load questions:', error);
       Alert.alert('Error', 'Failed to load questions. Please try again.');
     } finally {
-      setIsLoading(false);
+      if (showLoader) {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -170,9 +196,8 @@ export const CategoryQuestionsScreen = () => {
   if (isLoading) {
     return (
       <GradientBackground variant="background">
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-        </View>
+        <Header title={categoryName} showBack onBack={() => navigation.goBack()} />
+        <CategoryQuestionsSkeleton />
       </GradientBackground>
     );
   }
