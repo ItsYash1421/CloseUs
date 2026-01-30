@@ -38,6 +38,7 @@ export const AppNavigator = () => {
         screenOptions={{
           headerShown: false,
           gestureEnabled: true,
+          gestureDirection: 'horizontal',
           cardStyleInterpolator: ({ current }) => ({
             cardStyle: {
               opacity: current.progress,

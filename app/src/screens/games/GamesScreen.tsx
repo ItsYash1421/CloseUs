@@ -54,16 +54,25 @@ export const GamesScreen = ({ navigation }: any) => {
     translateYValue: -50,
   });
 
+  // Track if this is the initial load to prevent white flash on focus
+  const isInitialLoad = useRef(true);
+
   useEffect(() => {
-    loadData();
+    loadData(true);
   }, []);
 
   // Auto-refresh when screen comes into focus (after user completes question)
   useFocusEffect(
     useCallback(() => {
-      // Refresh game categories to update counts and status
-      console.log('[GamesScreen] Screen focused, refreshing data...');
-      loadData();
+      // Skip refresh on initial mount (already handled by useEffect)
+      if (isInitialLoad.current) {
+        isInitialLoad.current = false;
+        return;
+      }
+
+      // Refresh game categories to update counts and status - SILENTLY
+      console.log('[GamesScreen] Screen focused, refreshing data silently...');
+      loadData(false);
     }, []),
   );
 
@@ -99,9 +108,9 @@ export const GamesScreen = ({ navigation }: any) => {
     }
   };
 
-  const loadData = async (isRefreshAction = false) => {
+  const loadData = async (showLoader = true) => {
     try {
-      if (!isRefreshAction) setIsLoading(true);
+      if (showLoader) setIsLoading(true);
       setError(null);
 
       const [gamesData, dailyQData] = await Promise.all([
@@ -119,15 +128,15 @@ export const GamesScreen = ({ navigation }: any) => {
       setError('Failed to load games');
       Alert.alert('Error', 'Failed to load content. Please try again.');
     } finally {
-      setIsLoading(false);
+      if (showLoader) setIsLoading(false);
       setQuestionLoading(false);
-      if (isRefreshAction) setIsRefreshing(false);
+      setIsRefreshing(false);
     }
   };
 
   const onRefresh = useCallback(() => {
     setIsRefreshing(true);
-    loadData(true);
+    loadData(false); // Don't show main loader, usage of RefreshControl is handled by isRefresh state
   }, []);
 
   const refreshDailyQuestion = async () => {

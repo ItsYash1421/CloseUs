@@ -148,56 +148,61 @@ export const GameQuestionAnswerScreen = () => {
             <Spinner size="large" color={COLORS.primary} />
           </View>
         ) : data ? (
-          <ScrollView
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-          >
-            <Text style={styles.title}>Question</Text>
-            <Text style={styles.questionText}>{data.question.text}</Text>
-            <View style={styles.divider} />
+          <>
+            {/* Sticky Question Section */}
+            <View style={styles.stickyQuestionContainer}>
+              <Text style={styles.title}>Question</Text>
+              <Text style={styles.questionText}>{data.question.text}</Text>
+              <View style={styles.divider} />
+            </View>
 
-            {/* Answers Section */}
-            <Animated.View
-              style={[styles.answersContainer, { opacity: fadeAnim }]}
+            {/* Scrollable Answers Section */}
+            <ScrollView
+              style={styles.scrollView}
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={false}
             >
-              <Text style={styles.answersTitle}>Answers</Text>
+              <Animated.View
+                style={[styles.answersContainer, { opacity: fadeAnim }]}
+              >
+                <Text style={styles.answersTitle}>Answers</Text>
 
-              {/* User Answer */}
-              <View style={styles.answerCard}>
-                <View style={styles.answerHeader}>
-                  <Image source={getUserAvatar()} style={styles.avatar} />
-                  <Text style={styles.answerName}>{user?.name || 'You'}</Text>
+                {/* User Answer */}
+                <View style={styles.answerCard}>
+                  <View style={styles.answerHeader}>
+                    <Image source={getUserAvatar()} style={styles.avatar} />
+                    <Text style={styles.answerName}>{user?.name || 'You'}</Text>
+                  </View>
+                  {data.userAnswer ? (
+                    <Text style={styles.answerText}>
+                      {data.userAnswer.answer}
+                    </Text>
+                  ) : (
+                    <Text style={styles.waitingText}>No answer yet</Text>
+                  )}
                 </View>
-                {data.userAnswer ? (
-                  <Text style={styles.answerText}>
-                    {data.userAnswer.answer}
-                  </Text>
-                ) : (
-                  <Text style={styles.waitingText}>No answer yet</Text>
-                )}
-              </View>
 
-              {/* Partner Answer */}
-              <View style={styles.answerCard}>
-                <View style={styles.answerHeader}>
-                  <Image source={getPartnerAvatar()} style={styles.avatar} />
-                  <Text style={styles.answerName}>
-                    {partner?.name || 'Partner'}
-                  </Text>
+                {/* Partner Answer */}
+                <View style={styles.answerCard}>
+                  <View style={styles.answerHeader}>
+                    <Image source={getPartnerAvatar()} style={styles.avatar} />
+                    <Text style={styles.answerName}>
+                      {partner?.name || 'Partner'}
+                    </Text>
+                  </View>
+                  {data.partnerAnswer ? (
+                    <Text style={styles.answerText}>
+                      {data.partnerAnswer.answer}
+                    </Text>
+                  ) : (
+                    <Text style={styles.waitingText}>
+                      ⏳ Waiting for partner...
+                    </Text>
+                  )}
                 </View>
-                {data.partnerAnswer ? (
-                  <Text style={styles.answerText}>
-                    {data.partnerAnswer.answer}
-                  </Text>
-                ) : (
-                  <Text style={styles.waitingText}>
-                    ⏳ Waiting for partner...
-                  </Text>
-                )}
-              </View>
-            </Animated.View>
-          </ScrollView>
+              </Animated.View>
+            </ScrollView>
+          </>
         ) : null}
       </View>
     </View>
@@ -258,33 +263,40 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  stickyQuestionContainer: {
+    paddingHorizontal: THEME.spacing.xl,
+    paddingTop: 24, // Reduced from 40
+    paddingBottom: 0,
+    backgroundColor: '#1A0E2E',
+    zIndex: 10,
+  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     paddingHorizontal: THEME.spacing.xl,
-    paddingTop: 40,
+    paddingTop: 0,
     paddingBottom: 40,
   },
   title: {
-    fontSize: 14,
+    fontSize: 12, // Reduced from 14
     fontWeight: 'bold',
     color: COLORS.primary,
-    marginBottom: 8,
+    marginBottom: 4, // Reduced from 8
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   questionText: {
-    fontSize: 22,
-    fontWeight: '800',
+    fontSize: 18, // Reduced from 22
+    fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 20,
-    lineHeight: 28,
+    marginBottom: 16, // Reduced from 20
+    lineHeight: 24, // Reduced from 28
   },
   divider: {
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.1)',
-    marginBottom: 24,
+    marginBottom: 16, // Reduced from 24
   },
   answersContainer: {
     gap: 16,

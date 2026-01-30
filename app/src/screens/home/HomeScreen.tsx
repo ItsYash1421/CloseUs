@@ -58,10 +58,9 @@ export const HomeScreen = ({ navigation }: any) => {
   const scrollViewRef = useRef<ScrollView>(null);
   const currentScrollY = useRef(0);
   const restoreScrollY = useRef(0);
+  const isInitialLoad = useRef(true);
 
-  console.log('HomeScreen - partnerIsOnline:', partnerIsOnline);
-
-  const fetchDailyQuestion = React.useCallback(async () => {
+  const fetchDailyQuestion = async () => {
     try {
       // Don't show loading spinner on background refresh,
       // only if we don't have data yet
@@ -74,17 +73,7 @@ export const HomeScreen = ({ navigation }: any) => {
     } finally {
       setQuestionLoading(false);
     }
-  }, []);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchDailyQuestion();
-    }, [fetchDailyQuestion]),
-  );
-
-  useEffect(() => {
-    loadData();
-  }, []);
+  };
 
   // Continuously track scroll position
   useEffect(() => {
@@ -95,6 +84,23 @@ export const HomeScreen = ({ navigation }: any) => {
       scrollY.removeListener(listenerId);
     };
   }, [scrollY]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Skip on first load (handled by useEffect)
+      if (isInitialLoad.current) {
+        isInitialLoad.current = false;
+        return;
+      }
+      // Silent refresh on subsequent focus
+      console.log('[HomeScreen] Silent refresh on focus');
+      loadData(false);
+    }, []),
+  );
+
+  useEffect(() => {
+    loadData(true);
+  }, []);
 
   const handleInputFocus = () => {
     // Snapshot scroll position IMMEDIATELY when user focuses input
@@ -132,7 +138,9 @@ export const HomeScreen = ({ navigation }: any) => {
     };
   }, []);
 
-  const loadData = async () => {
+  const loadData = async (showLoader = false) => {
+    if (showLoader) setIsScreenLoading(true);
+
     const dataPromises = Promise.all([
       fetchCoupleInfo(),
       fetchCoupleStats(),
@@ -140,7 +148,7 @@ export const HomeScreen = ({ navigation }: any) => {
     ]);
 
     await dataPromises;
-    setIsScreenLoading(false);
+    if (showLoader) setIsScreenLoading(false);
   };
 
   const onRefresh = async () => {

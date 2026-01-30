@@ -15,11 +15,12 @@ import {
   RelationshipInfo,
   ProfileMenu,
 } from '../../components/profile';
+import { ProfileSkeleton } from '../../components/loaders';
 import { COLORS } from '../../constants/colors';
 import THEME from '../../constants/theme';
 import { useAuthStore } from '../../store/authStore';
 import { useCoupleStore } from '../../store/coupleStore';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { differenceInDays } from 'date-fns';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -29,15 +30,44 @@ import { ConfirmModal } from '../../components/global/ConfirmModal';
 export const ProfileScreen = () => {
   const navigation = useNavigation();
   const { user, logout } = useAuthStore();
-  const { couple, partner, stats, fetchCoupleStats } = useCoupleStore();
+  const {
+    couple,
+    partner,
+    stats,
+    fetchCoupleStats,
+    fetchCoupleInfo,
+    isLoading,
+  } = useCoupleStore();
   const [daysTogether, setDaysTogether] = useState(0);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isScreenLoading, setIsScreenLoading] = useState(true);
   const scrollY = useRef(new Animated.Value(0)).current;
 
+  const isInitialLoad = useRef(true);
+
+  const loadData = async (showLoader = false) => {
+    if (showLoader) setIsScreenLoading(true);
+    await Promise.all([fetchCoupleInfo(), fetchCoupleStats()]);
+    if (showLoader) setIsScreenLoading(false);
+  };
+
   useEffect(() => {
-    fetchCoupleStats();
+    loadData(true);
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Skip on first load (handled by useEffect)
+      if (isInitialLoad.current) {
+        isInitialLoad.current = false;
+        return;
+      }
+      // Silent refresh on subsequent focus
+      console.log('[ProfileScreen] Silent refresh on focus');
+      loadData(false);
+    }, []),
+  );
 
   useEffect(() => {
     if (couple?.startDate) {
@@ -76,125 +106,131 @@ export const ProfileScreen = () => {
 
   return (
     <GradientBackground variant="background" scrollY={scrollY}>
-      <Animated.ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true },
-        )}
-        scrollEventThrottle={16}
-      >
-        {/* Spacer for status bar/top padding since we removed header */}
-        <View style={{ height: 60 }} />
-
-        {/* Profile Header Section (Inlined) */}
-        <View style={styles.headerContent}>
-          {/* Avatars */}
-          <View style={styles.avatarsContainer}>
-            <View style={styles.avatarWrapper}>
-              {/* User Avatar (Left / Front) */}
-              <View style={[styles.avatarFrame, styles.userAvatar]}>
-                <Image
-                  source={
-                    user?.photoUrl
-                      ? { uri: user.photoUrl }
-                      : require('../../assets/images/Logo-Male-2.png')
-                  }
-                  style={styles.avatarImage}
-                />
-              </View>
-
-              {/* Partner Avatar (Right / Behind) */}
-              <View style={[styles.avatarFrame, styles.partnerAvatar]}>
-                <Image
-                  source={
-                    partner?.photoUrl
-                      ? { uri: partner.photoUrl }
-                      : require('../../assets/images/Logo-Female-2.png')
-                  }
-                  style={styles.avatarImage}
-                />
-              </View>
-
-              {/* Heart badge removed as per request ("icon bich m remove kr de") */}
-            </View>
-          </View>
-
-          {/* Names */}
-          <View style={styles.namesContainer}>
-            <Text style={styles.names}>
-              {user?.name?.split(' ')[0] || 'Me'} &{' '}
-              {partner?.name?.split(' ')[0] || 'Partner'}
-            </Text>
-            <View style={styles.tagContainer}>
-              <Text style={styles.tag}>
-                {couple?.coupleTag || '#Us'} on CloseUs
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        <ProfileStats
-          daysTogether={daysTogether}
-          questionsCount={stats?.questionsAnswered || 0}
-          gamesWon={stats?.gamesWon || 0}
-        />
-
-        <RelationshipInfo
-          status={
-            user?.relationshipStatus
-              ? {
-                  dating: 'Dating',
-                  engaged: 'Engaged',
-                  married: 'Married',
-                  other: 'Other',
-                }[user.relationshipStatus] || 'Dating'
-              : 'Dating'
-          }
-          style={
-            user?.livingStyle
-              ? {
-                  long_distance: 'Long Distance',
-                  same_city: 'Same City',
-                  living_together: 'Living Together',
-                }[user.livingStyle] || 'Same City'
-              : 'Same City'
-          }
-          anniversary={
-            user?.anniversary
-              ? new Date(user.anniversary).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })
-              : couple?.startDate
-                ? new Date(couple.startDate).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })
-                : 'Select Date'
-          }
-        />
-
-        <ProfileMenu />
-
-        {/* Logout Button */}
-        <View style={styles.logoutContainer}>
-          <TouchableOpacity
-            style={styles.logoutButton}
-            onPress={handleLogout}
-            activeOpacity={0.9}
+      {isScreenLoading ? (
+        <ProfileSkeleton />
+      ) : (
+        <>
+          <Animated.ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+              { useNativeDriver: true },
+            )}
+            scrollEventThrottle={16}
           >
-            <Icon name="logout" size={20} color={COLORS.error} />
-            <Text style={styles.logoutText}>Logout</Text>
-          </TouchableOpacity>
-        </View>
+            {/* Spacer for status bar/top padding since we removed header */}
+            <View style={{ height: 60 }} />
 
-        {/* Bottom padding for scroll */}
-        <View style={{ height: 40 }} />
-      </Animated.ScrollView>
+            {/* Profile Header Section (Inlined) */}
+            <View style={styles.headerContent}>
+              {/* Avatars */}
+              <View style={styles.avatarsContainer}>
+                <View style={styles.avatarWrapper}>
+                  {/* User Avatar (Left / Front) */}
+                  <View style={[styles.avatarFrame, styles.userAvatar]}>
+                    <Image
+                      source={
+                        user?.photoUrl
+                          ? { uri: user.photoUrl }
+                          : require('../../assets/images/Logo-Male-2.png')
+                      }
+                      style={styles.avatarImage}
+                    />
+                  </View>
+
+                  {/* Partner Avatar (Right / Behind) */}
+                  <View style={[styles.avatarFrame, styles.partnerAvatar]}>
+                    <Image
+                      source={
+                        partner?.photoUrl
+                          ? { uri: partner.photoUrl }
+                          : require('../../assets/images/Logo-Female-2.png')
+                      }
+                      style={styles.avatarImage}
+                    />
+                  </View>
+
+                  {/* Heart badge removed as per request ("icon bich m remove kr de") */}
+                </View>
+              </View>
+
+              {/* Names */}
+              <View style={styles.namesContainer}>
+                <Text style={styles.names}>
+                  {user?.name?.split(' ')[0] || 'Me'} &{' '}
+                  {partner?.name?.split(' ')[0] || 'Partner'}
+                </Text>
+                <View style={styles.tagContainer}>
+                  <Text style={styles.tag}>
+                    {couple?.coupleTag || '#Us'} on CloseUs
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <ProfileStats
+              daysTogether={daysTogether}
+              questionsCount={stats?.questionsAnswered || 0}
+              gamesWon={stats?.gamesWon || 0}
+            />
+
+            <RelationshipInfo
+              status={
+                user?.relationshipStatus
+                  ? {
+                      dating: 'Dating',
+                      engaged: 'Engaged',
+                      married: 'Married',
+                      other: 'Other',
+                    }[user.relationshipStatus] || 'Dating'
+                  : 'Dating'
+              }
+              style={
+                user?.livingStyle
+                  ? {
+                      long_distance: 'Long Distance',
+                      same_city: 'Same City',
+                      living_together: 'Living Together',
+                    }[user.livingStyle] || 'Same City'
+                  : 'Same City'
+              }
+              anniversary={
+                user?.anniversary
+                  ? new Date(user.anniversary).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })
+                  : couple?.startDate
+                    ? new Date(couple.startDate).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })
+                    : 'Select Date'
+              }
+            />
+
+            <ProfileMenu />
+
+            {/* Logout Button */}
+            <View style={styles.logoutContainer}>
+              <TouchableOpacity
+                style={styles.logoutButton}
+                onPress={handleLogout}
+                activeOpacity={0.9}
+              >
+                <Icon name="logout" size={20} color={COLORS.error} />
+                <Text style={styles.logoutText}>Logout</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Bottom padding for scroll */}
+            <View style={{ height: 40 }} />
+          </Animated.ScrollView>
+        </>
+      )}
 
       {/* Logout Confirmation Modal */}
       <ConfirmModal
