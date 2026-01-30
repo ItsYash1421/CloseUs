@@ -33,4 +33,9 @@ router.post('/answer', gamesController.saveAnswer);
 // ------------------------------------------------------------------
 router.get('/answers', gamesController.getUserAnswers);
 
+// ------------------------------------------------------------------
+// Get Question with Answers
+// ------------------------------------------------------------------
+router.get('/question/:questionId/answers', gamesController.getQuestionWithAnswers);
+
 module.exports = router;

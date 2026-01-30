@@ -342,10 +342,92 @@ const getUserAnswers = async (req, res) => {
     }
 };
 
+// ------------------------------------------------------------------
+// Get Question with Answers (Protected - For App)
+// ------------------------------------------------------------------
+const getQuestionWithAnswers = async (req, res) => {
+    try {
+        const { questionId } = req.params;
+        const userId = req.userId;
+
+        // ------------------------------------------------------------------
+        // Verify Question Exists
+        // ------------------------------------------------------------------
+        const question = await GameQuestion.findById(questionId);
+        if (!question) {
+            return res.status(404).json(errorResponse('Question not found', 404));
+        }
+
+        // ------------------------------------------------------------------
+        // Get Category Info
+        // ------------------------------------------------------------------
+        const category = await GameCategory.findById(question.categoryId);
+        if (!category) {
+            return res.status(404).json(errorResponse('Category not found', 404));
+        }
+
+        // ------------------------------------------------------------------
+        // Get User and Couple Info
+        // ------------------------------------------------------------------
+        const User = require('../../models/User');
+        const user = await User.findById(userId);
+        if (!user.coupleId) {
+            return res.status(400).json(errorResponse('User not paired', 400));
+        }
+
+        // ------------------------------------------------------------------
+        // Get Answers for Question
+        // ------------------------------------------------------------------
+        const GameAnswer = require('../../models/GameAnswer');
+        const answers = await GameAnswer.find({
+            coupleId: user.coupleId,
+            questionId: questionId
+        });
+
+        // ------------------------------------------------------------------
+        // Separate User and Partner Answers
+        // ------------------------------------------------------------------
+        const userAnswer = answers.find(a => a.userId.toString() === userId.toString());
+        const partnerAnswer = answers.find(a => a.userId.toString() !== userId.toString());
+
+        // ------------------------------------------------------------------
+        // Format Response
+        // ------------------------------------------------------------------
+        res.json(
+            successResponse({
+                question: {
+                    _id: question._id,
+                    text: question.text,
+                    categoryId: question.categoryId,
+                },
+                category: {
+                    _id: category._id,
+                    name: category.name,
+                    emoji: category.emoji,
+                    gameType: category.gameType,
+                    color: category.color,
+                },
+                userAnswer: userAnswer ? {
+                    answer: userAnswer.text,
+                    answeredAt: userAnswer.createdAt,
+                } : null,
+                partnerAnswer: partnerAnswer ? {
+                    answer: partnerAnswer.text,
+                    answeredAt: partnerAnswer.createdAt,
+                } : null,
+            })
+        );
+    } catch (error) {
+        console.error('Get question with answers error:', error);
+        res.status(500).json(errorResponse('Internal server error'));
+    }
+};
+
 module.exports = {
     getGameCategories,
     getQuestionsByCategory,
     getRandomGame,
     saveAnswer,
     getUserAnswers,
+    getQuestionWithAnswers,
 };

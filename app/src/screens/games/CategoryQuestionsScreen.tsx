@@ -110,26 +110,15 @@ export const CategoryQuestionsScreen = () => {
 
   const handleQuestionPress = (question: GameQuestion) => {
     if (activeTab === 'completed') {
-      // Logic for completed tab
-      if (question.isAnsweredByPartner) {
-        // Navigate to reveal/detail screen
-        // Assuming 'GameQuestionDetail' handles showing answers
-        navigation.navigate('GameQuestionDetail', {
-          questionId: question._id,
-          text: question.text,
-          categoryName,
-          categoryEmoji,
-          categoryColor,
-        });
-      } else {
-        // Waiting for partner
-        Alert.alert(
-          'Waiting for Partner',
-          'Your partner hasn\'t answered this question yet. Nudge them to play!',
-        );
-      }
+      // Navigate to answer viewing screen for completed questions
+      navigation.navigate('GameQuestionAnswer', {
+        questionId: question._id,
+        categoryName,
+        categoryEmoji,
+        categoryColor,
+      });
     } else {
-      // Logic for available tab (Play)
+      // Navigate to input screen for available questions
       navigation.navigate('GameQuestionDetail', {
         questionId: question._id,
         text: question.text,

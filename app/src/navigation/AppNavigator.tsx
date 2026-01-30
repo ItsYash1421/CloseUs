@@ -25,6 +25,7 @@ import { ChatScreen } from '../screens/chat/ChatScreen';
 import { QuestionsScreen } from '../screens/questions/QuestionsScreen';
 import { CategoryQuestionsScreen } from '../screens/games/CategoryQuestionsScreen';
 import { GameQuestionDetailScreen } from '../screens/games/GameQuestionDetailScreen';
+import { GameQuestionAnswerScreen } from '../screens/games/GameQuestionAnswerScreen';
 import { AllGamesScreen } from '../screens/games/AllGamesScreen';
 import { TabNavigator } from './TabNavigator';
 
@@ -73,6 +74,10 @@ export const AppNavigator = () => {
         <Stack.Screen
           name="GameQuestionDetail"
           component={GameQuestionDetailScreen}
+        />
+        <Stack.Screen
+          name="GameQuestionAnswer"
+          component={GameQuestionAnswerScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -62,6 +62,29 @@ export interface RandomGameResponse {
   };
 }
 
+export interface QuestionWithAnswersResponse {
+  question: {
+    _id: string;
+    text: string;
+    categoryId: string;
+  };
+  category: {
+    _id: string;
+    name: string;
+    emoji: string;
+    gameType: string;
+    color: string;
+  };
+  userAnswer: {
+    answer: string;
+    answeredAt: string;
+  } | null;
+  partnerAnswer: {
+    answer: string;
+    answeredAt: string;
+  } | null;
+}
+
 // ------------------------------------------------------------------
 // Games API Service
 // ------------------------------------------------------------------
@@ -155,6 +178,23 @@ class GamesService {
       return response.data;
     } catch (error) {
       console.error('Failed to fetch user answers:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get question with both user and partner answers
+   */
+  async getQuestionWithAnswers(
+    questionId: string,
+  ): Promise<QuestionWithAnswersResponse> {
+    try {
+      const response = await apiClient.get<
+        ApiResponse<QuestionWithAnswersResponse>
+      >(`/api/games/question/${questionId}/answers`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch question with answers:', error);
       throw error;
     }
   }

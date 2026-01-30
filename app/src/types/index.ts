@@ -181,6 +181,12 @@ export type RootStackParamList = {
     categoryEmoji: string;
     categoryColor: string;
   };
+  GameQuestionAnswer: {
+    questionId: string;
+    categoryName: string;
+    categoryEmoji: string;
+    categoryColor: string;
+  };
   NeverHaveIEver: { gameId: string };
   Profile: undefined;
   EditProfile: undefined;
