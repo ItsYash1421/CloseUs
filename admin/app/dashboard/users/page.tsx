@@ -75,20 +75,22 @@ export default function UsersPage() {
                 <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
                     <button
                         onClick={() => toggleViewMode('table')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all ${viewMode === 'table'
+                        className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all ${
+                            viewMode === 'table'
                                 ? 'bg-white shadow-sm text-blue-600 font-medium'
                                 : 'text-gray-600 hover:text-gray-900'
-                            }`}
+                        }`}
                     >
                         <TableIcon size={18} />
                         <span className="text-sm">Table</span>
                     </button>
                     <button
                         onClick={() => toggleViewMode('card')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all ${viewMode === 'card'
+                        className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all ${
+                            viewMode === 'card'
                                 ? 'bg-white shadow-sm text-blue-600 font-medium'
                                 : 'text-gray-600 hover:text-gray-900'
-                            }`}
+                        }`}
                     >
                         <LayoutGrid size={18} />
                         <span className="text-sm">Cards</span>
@@ -135,7 +137,9 @@ export default function UsersPage() {
                                             <td>{user.phone || 'N/A'}</td>
                                             <td>
                                                 {user.coupleId?.isPaired ? (
-                                                    <span className="badge badge-success">Paired</span>
+                                                    <span className="badge badge-success">
+                                                        Paired
+                                                    </span>
                                                 ) : (
                                                     <span className="badge badge-warning">
                                                         Unpaired
@@ -195,7 +199,9 @@ export default function UsersPage() {
                                             {user.coupleId?.isPaired ? (
                                                 <span className="badge badge-success">Paired</span>
                                             ) : (
-                                                <span className="badge badge-warning">Unpaired</span>
+                                                <span className="badge badge-warning">
+                                                    Unpaired
+                                                </span>
                                             )}
                                             {user.coupleId?.coupleTag && (
                                                 <span className="text-pink-600 font-semibold text-sm">
