@@ -88,3 +88,57 @@ body {
 [data-radix-dialog-overlay] {
     background-color: rgba(0, 0, 0, 0.5) !important;
 }
+
+/* Couples Grid Layout */
+.couples-grid {
+    @apply grid gap-6;
+    grid-template-columns: repeat(1, 1fr);
+}
+
+@media (min-width: 640px) {
+    .couples-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .couples-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Couple Card */
+.couple-card {
+    @apply bg-white rounded-lg border border-gray-200 p-6 transition-all duration-300;
+}
+
+.couple-card:hover {
+    @apply shadow-lg border-gray-300 -translate-y-1;
+}
+
+/* Users Grid Layout */
+.users-grid {
+    @apply grid gap-6;
+    grid-template-columns: repeat(1, 1fr);
+}
+
+@media (min-width: 640px) {
+    .users-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .users-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* User Card */
+.user-card {
+    @apply bg-white rounded-lg border border-gray-200 p-6 transition-all duration-300;
+}
+
+.user-card:hover {
+    @apply shadow-lg border-gray-300 -translate-y-1;
+}
