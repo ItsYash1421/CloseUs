@@ -15,9 +15,9 @@ class ChatService {
     before: string,
     limit: number = 20,
   ): Promise<PaginatedResponse<Message>> {
-    const response = await apiClient.get<ApiResponse<{ messages: Message[], hasMore: boolean }>>(
-      `/api/chat/messages/older?before=${before}&limit=${limit}`,
-    );
+    const response = await apiClient.get<
+      ApiResponse<{ messages: Message[]; hasMore: boolean }>
+    >(`/api/chat/messages/older?before=${before}&limit=${limit}`);
 
     const data = response.data as any;
     return {

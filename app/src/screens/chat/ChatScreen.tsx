@@ -1,11 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  Platform,
-} from 'react-native';
+import { View, Text, StyleSheet, FlatList, Platform } from 'react-native';
 import { GradientBackground } from '../../components/common';
 import { ChatHeader } from '../../components/chat/ChatHeader';
 import { MessageBubble } from '../../components/chat/MessageBubble';
@@ -84,13 +78,14 @@ export const ChatScreen = () => {
       messageId: item._id,
       senderId: item.senderId,
       userId: user?._id,
-      isMe: item.senderId === user?._id
+      isMe: item.senderId === user?._id,
     });
 
     // Handle both populated senderId (object) and non-populated (string)
-    const senderId = typeof item.senderId === 'string'
-      ? item.senderId
-      : (item.senderId as any)?._id || (item.senderId as any)?.id;
+    const senderId =
+      typeof item.senderId === 'string'
+        ? item.senderId
+        : (item.senderId as any)?._id || (item.senderId as any)?.id;
 
     const isMe = senderId === user?._id;
 
@@ -105,11 +100,15 @@ export const ChatScreen = () => {
     // 2. Previous message (index - 1) is from different sender, OR
     // 3. Previous message is more than 1 minute apart
     const prevMessage = index > 0 ? messages[index - 1] : null;
-    const showTime = !prevMessage ||
+    const showTime =
+      !prevMessage ||
       (typeof prevMessage.senderId === 'string'
         ? prevMessage.senderId
-        : (prevMessage.senderId as any)?._id || (prevMessage.senderId as any)?.id) !== senderId ||
-      (new Date(item.createdAt).getTime() - new Date(prevMessage.createdAt).getTime()) > 60000;
+        : (prevMessage.senderId as any)?._id ||
+          (prevMessage.senderId as any)?.id) !== senderId ||
+      new Date(item.createdAt).getTime() -
+        new Date(prevMessage.createdAt).getTime() >
+        60000;
 
     return (
       <MessageBubble

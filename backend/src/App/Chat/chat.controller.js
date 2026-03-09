@@ -93,16 +93,21 @@ const getOlderMessages = async (req, res) => {
         // Get messages older than the 'before' timestamp
         const messages = await Message.find({
             coupleId: couple._id,
-            createdAt: { $lt: new Date(before) }
+            createdAt: { $lt: new Date(before) },
         })
             .sort({ createdAt: -1 })
             .limit(parseInt(limit))
             .populate('senderId', 'name photoUrl gender isOnline');
 
-        res.json(successResponse({
-            messages,
-            hasMore: messages.length === parseInt(limit)
-        }, 'Older messages retrieved'));
+        res.json(
+            successResponse(
+                {
+                    messages,
+                    hasMore: messages.length === parseInt(limit),
+                },
+                'Older messages retrieved'
+            )
+        );
     } catch (error) {
         console.error('Get older messages error:', error);
         res.status(500).json(errorResponse('Internal server error'));

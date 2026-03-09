@@ -47,13 +47,18 @@ export const useChatStore = create<ChatState>()(
         if (!messageExists) {
           // Check if there is a pending/optimistic message that matches this new message
           // We match by content and sender, and ensure the pending one has a temp ID
-          const pendingMessageIndex = messages.findIndex(m =>
-            typeof m._id === 'string' &&
-            m._id.startsWith('temp-') &&
-            m.content === message.content &&
-            // Handle both object and string senderId formats
-            ((typeof m.senderId === 'string' ? m.senderId : (m.senderId as any)._id) ===
-              (typeof message.senderId === 'string' ? message.senderId : (message.senderId as any)._id))
+          const pendingMessageIndex = messages.findIndex(
+            m =>
+              typeof m._id === 'string' &&
+              m._id.startsWith('temp-') &&
+              m.content === message.content &&
+              // Handle both object and string senderId formats
+              (typeof m.senderId === 'string'
+                ? m.senderId
+                : (m.senderId as any)._id) ===
+                (typeof message.senderId === 'string'
+                  ? message.senderId
+                  : (message.senderId as any)._id),
           );
 
           if (pendingMessageIndex !== -1) {
@@ -90,25 +95,29 @@ export const useChatStore = create<ChatState>()(
           } else {
             // Load older messages with pagination
             const currentMessages = get().messages;
-            const oldestMessage = currentMessages.length > 0
-              ? currentMessages[currentMessages.length - 1]
-              : null;
+            const oldestMessage =
+              currentMessages.length > 0
+                ? currentMessages[currentMessages.length - 1]
+                : null;
 
             if (!oldestMessage) {
               set({ isLoading: false });
               return;
             }
 
-            const before = typeof oldestMessage.createdAt === 'string'
-              ? oldestMessage.createdAt
-              : new Date(oldestMessage.createdAt).toISOString();
+            const before =
+              typeof oldestMessage.createdAt === 'string'
+                ? oldestMessage.createdAt
+                : new Date(oldestMessage.createdAt).toISOString();
 
             const response = await chatService.getOlderMessages(before, 20);
 
             // Append older messages to the end (avoid duplicates)
             const newMessages = response.data;
             const existingIds = new Set(currentMessages.map(m => m._id));
-            const uniqueNewMessages = newMessages.filter(m => !existingIds.has(m._id));
+            const uniqueNewMessages = newMessages.filter(
+              m => !existingIds.has(m._id),
+            );
 
             set({
               messages: [...currentMessages, ...uniqueNewMessages],
@@ -224,11 +233,11 @@ export const useChatStore = create<ChatState>()(
       // Optimization: Only persist essential data.
       // Exclude ephemeral state like isTyping, isConnected, isLoading which causes
       // unnecessary expensive writes to storage on frequent updates.
-      partialize: (state) => ({
+      partialize: state => ({
         messages: state.messages,
         hasMore: state.hasMore,
         page: state.page,
       }),
-    }
-  )
+    },
+  ),
 );
