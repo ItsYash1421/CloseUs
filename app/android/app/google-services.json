@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "679581555584-rospuhvenv465jvsdbp5iki3s0up0he3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.closeus",
+            "certificate_hash": "e2b1139584614f3d328a02a541c3a0f2c19c9c23"
+          }
+        },
+        {
           "client_id": "679581555584-5b3cqif6kg6th684lm2ijnp330c7950k.apps.googleusercontent.com",
           "client_type": 3
         }

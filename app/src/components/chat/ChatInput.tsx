@@ -41,8 +41,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const translateY = React.useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
 
     const onShow = () => {
       Animated.spring(translateY, {
@@ -95,13 +97,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const canSend = value.trim().length > 0;
 
   return (
-    <Animated.View 
+    <Animated.View
       style={[
         styles.wrapper,
         {
           paddingBottom: insets.bottom + 10,
           transform: [{ translateY }],
-        }
+        },
       ]}
     >
       <View style={styles.container}>
@@ -111,61 +113,61 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           blurAmount={BLUR_CONFIG.blurAmount}
           reducedTransparencyFallbackColor={BLUR_CONFIG.fallbackColor}
         />
-        
+
         {/* Dark tint overlay */}
         <View style={styles.tintOverlay} />
-        
+
         {/* Border overlay */}
         <View style={styles.borderOverlay} />
-      
-      <View style={styles.content}>
-        {/* Input Field */}
-        <View
-          style={[
-            styles.inputContainer,
-            isFocused && styles.inputContainerFocused,
-          ]}
-        >
-          <TextInput
-            style={styles.input}
-            placeholder={placeholder}
-            placeholderTextColor={COLORS.textMuted}
-            value={value}
-            onChangeText={onChangeText}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            multiline
-            maxLength={maxLength}
-            textAlignVertical="center"
-          />
-        </View>
 
-        {/* Send Button */}
-        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-          <TouchableOpacity
-            onPress={handleSend}
-            onPressIn={handlePressIn}
-            onPressOut={handlePressOut}
-            disabled={!canSend}
-            activeOpacity={0.8}
+        <View style={styles.content}>
+          {/* Input Field */}
+          <View
+            style={[
+              styles.inputContainer,
+              isFocused && styles.inputContainerFocused,
+            ]}
           >
-            {canSend ? (
-              <LinearGradient
-                colors={['#FF6B9D', '#C2185B']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.sendButton}
-              >
-                <Icon name="send" size={22} color={COLORS.white} />
-              </LinearGradient>
-            ) : (
-              <View style={styles.sendButtonDisabled}>
-                <Icon name="send" size={22} color={COLORS.textMuted} />
-              </View>
-            )}
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
+            <TextInput
+              style={styles.input}
+              placeholder={placeholder}
+              placeholderTextColor={COLORS.textMuted}
+              value={value}
+              onChangeText={onChangeText}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              multiline
+              maxLength={maxLength}
+              textAlignVertical="center"
+            />
+          </View>
+
+          {/* Send Button */}
+          <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+            <TouchableOpacity
+              onPress={handleSend}
+              onPressIn={handlePressIn}
+              onPressOut={handlePressOut}
+              disabled={!canSend}
+              activeOpacity={0.8}
+            >
+              {canSend ? (
+                <LinearGradient
+                  colors={['#FF6B9D', '#C2185B']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.sendButton}
+                >
+                  <Icon name="send" size={22} color={COLORS.white} />
+                </LinearGradient>
+              ) : (
+                <View style={styles.sendButtonDisabled}>
+                  <Icon name="send" size={22} color={COLORS.textMuted} />
+                </View>
+              )}
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
       </View>
     </Animated.View>
   );

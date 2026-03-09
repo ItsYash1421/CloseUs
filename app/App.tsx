@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { BackHandler, Alert } from 'react-native';
+import { BackHandler, Alert, View, Text, StyleSheet } from 'react-native';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { reset as resetNavigation } from './src/services/navigationService';
 import notificationService from './src/services/notificationService';
@@ -15,8 +15,23 @@ import apiClient from './src/services/apiClient';
 import { NetworkLoggerButton } from './src/components/NetworkLoggerButton';
 import { ConfirmModal } from './src/components/global/ConfirmModal';
 import { eventEmitter } from './src/utils/eventEmitter';
+import { COLORS } from './src/constants/colors';
+import THEME from './src/constants/theme';
 
 import Toast from 'react-native-toast-message';
+
+const toastConfig = {
+  success: (props: any) => (
+    <View style={appToastStyles.successContainer}>
+      <Text style={appToastStyles.title}>{props.text1}</Text>
+    </View>
+  ),
+  error: (props: any) => (
+    <View style={appToastStyles.errorContainer}>
+      <Text style={appToastStyles.title}>{props.text1}</Text>
+    </View>
+  ),
+};
 
 function App() {
   const user = useAuthStore(state => state.user);
@@ -189,7 +204,7 @@ function App() {
     <SafeAreaProvider>
       <AppNavigator />
       <NetworkLoggerButton />
-      <Toast />
+      <Toast config={toastConfig} />
 
       {/* Session Expired Modal */}
       <ConfirmModal
@@ -203,5 +218,40 @@ function App() {
     </SafeAreaProvider>
   );
 }
+
+const appToastStyles = StyleSheet.create({
+  successContainer: {
+    width: '90%',
+    alignSelf: 'center',
+    backgroundColor: COLORS.green500,
+    paddingHorizontal: THEME.spacing.lg,
+    paddingVertical: 12,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 9999,
+  },
+  errorContainer: {
+    width: '90%',
+    alignSelf: 'center',
+    backgroundColor: COLORS.red500,
+    paddingHorizontal: THEME.spacing.lg,
+    paddingVertical: 12,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 9999,
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.white,
+    textAlign: 'center',
+  },
+});
 
 export default App;

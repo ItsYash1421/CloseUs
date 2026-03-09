@@ -488,7 +488,7 @@ export const AnniversaryScreen = ({ navigation }: any) => {
               style={[
                 styles.nextButton,
                 (!day || !month || !year || !partnerName || loading) &&
-                styles.nextButtonDisabled,
+                  styles.nextButtonDisabled,
               ]}
               onPress={handleContinue}
               disabled={!day || !month || !year || !partnerName || loading}

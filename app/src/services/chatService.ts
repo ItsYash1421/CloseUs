@@ -15,9 +15,9 @@ class ChatService {
     before: string,
     limit: number = 20,
   ): Promise<PaginatedResponse<Message>> {
-    const response = await apiClient.get<ApiResponse<{ messages: Message[], hasMore: boolean }>>(
-      `/api/chat/messages/older?before=${before}&limit=${limit}`,
-    );
+    const response = await apiClient.get<
+      ApiResponse<{ messages: Message[]; hasMore: boolean }>
+    >(`/api/chat/messages/older?before=${before}&limit=${limit}`);
 
     const data = response.data as any;
     return {
@@ -78,6 +78,34 @@ class ChatService {
       formData,
     );
     return response.data!.url;
+  }
+
+  async updateChatSettings(settings: {
+    deleteAfterSeen?: boolean;
+    deleteAfter12Hours?: boolean;
+  }): Promise<{ deleteAfterSeen: boolean; deleteAfter12Hours: boolean }> {
+    const response = await apiClient.put<
+      ApiResponse<{ deleteAfterSeen: boolean; deleteAfter12Hours: boolean }>
+    >('/api/chat/settings', settings);
+    return response.data!;
+  }
+
+  async getChatSettings(): Promise<{
+    deleteAfterSeen: boolean;
+    deleteAfter12Hours: boolean;
+  }> {
+    const response = await apiClient.get<
+      ApiResponse<{ deleteAfterSeen: boolean; deleteAfter12Hours: boolean }>
+    >('/api/chat/settings');
+    return response.data!;
+  }
+
+  async deleteMessage(messageId: string): Promise<void> {
+    await apiClient.delete(`/api/chat/messages/${messageId}`);
+  }
+
+  async deleteAllMessages(): Promise<void> {
+    await apiClient.delete('/api/chat/messages');
   }
 }
 

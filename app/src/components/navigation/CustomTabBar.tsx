@@ -91,8 +91,10 @@ export const CustomTabBar: React.FC<TabBarProps> = ({
   const opacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
 
     const onShow = (e: any) => {
       // Just fade out instantly, no movement

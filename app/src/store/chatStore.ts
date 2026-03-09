@@ -5,6 +5,11 @@ import { Message } from '../types';
 import chatService from '../services/chatService';
 import socketService from '../services/socketService';
 
+interface ChatSettings {
+  deleteAfterSeen: boolean;
+  deleteAfter12Hours: boolean;
+}
+
 interface ChatState {
   messages: Message[];
   isTyping: boolean;
@@ -12,6 +17,7 @@ interface ChatState {
   isLoading: boolean;
   hasMore: boolean;
   page: number;
+  chatSettings: ChatSettings | null;
 
   // Actions
   setMessages: (messages: Message[]) => void;
@@ -25,6 +31,9 @@ interface ChatState {
   markMessageAsRead: (messageId: string) => Promise<void>;
   connectSocket: () => Promise<void>;
   disconnectSocket: () => void;
+  updateChatSettings: (settings: Partial<ChatSettings>) => Promise<void>;
+  loadChatSettings: () => Promise<void>;
+  deleteMessage: (messageId: string) => Promise<void>;
 }
 
 export const useChatStore = create<ChatState>()(
@@ -36,6 +45,7 @@ export const useChatStore = create<ChatState>()(
       isLoading: false,
       hasMore: true,
       page: 1,
+      chatSettings: null,
 
       setMessages: messages => set({ messages }),
 
@@ -47,13 +57,18 @@ export const useChatStore = create<ChatState>()(
         if (!messageExists) {
           // Check if there is a pending/optimistic message that matches this new message
           // We match by content and sender, and ensure the pending one has a temp ID
-          const pendingMessageIndex = messages.findIndex(m =>
-            typeof m._id === 'string' &&
-            m._id.startsWith('temp-') &&
-            m.content === message.content &&
-            // Handle both object and string senderId formats
-            ((typeof m.senderId === 'string' ? m.senderId : (m.senderId as any)._id) ===
-              (typeof message.senderId === 'string' ? message.senderId : (message.senderId as any)._id))
+          const pendingMessageIndex = messages.findIndex(
+            m =>
+              typeof m._id === 'string' &&
+              m._id.startsWith('temp-') &&
+              m.content === message.content &&
+              // Handle both object and string senderId formats
+              (typeof m.senderId === 'string'
+                ? m.senderId
+                : (m.senderId as any)._id) ===
+                (typeof message.senderId === 'string'
+                  ? message.senderId
+                  : (message.senderId as any)._id),
           );
 
           if (pendingMessageIndex !== -1) {
@@ -90,25 +105,29 @@ export const useChatStore = create<ChatState>()(
           } else {
             // Load older messages with pagination
             const currentMessages = get().messages;
-            const oldestMessage = currentMessages.length > 0
-              ? currentMessages[currentMessages.length - 1]
-              : null;
+            const oldestMessage =
+              currentMessages.length > 0
+                ? currentMessages[currentMessages.length - 1]
+                : null;
 
             if (!oldestMessage) {
               set({ isLoading: false });
               return;
             }
 
-            const before = typeof oldestMessage.createdAt === 'string'
-              ? oldestMessage.createdAt
-              : new Date(oldestMessage.createdAt).toISOString();
+            const before =
+              typeof oldestMessage.createdAt === 'string'
+                ? oldestMessage.createdAt
+                : new Date(oldestMessage.createdAt).toISOString();
 
             const response = await chatService.getOlderMessages(before, 20);
 
             // Append older messages to the end (avoid duplicates)
             const newMessages = response.data;
             const existingIds = new Set(currentMessages.map(m => m._id));
-            const uniqueNewMessages = newMessages.filter(m => !existingIds.has(m._id));
+            const uniqueNewMessages = newMessages.filter(
+              m => !existingIds.has(m._id),
+            );
 
             set({
               messages: [...currentMessages, ...uniqueNewMessages],
@@ -207,6 +226,24 @@ export const useChatStore = create<ChatState>()(
           socketService.onConnection(isConnected => {
             set({ isConnected });
           });
+
+          // Listen for message deletions
+          socketService.onMessageDeleted(messageId => {
+            const messages = get().messages.filter(msg => msg._id !== messageId);
+            set({ messages });
+          });
+
+          // Listen for clear chat (delete all messages)
+          socketService.onClearChat(() => {
+            set({ messages: [] });
+          });
+
+          // Listen for clear read messages (delete after chat closed)
+          socketService.onClearReadMessages(() => {
+            // Remove all read messages from local state
+            const messages = get().messages.filter(msg => !msg.isRead);
+            set({ messages });
+          });
         } catch (error) {
           console.error('Failed to connect socket:', error);
           set({ isConnected: false });
@@ -217,6 +254,37 @@ export const useChatStore = create<ChatState>()(
         socketService.disconnect();
         set({ isConnected: false });
       },
+
+      updateChatSettings: async (settings: Partial<ChatSettings>) => {
+        try {
+          set({ isLoading: true });
+          const response = await chatService.updateChatSettings(settings);
+          set({ chatSettings: response, isLoading: false });
+        } catch (error) {
+          console.error('Failed to update chat settings:', error);
+          set({ isLoading: false });
+          throw error;
+        }
+      },
+
+      loadChatSettings: async () => {
+        try {
+          const settings = await chatService.getChatSettings();
+          set({ chatSettings: settings });
+        } catch (error) {
+          console.error('Failed to load chat settings:', error);
+        }
+      },
+
+      deleteMessage: async (messageId: string) => {
+        try {
+          await chatService.deleteMessage(messageId);
+          const messages = get().messages.filter(msg => msg._id !== messageId);
+          set({ messages });
+        } catch (error) {
+          console.error('Failed to delete message:', error);
+        }
+      },
     }),
     {
       name: 'chat-storage',
@@ -224,11 +292,11 @@ export const useChatStore = create<ChatState>()(
       // Optimization: Only persist essential data.
       // Exclude ephemeral state like isTyping, isConnected, isLoading which causes
       // unnecessary expensive writes to storage on frequent updates.
-      partialize: (state) => ({
+      partialize: state => ({
         messages: state.messages,
         hasMore: state.hasMore,
         page: state.page,
       }),
-    }
-  )
+    },
+  ),
 );

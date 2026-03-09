@@ -244,7 +244,7 @@ export const CreateKeyScreen = ({ navigation }: any) => {
             <Text style={styles.gotKeyText}>Got a Key?</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => { }}>
+          <TouchableOpacity onPress={() => {}}>
             <Text style={styles.whyPairText}>Why to Pair?</Text>
           </TouchableOpacity>
         </View>

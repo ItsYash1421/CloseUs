@@ -6,12 +6,18 @@ import authService from './authService';
 type MessageCallback = (message: Message) => void;
 type TypingCallback = (isTyping: boolean) => void;
 type ConnectionCallback = (connected: boolean) => void;
+type MessageDeletedCallback = (messageId: string) => void;
+type ClearChatCallback = () => void;
+type ClearReadMessagesCallback = () => void;
 
 class SocketService {
   private socket: Socket | null = null;
   private messageCallbacks: MessageCallback[] = [];
   private typingCallbacks: TypingCallback[] = [];
   private connectionCallbacks: ConnectionCallback[] = [];
+  private messageDeletedCallbacks: MessageDeletedCallback[] = [];
+  private clearChatCallbacks: ClearChatCallback[] = [];
+  private clearReadMessagesCallbacks: ClearReadMessagesCallback[] = [];
 
   async connect() {
     if (this.socket?.connected) {
@@ -60,6 +66,20 @@ class SocketService {
       this.typingCallbacks.forEach(callback => callback(false));
     });
 
+    this.socket.on('message_deleted', (data: { messageId: string }) => {
+      this.messageDeletedCallbacks.forEach(callback =>
+        callback(data.messageId),
+      );
+    });
+
+    this.socket.on('clear_chat', () => {
+      this.clearChatCallbacks.forEach(callback => callback());
+    });
+
+    this.socket.on('clear_read_messages', () => {
+      this.clearReadMessagesCallbacks.forEach(callback => callback());
+    });
+
     this.socket.on('error', (error: any) => {
       console.error('Socket error:', error);
     });
@@ -92,6 +112,24 @@ class SocketService {
     }
   }
 
+  markMessageAsRead(messageId: string) {
+    if (this.socket?.connected) {
+      this.socket.emit('message_read', { messageId });
+    }
+  }
+
+  notifyChatClosed() {
+    if (this.socket?.connected) {
+      this.socket.emit('chat_closed');
+    }
+  }
+
+  notifyChatOpened() {
+    if (this.socket?.connected) {
+      this.socket.emit('chat_opened');
+    }
+  }
+
   onMessage(callback: MessageCallback) {
     this.messageCallbacks.push(callback);
     return () => {
@@ -112,6 +150,33 @@ class SocketService {
     this.connectionCallbacks.push(callback);
     return () => {
       this.connectionCallbacks = this.connectionCallbacks.filter(
+        cb => cb !== callback,
+      );
+    };
+  }
+
+  onMessageDeleted(callback: MessageDeletedCallback) {
+    this.messageDeletedCallbacks.push(callback);
+    return () => {
+      this.messageDeletedCallbacks = this.messageDeletedCallbacks.filter(
+        cb => cb !== callback,
+      );
+    };
+  }
+
+  onClearChat(callback: ClearChatCallback) {
+    this.clearChatCallbacks.push(callback);
+    return () => {
+      this.clearChatCallbacks = this.clearChatCallbacks.filter(
+        cb => cb !== callback,
+      );
+    };
+  }
+
+  onClearReadMessages(callback: ClearReadMessagesCallback) {
+    this.clearReadMessagesCallbacks.push(callback);
+    return () => {
+      this.clearReadMessagesCallbacks = this.clearReadMessagesCallbacks.filter(
         cb => cb !== callback,
       );
     };

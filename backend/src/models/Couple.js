@@ -43,6 +43,20 @@ const coupleSchema = new mongoose.Schema(
         timeZone: String,
 
         // ------------------------------------------------------------------
+        // Chat Settings
+        // ------------------------------------------------------------------
+        chatSettings: {
+            deleteAfterSeen: {
+                type: Boolean,
+                default: false,
+            },
+            deleteAfter12Hours: {
+                type: Boolean,
+                default: true,
+            },
+        },
+
+        // ------------------------------------------------------------------
         // Status
         // ------------------------------------------------------------------
         isActive: {
