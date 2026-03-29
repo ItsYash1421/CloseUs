@@ -107,12 +107,20 @@ class ApiClient {
     return response.data;
   }
 
-  async post<T>(url: string, data?: any, config?: AxiosRequestConfig) {
+  async post<T>(
+    url: string,
+    data?: Record<string, unknown>,
+    config?: AxiosRequestConfig,
+  ) {
     const response = await this.client.post<T>(url, data, config);
     return response.data;
   }
 
-  async put<T>(url: string, data?: any, config?: AxiosRequestConfig) {
+  async put<T>(
+    url: string,
+    data?: Record<string, unknown>,
+    config?: AxiosRequestConfig,
+  ) {
     const response = await this.client.put<T>(url, data, config);
     return response.data;
   }
@@ -122,7 +130,11 @@ class ApiClient {
     return response.data;
   }
 
-  async patch<T>(url: string, data?: any, config?: AxiosRequestConfig) {
+  async patch<T>(
+    url: string,
+    data?: Record<string, unknown>,
+    config?: AxiosRequestConfig,
+  ) {
     const response = await this.client.patch<T>(url, data, config);
     return response.data;
   }

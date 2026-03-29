@@ -21,7 +21,6 @@ const adminAuthMiddleware = async (req, res, next) => {
         req.adminRole = decoded.role;
         next();
     } catch (error) {
-        console.error('Admin auth middleware error:', error);
         res.status(401).json(errorResponse('Authentication failed', 401));
     }
 };

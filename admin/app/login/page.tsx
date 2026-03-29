@@ -20,8 +20,8 @@ export default function LoginPage() {
         try {
             await login(email, password);
             router.push('/dashboard');
-        } catch (err: any) {
-            setError(err.message || 'Login failed');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Login failed');
         } finally {
             setLoading(false);
         }
@@ -79,9 +79,8 @@ export default function LoginPage() {
                     </button>
                 </form>
 
-                <div className="mt-6 text-center text-sm text-gray-600">
-                    <p>Default credentials:</p>
-                    <p className="font-mono text-xs mt-1">yashbt22csd@gmail.com / Admin@123456</p>
+                <div className="mt-6 text-center text-sm text-gray-500">
+                    <p>Contact your administrator for access credentials.</p>
                 </div>
             </div>
         </div>

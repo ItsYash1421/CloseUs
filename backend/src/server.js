@@ -18,10 +18,24 @@ const server = http.createServer(app);
 // ------------------------------------------------------------------
 // Initialize Socket.io
 // ------------------------------------------------------------------
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    process.env.ADMIN_URL,
+    process.env.WEB_URL,
+].filter(Boolean);
+
 const io = new Server(server, {
     cors: {
-        origin: '*',
+        origin: function (origin, callback) {
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+            return callback(new Error('Not allowed by CORS'));
+        },
         methods: ['GET', 'POST'],
+        credentials: true,
     },
 });
 

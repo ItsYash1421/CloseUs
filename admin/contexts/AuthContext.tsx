@@ -3,9 +3,16 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { apiClient } from '@/lib/api';
 
+interface Admin {
+    _id: string;
+    name: string;
+    email: string;
+    role: string;
+}
+
 interface AuthContextType {
     token: string | null;
-    admin: any | null;
+    admin: Admin | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => void;
     isLoading: boolean;
@@ -15,7 +22,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [token, setToken] = useState<string | null>(null);
-    const [admin, setAdmin] = useState<any | null>(null);
+    const [admin, setAdmin] = useState<Admin | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {

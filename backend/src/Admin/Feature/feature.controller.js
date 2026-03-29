@@ -6,8 +6,13 @@ const { successResponse, errorResponse } = require('../../Shared/Utils');
 // ------------------------------------------------------------------
 exports.createFeatureFlag = async (req, res) => {
     try {
+        const { name, displayName, description, isEnabled, rolloutPercentage } = req.body;
         const featureFlag = new FeatureFlag({
-            ...req.body,
+            name,
+            displayName,
+            description,
+            isEnabled,
+            rolloutPercentage,
             createdBy: req.adminId,
         });
 
@@ -15,7 +20,6 @@ exports.createFeatureFlag = async (req, res) => {
 
         res.status(201).json(successResponse(featureFlag, 'Feature flag created'));
     } catch (error) {
-        console.error('Error creating feature flag:', error);
         if (error.code === 11000) {
             return res.status(400).json(errorResponse('Feature flag already exists'));
         }
@@ -34,7 +38,6 @@ exports.getFeatureFlags = async (req, res) => {
 
         res.json(successResponse(featureFlags));
     } catch (error) {
-        console.error('Error fetching feature flags:', error);
         res.status(500).json(errorResponse('Failed to fetch feature flags'));
     }
 };
@@ -44,7 +47,19 @@ exports.getFeatureFlags = async (req, res) => {
 // ------------------------------------------------------------------
 exports.updateFeatureFlag = async (req, res) => {
     try {
-        const featureFlag = await FeatureFlag.findByIdAndUpdate(req.params.id, req.body, {
+        const allowedFields = [
+            'name',
+            'displayName',
+            'description',
+            'isEnabled',
+            'rolloutPercentage',
+        ];
+        const updates = {};
+        for (const key of allowedFields) {
+            if (req.body[key] !== undefined) updates[key] = req.body[key];
+        }
+
+        const featureFlag = await FeatureFlag.findByIdAndUpdate(req.params.id, updates, {
             new: true,
             runValidators: true,
         });
@@ -55,7 +70,6 @@ exports.updateFeatureFlag = async (req, res) => {
 
         res.json(successResponse(featureFlag, 'Feature flag updated'));
     } catch (error) {
-        console.error('Error updating feature flag:', error);
         res.status(500).json(errorResponse('Failed to update feature flag'));
     }
 };
@@ -73,7 +87,6 @@ exports.deleteFeatureFlag = async (req, res) => {
 
         res.json(successResponse(null, 'Feature flag deleted'));
     } catch (error) {
-        console.error('Error deleting feature flag:', error);
         res.status(500).json(errorResponse('Failed to delete feature flag'));
     }
 };
@@ -107,7 +120,6 @@ exports.toggleFeatureFlag = async (req, res) => {
             )
         );
     } catch (error) {
-        console.error('Error toggling feature flag:', error);
         res.status(500).json(errorResponse('Failed to toggle feature flag'));
     }
 };
@@ -137,7 +149,6 @@ exports.updateRollout = async (req, res) => {
 
         res.json(successResponse(featureFlag, 'Rollout updated'));
     } catch (error) {
-        console.error('Error updating rollout:', error);
         res.status(500).json(errorResponse('Failed to update rollout'));
     }
 };
@@ -161,7 +172,6 @@ exports.getUserFeatures = async (req, res) => {
 
         res.json(successResponse(enabledFeatures));
     } catch (error) {
-        console.error('Error fetching user features:', error);
         res.status(500).json(errorResponse('Failed to fetch features'));
     }
 };

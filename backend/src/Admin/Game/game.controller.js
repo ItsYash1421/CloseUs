@@ -18,7 +18,6 @@ const createGameCategory = async (req, res) => {
 
         res.status(201).json(successResponse(category, 'Game category created'));
     } catch (error) {
-        console.error('Create game category error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
@@ -28,20 +27,23 @@ const createGameCategory = async (req, res) => {
 // ------------------------------------------------------------------
 const getGameCategories = async (req, res) => {
     try {
-        const categories = await GameCategory.find().sort({ order: 1, timesPlayed: -1 });
-
-        // ------------------------------------------------------------------
-        // Count Questions Per Category
-        // ------------------------------------------------------------------
-        const categoriesWithCount = await Promise.all(
-            categories.map(async (cat) => {
-                const questionCount = await GameQuestion.countDocuments({ categoryId: cat._id });
-                return {
-                    ...cat.toObject(),
-                    questionCount,
-                };
-            })
-        );
+        const categoriesWithCount = await GameCategory.aggregate([
+            { $sort: { order: 1, timesPlayed: -1 } },
+            {
+                $lookup: {
+                    from: 'gamequestions',
+                    localField: '_id',
+                    foreignField: 'categoryId',
+                    as: 'questions',
+                },
+            },
+            {
+                $addFields: {
+                    questionCount: { $size: '$questions' },
+                },
+            },
+            { $project: { questions: 0 } },
+        ]);
 
         res.json(successResponse(categoriesWithCount));
     } catch (error) {
@@ -55,7 +57,11 @@ const getGameCategories = async (req, res) => {
 const updateGameCategory = async (req, res) => {
     try {
         const { id } = req.params;
-        const updates = req.body;
+        const allowedFields = ['name', 'emoji', 'tags', 'color', 'order', 'isActive', 'gameType'];
+        const updates = {};
+        for (const key of allowedFields) {
+            if (req.body[key] !== undefined) updates[key] = req.body[key];
+        }
 
         const category = await GameCategory.findByIdAndUpdate(id, updates, { new: true });
         if (!category) {
@@ -106,7 +112,6 @@ const createGameQuestion = async (req, res) => {
 
         res.status(201).json(successResponse(question, 'Game question created'));
     } catch (error) {
-        console.error('Create game question error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
@@ -126,9 +131,18 @@ const getAllGameQuestions = async (req, res) => {
 
         const total = await GameQuestion.countDocuments();
 
-        res.json(successResponse(questions));
+        res.json(
+            successResponse({
+                questions,
+                pagination: {
+                    page: Number(page),
+                    limit: Number(limit),
+                    total,
+                    pages: Math.ceil(total / Number(limit)),
+                },
+            })
+        );
     } catch (error) {
-        console.error('Get all game questions error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
@@ -156,7 +170,11 @@ const getGameQuestions = async (req, res) => {
 const updateGameQuestion = async (req, res) => {
     try {
         const { id } = req.params;
-        const updates = req.body;
+        const allowedFields = ['text', 'categoryId', 'isActive', 'order'];
+        const updates = {};
+        for (const key of allowedFields) {
+            if (req.body[key] !== undefined) updates[key] = req.body[key];
+        }
 
         const question = await GameQuestion.findByIdAndUpdate(id, updates, { new: true });
         if (!question) {

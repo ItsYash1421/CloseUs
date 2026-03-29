@@ -16,30 +16,23 @@ export const apiClient = {
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
         }
-
-        console.log('API GET:', `${API_BASE_URL}${endpoint}`);
-
         const response = await fetch(`${API_BASE_URL}${endpoint}`, {
             method: 'GET',
             headers,
         });
-
-        console.log('Response status:', response.status);
 
         if (!response.ok) {
             if (response.status === 401) {
                 handleTokenExpiration();
                 throw new Error('Token expired');
             }
-            const error = await response.text();
-            console.error('API Error:', error);
             throw new Error(`API Error: ${response.statusText}`);
         }
 
         return response.json();
     },
 
-    post: async (endpoint: string, data: any, token?: string) => {
+    post: async (endpoint: string, data: Record<string, unknown>, token?: string) => {
         const headers: HeadersInit = {
             'Content-Type': 'application/json',
         };
@@ -64,7 +57,7 @@ export const apiClient = {
         return response.json();
     },
 
-    put: async (endpoint: string, data: any, token?: string) => {
+    put: async (endpoint: string, data: Record<string, unknown>, token?: string) => {
         const headers: HeadersInit = {
             'Content-Type': 'application/json',
         };

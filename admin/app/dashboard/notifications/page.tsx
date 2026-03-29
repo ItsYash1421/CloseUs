@@ -40,6 +40,7 @@ export default function NotificationsPage() {
     const [templates, setTemplates] = useState<any[]>([]);
     const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isSendOpen, setIsSendOpen] = useState(false);
 
@@ -60,23 +61,27 @@ export default function NotificationsPage() {
 
     const fetchTemplates = async () => {
         try {
+            setError(null);
             const response = await apiClient.get('/admin/notifications/templates', token!);
             if (response.success) {
                 setTemplates(response.data || []);
             }
-        } catch (error) {
+        } catch (err) {
             toast.error('Failed to fetch templates');
+            setError('Failed to load data. Please try again.');
         }
     };
 
     const fetchStats = async () => {
         try {
+            setError(null);
             const response = await apiClient.get('/admin/notifications/stats', token!);
             if (response.success) {
                 setStats(response.data);
             }
-        } catch (error) {
+        } catch (err) {
             console.error('Failed to fetch stats');
+            setError('Failed to load data. Please try again.');
         }
     };
 
@@ -169,6 +174,15 @@ export default function NotificationsPage() {
 
     return (
         <div className="space-y-6">
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-center rounded-lg py-8 mb-6">
+                    <p className="text-red-600 mb-4">{error}</p>
+                    <button onClick={fetchTemplates} className="btn-primary">
+                        Retry
+                    </button>
+                </div>
+            )}
+
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold">Notifications</h1>

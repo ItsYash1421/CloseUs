@@ -40,6 +40,7 @@ export default function GamesPage() {
     const [categories, setCategories] = useState<any[]>([]);
     const [questions, setQuestions] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [isCreateCategoryOpen, setIsCreateCategoryOpen] = useState(false);
     const [isCreateQuestionOpen, setIsCreateQuestionOpen] = useState(false);
     const [editingQuestion, setEditingQuestion] = useState<any>(null);
@@ -66,17 +67,20 @@ export default function GamesPage() {
 
     const fetchCategories = async () => {
         try {
+            setError(null);
             const response = await apiClient.get('/admin/games/categories', token!);
             if (response.success) {
                 setCategories(response.data || []);
             }
-        } catch (error) {
+        } catch (err) {
             toast.error('Failed to fetch game categories');
+            setError('Failed to load data. Please try again.');
         }
     };
 
     const fetchQuestions = async () => {
         try {
+            setError(null);
             const endpoint =
                 selectedCategory === 'all'
                     ? '/admin/games/questions'
@@ -85,8 +89,9 @@ export default function GamesPage() {
             if (response.success) {
                 setQuestions(response.data || response.data?.questions || []);
             }
-        } catch (error) {
+        } catch (err) {
             console.error('Failed to fetch game questions');
+            setError('Failed to load data. Please try again.');
         }
     };
 
@@ -180,8 +185,8 @@ export default function GamesPage() {
                 toast.success('Game category deleted');
                 fetchCategories();
             }
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to delete category');
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : 'Failed to delete category');
         }
     };
 
@@ -196,6 +201,15 @@ export default function GamesPage() {
 
     return (
         <div className="space-y-6">
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-center rounded-lg py-8 mb-6">
+                    <p className="text-red-600 mb-4">{error}</p>
+                    <button onClick={fetchQuestions} className="btn-primary">
+                        Retry
+                    </button>
+                </div>
+            )}
+
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold">Games Management</h1>

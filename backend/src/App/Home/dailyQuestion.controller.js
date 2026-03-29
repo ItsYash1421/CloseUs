@@ -33,8 +33,7 @@ const getDailyQuestion = async (req, res) => {
         }).populate('questionId');
 
         if (!assignedInfo) {
-            const usedQuestions = await DailyCoupleQuestion.find({ coupleId }).select('questionId');
-            const usedIds = usedQuestions.map((dq) => dq.questionId);
+            const usedIds = await DailyCoupleQuestion.find({ coupleId }).distinct('questionId');
 
             const count = await Question.countDocuments({
                 isDaily: true,
@@ -112,7 +111,6 @@ const getDailyQuestion = async (req, res) => {
             })
         );
     } catch (error) {
-        console.error('Get daily question error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
@@ -157,7 +155,6 @@ const answerDailyQuestion = async (req, res) => {
 
         res.json(successResponse(answer, 'Answer submitted successfully'));
     } catch (error) {
-        console.error('Answer question error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
@@ -208,7 +205,6 @@ const deleteDailyAnswer = async (req, res) => {
 
         res.json(successResponse(null, 'Answer deleted successfully'));
     } catch (error) {
-        console.error('Delete answer error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };

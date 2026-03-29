@@ -11,6 +11,7 @@ export default function CouplesPage() {
     const { token } = useAuth();
     const [couples, setCouples] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [viewMode, setViewMode] = useState<ViewMode>('table');
@@ -32,14 +33,16 @@ export default function CouplesPage() {
 
         setLoading(true);
         try {
+            setError(null);
             const response = await apiClient.get(
                 `/admin/dashboard/couples?page=${page}&limit=20`,
                 token
             );
             setCouples(response.data.couples);
             setTotalPages(response.data.pagination.pages);
-        } catch (error) {
-            console.error('Failed to fetch couples:', error);
+        } catch (err) {
+            console.error('Failed to fetch couples:', err);
+            setError('Failed to load data. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -60,6 +63,15 @@ export default function CouplesPage() {
 
     return (
         <div>
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-center rounded-lg py-8 mb-6">
+                    <p className="text-red-600 mb-4">{error}</p>
+                    <button onClick={fetchCouples} className="btn-primary">
+                        Retry
+                    </button>
+                </div>
+            )}
+
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold text-gray-900">Couples Management</h1>
 

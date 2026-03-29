@@ -7,10 +7,21 @@ import { LayoutGrid, Table as TableIcon, User, Mail, Phone, Clock } from 'lucide
 
 type ViewMode = 'table' | 'card';
 
+interface UserRecord {
+    _id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    photoUrl?: string;
+    coupleId?: { isPaired: boolean; coupleTag?: string };
+    createdAt: string;
+}
+
 export default function UsersPage() {
     const { token } = useAuth();
-    const [users, setUsers] = useState<any[]>([]);
+    const [users, setUsers] = useState<UserRecord[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -25,29 +36,26 @@ export default function UsersPage() {
     }, []);
 
     useEffect(() => {
-        console.log('Users page - token:', token);
         fetchUsers();
     }, [token, page, search]);
 
     const fetchUsers = async () => {
-        console.log('fetchUsers called, token:', token);
         if (!token) {
-            console.log('No token found, skipping API call');
             setLoading(false);
             return;
         }
 
         setLoading(true);
+        setError(null);
         try {
             const response = await apiClient.get(
                 `/admin/dashboard/users?page=${page}&limit=20&search=${search}`,
                 token
             );
-            console.log('Users response:', response);
             setUsers(response.data.users || []);
             setTotalPages(response.data.pagination?.pages || 1);
-        } catch (error) {
-            console.error('Failed to fetch users:', error);
+        } catch (err) {
+            setError('Failed to load users. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -109,8 +117,18 @@ export default function UsersPage() {
                 />
             </div>
 
+            {/* Error State */}
+            {error && (
+                <div className="card mb-6 bg-red-50 border-red-200 text-center py-8">
+                    <p className="text-red-600 mb-4">{error}</p>
+                    <button onClick={fetchUsers} className="btn-primary">
+                        Retry
+                    </button>
+                </div>
+            )}
+
             {/* Users Table View */}
-            {viewMode === 'table' && (
+            {!error && viewMode === 'table' && (
                 <div className="card overflow-x-auto">
                     {loading ? (
                         <div className="flex justify-center py-12">
@@ -183,7 +201,7 @@ export default function UsersPage() {
             )}
 
             {/* Users Card View */}
-            {viewMode === 'card' && (
+            {!error && viewMode === 'card' && (
                 <div>
                     {loading ? (
                         <div className="flex justify-center py-12">

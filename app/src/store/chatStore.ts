@@ -55,10 +55,10 @@ export const useChatStore = create<ChatState>()(
               // Handle both object and string senderId formats
               (typeof m.senderId === 'string'
                 ? m.senderId
-                : (m.senderId as any)._id) ===
+                : (m.senderId as unknown as { _id: string })._id) ===
                 (typeof message.senderId === 'string'
                   ? message.senderId
-                  : (message.senderId as any)._id),
+                  : (message.senderId as unknown as { _id: string })._id),
           );
 
           if (pendingMessageIndex !== -1) {

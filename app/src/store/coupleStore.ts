@@ -71,8 +71,14 @@ export const useCoupleStore = create<CoupleState>()(
             isLoading: false,
           });
           return pairingKey;
-        } catch (error: any) {
-          set({ error: error.message, isLoading: false });
+        } catch (error) {
+          set({
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Failed to create pairing key',
+            isLoading: false,
+          });
           throw error;
         }
       },
@@ -89,7 +95,7 @@ export const useCoupleStore = create<CoupleState>()(
             isLoading: false,
           });
           return pairingKey;
-        } catch (error: any) {
+        } catch (error) {
           set({ error: getErrorMessage(error), isLoading: false });
           throw error;
         }
@@ -115,7 +121,7 @@ export const useCoupleStore = create<CoupleState>()(
             });
           }
           return isPaired;
-        } catch (error: any) {
+        } catch (error) {
           console.error('Check pairing status error:', error);
           return false;
         }
@@ -126,7 +132,7 @@ export const useCoupleStore = create<CoupleState>()(
           set({ isLoading: true, error: null });
           const couple = await coupleService.pairWithPartner(key);
           set({ couple, isLoading: false, pairingKey: null });
-        } catch (error: any) {
+        } catch (error) {
           set({ error: getErrorMessage(error), isLoading: false });
           throw error;
         }
@@ -137,7 +143,7 @@ export const useCoupleStore = create<CoupleState>()(
           set({ isLoading: true, error: null });
           const couple = await coupleService.devPair();
           set({ couple, isLoading: false, pairingKey: null });
-        } catch (error: any) {
+        } catch (error) {
           set({ error: getErrorMessage(error), isLoading: false });
           throw error;
         }
@@ -146,14 +152,17 @@ export const useCoupleStore = create<CoupleState>()(
       fetchCoupleInfo: async () => {
         try {
           set({ isLoading: true, error: null });
-          const response: any = await coupleService.getCoupleInfo();
+          const response = (await coupleService.getCoupleInfo()) as {
+            couple?: Couple;
+            partner?: User;
+          };
           // Response contains { couple, partner }
           set({
             couple: response.couple || response,
             partner: response.partner || null,
             isLoading: false,
           });
-        } catch (error: any) {
+        } catch (error) {
           set({ error: getErrorMessage(error), isLoading: false });
         }
       },
@@ -162,7 +171,7 @@ export const useCoupleStore = create<CoupleState>()(
         try {
           const stats = await coupleService.getCoupleStats();
           set({ stats });
-        } catch (error: any) {
+        } catch (error) {
           console.error('Failed to fetch couple stats:', error);
         }
       },
