@@ -121,7 +121,9 @@ export default function UsersPage() {
             {error && (
                 <div className="card mb-6 bg-red-50 border-red-200 text-center py-8">
                     <p className="text-red-600 mb-4">{error}</p>
-                    <button onClick={fetchUsers} className="btn-primary">Retry</button>
+                    <button onClick={fetchUsers} className="btn-primary">
+                        Retry
+                    </button>
                 </div>
             )}
 

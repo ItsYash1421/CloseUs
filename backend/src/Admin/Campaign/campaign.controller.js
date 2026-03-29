@@ -85,7 +85,16 @@ exports.getCampaignById = async (req, res) => {
 // ------------------------------------------------------------------
 exports.updateCampaign = async (req, res) => {
     try {
-        const allowedFields = ['name', 'description', 'type', 'status', 'targetAudience', 'content', 'startDate', 'endDate'];
+        const allowedFields = [
+            'name',
+            'description',
+            'type',
+            'status',
+            'targetAudience',
+            'content',
+            'startDate',
+            'endDate',
+        ];
         const updates = {};
         for (const key of allowedFields) {
             if (req.body[key] !== undefined) updates[key] = req.body[key];

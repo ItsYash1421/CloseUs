@@ -13,7 +13,11 @@ export const useKeyboardAnimation = (config = {}) => {
     translateYValue = -150,
     imageScaleValue = 0.8,
     buttonScaleValue = 0.8,
-  } = config as { translateYValue?: number; imageScaleValue?: number; buttonScaleValue?: number };
+  } = config as {
+    translateYValue?: number;
+    imageScaleValue?: number;
+    buttonScaleValue?: number;
+  };
 
   useEffect(() => {
     const showEvent =

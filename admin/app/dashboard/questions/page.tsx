@@ -206,7 +206,9 @@ export default function QuestionsPage() {
             {error && (
                 <div className="bg-red-50 border border-red-200 text-center rounded-lg py-8 mb-6">
                     <p className="text-red-600 mb-4">{error}</p>
-                    <button onClick={fetchQuestions} className="btn-primary">Retry</button>
+                    <button onClick={fetchQuestions} className="btn-primary">
+                        Retry
+                    </button>
                 </div>
             )}
 

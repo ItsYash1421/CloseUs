@@ -92,11 +92,16 @@ export const useAuthStore = create<AuthState>()(
           console.log('[AuthStore] checkAuth - Current user:', currentUser);
 
           // Fix double-nested user data
-          if (currentUser && 'user' in currentUser && (currentUser as Record<string, unknown>).user) {
+          if (
+            currentUser &&
+            'user' in currentUser &&
+            (currentUser as Record<string, unknown>).user
+          ) {
             console.log(
               '[AuthStore] Detected double-nested user, unwrapping...',
             );
-            const unwrappedUser = (currentUser as Record<string, unknown>).user as User;
+            const unwrappedUser = (currentUser as Record<string, unknown>)
+              .user as User;
             set({
               user: unwrappedUser,
               isAuthenticated: true,
@@ -110,7 +115,9 @@ export const useAuthStore = create<AuthState>()(
             // User exists in storage, verify with backend
             try {
               const apiClient = (await import('../services/apiClient')).default;
-              const response = await apiClient.get<{ data: User }>('/api/users/me') as { data: User };
+              const response = (await apiClient.get<{ data: User }>(
+                '/api/users/me',
+              )) as { data: User };
               console.log('[AuthStore] Backend verification successful');
               set({
                 user: response.data,
@@ -130,7 +137,10 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           console.error('[AuthStore] checkAuth error:', error);
           set({
-            error: error instanceof Error ? error.message : 'Authentication check failed',
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Authentication check failed',
             isLoading: false,
             isAuthenticated: false,
           });

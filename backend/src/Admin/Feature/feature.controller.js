@@ -47,7 +47,13 @@ exports.getFeatureFlags = async (req, res) => {
 // ------------------------------------------------------------------
 exports.updateFeatureFlag = async (req, res) => {
     try {
-        const allowedFields = ['name', 'displayName', 'description', 'isEnabled', 'rolloutPercentage'];
+        const allowedFields = [
+            'name',
+            'displayName',
+            'description',
+            'isEnabled',
+            'rolloutPercentage',
+        ];
         const updates = {};
         for (const key of allowedFields) {
             if (req.body[key] !== undefined) updates[key] = req.body[key];

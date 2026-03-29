@@ -6,7 +6,17 @@ const { successResponse, errorResponse } = require('../../Shared/Utils');
 // ------------------------------------------------------------------
 exports.createPromotion = async (req, res) => {
     try {
-        const { title, description, code, type, value, usageLimit, startDate, endDate, applicableTo } = req.body;
+        const {
+            title,
+            description,
+            code,
+            type,
+            value,
+            usageLimit,
+            startDate,
+            endDate,
+            applicableTo,
+        } = req.body;
         const promotion = new Promotion({
             title,
             description,
@@ -71,7 +81,18 @@ exports.getPromotions = async (req, res) => {
 // ------------------------------------------------------------------
 exports.updatePromotion = async (req, res) => {
     try {
-        const allowedFields = ['title', 'description', 'code', 'type', 'value', 'usageLimit', 'startDate', 'endDate', 'isActive', 'applicableTo'];
+        const allowedFields = [
+            'title',
+            'description',
+            'code',
+            'type',
+            'value',
+            'usageLimit',
+            'startDate',
+            'endDate',
+            'isActive',
+            'applicableTo',
+        ];
         const updates = {};
         for (const key of allowedFields) {
             if (req.body[key] !== undefined) updates[key] = req.body[key];

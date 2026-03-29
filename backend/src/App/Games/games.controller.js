@@ -16,7 +16,16 @@ const getGameCategories = async (req, res) => {
                     from: 'gamequestions',
                     let: { catId: '$_id' },
                     pipeline: [
-                        { $match: { $expr: { $and: [{ $eq: ['$categoryId', '$$catId'] }, { $eq: ['$isActive', true] }] } } },
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$categoryId', '$$catId'] },
+                                        { $eq: ['$isActive', true] },
+                                    ],
+                                },
+                            },
+                        },
                         { $count: 'count' },
                     ],
                     as: 'questionStats',
@@ -314,8 +323,7 @@ const saveAnswer = async (req, res) => {
                             text: randomAnswer,
                         });
                     }
-                } catch (err) {
-                }
+                } catch (err) {}
             }, 120000);
         }
     } catch (error) {

@@ -72,7 +72,11 @@ class SocketService {
     }
   }
 
-  sendMessage(type: string, content: string, metadata?: Record<string, unknown>) {
+  sendMessage(
+    type: string,
+    content: string,
+    metadata?: Record<string, unknown>,
+  ) {
     if (!this.socket?.connected) {
       throw new Error('Socket not connected');
     }

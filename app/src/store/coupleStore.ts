@@ -72,7 +72,13 @@ export const useCoupleStore = create<CoupleState>()(
           });
           return pairingKey;
         } catch (error) {
-          set({ error: error instanceof Error ? error.message : 'Failed to create pairing key', isLoading: false });
+          set({
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Failed to create pairing key',
+            isLoading: false,
+          });
           throw error;
         }
       },
@@ -146,7 +152,10 @@ export const useCoupleStore = create<CoupleState>()(
       fetchCoupleInfo: async () => {
         try {
           set({ isLoading: true, error: null });
-          const response = await coupleService.getCoupleInfo() as { couple?: Couple; partner?: User };
+          const response = (await coupleService.getCoupleInfo()) as {
+            couple?: Couple;
+            partner?: User;
+          };
           // Response contains { couple, partner }
           set({
             couple: response.couple || response,

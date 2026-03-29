@@ -22,7 +22,15 @@ import { COLORS } from '../../constants/colors';
 import { FONTS } from '../../constants/text';
 import { getErrorMessage } from '../../utils/errorHandler';
 
-export const EnterKeyScreen = ({ navigation }: { navigation: { replace: (screen: string) => void; navigate: (screen: string) => void; reset: (state: { index: number; routes: { name: string }[] }) => void } }) => {
+export const EnterKeyScreen = ({
+  navigation,
+}: {
+  navigation: {
+    replace: (screen: string) => void;
+    navigate: (screen: string) => void;
+    reset: (state: { index: number; routes: { name: string }[] }) => void;
+  };
+}) => {
   const [key, setKey] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { pairWithPartner } = useCoupleStore();

@@ -59,7 +59,9 @@ export default function DashboardPage() {
         return (
             <div className="p-8 text-center">
                 <p className="text-red-600 mb-4">{error}</p>
-                <button onClick={fetchStats} className="btn-primary">Retry</button>
+                <button onClick={fetchStats} className="btn-primary">
+                    Retry
+                </button>
             </div>
         );
     }

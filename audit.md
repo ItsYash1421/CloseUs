@@ -69,6 +69,7 @@ Access and refresh tokens passed as URL query params in OAuth callback. These ge
 ~~Admin endpoints pass `req.body` directly to `findByIdAndUpdate()` without field whitelisting.~~
 
 **Fix:** Added explicit `allowedFields` arrays with field whitelisting to ALL admin update controllers:
+
 - `question.controller.js` - updateCategory, updateQuestion
 - `game.controller.js` - updateGameCategory, updateGameQuestion
 - `campaign.controller.js` - updateCampaign
@@ -80,6 +81,7 @@ Access and refresh tokens passed as URL query params in OAuth callback. These ge
 ~~4 locations with N+1 queries.~~
 
 **Fix:**
+
 - `question.controller.js` `getCategories` - Replaced with `$lookup` aggregation pipeline
 - `game.controller.js` `getGameCategories` - Replaced with `$lookup` aggregation pipeline
 - `games.controller.js` `getGameCategories` (app) - Replaced with `$lookup` aggregation with `$match` filter
@@ -113,6 +115,7 @@ Access and refresh tokens passed as URL query params in OAuth callback. These ge
 ~~Pervasive across TypeScript files.~~
 
 **Fix:** Fixed `any` types in:
+
 - `admin/contexts/AuthContext.tsx` - Added `Admin` interface, replaced `any | null`
 - `admin/lib/api.ts` - Changed `data: any` to `data: Record<string, unknown>`
 - `admin/app/login/page.tsx` - Fixed `catch (err: any)` with `instanceof Error` pattern
@@ -136,6 +139,7 @@ Access and refresh tokens passed as URL query params in OAuth callback. These ge
 ~~No evidence of indexes for frequently queried fields.~~
 
 **Correction:** Upon inspection, all models already have proper compound indexes:
+
 - `Message`: `{ coupleId: 1, createdAt: -1 }`, `{ senderId: 1 }`
 - `DailyCoupleQuestion`: `{ coupleId: 1, date: 1 }` (unique)
 - `GameAnswer`: `{ userId: 1, questionId: 1 }` (unique), `{ coupleId: 1, questionId: 1 }`
@@ -153,6 +157,7 @@ Access and refresh tokens passed as URL query params in OAuth callback. These ge
 ~~All 7 dashboard pages show no error state when API calls fail.~~
 
 **Fix:** Added `error` state, `setError()` in catch blocks, and error UI with retry button to:
+
 - `dashboard/page.tsx` (main dashboard)
 - `dashboard/users/page.tsx`
 - `dashboard/couples/page.tsx`
@@ -206,58 +211,61 @@ Access and refresh tokens passed as URL query params in OAuth callback. These ge
 ## Summary of Changes
 
 ### Files Created
+
 - `admin/middleware.ts` - Next.js route protection
 - `admin/components/ErrorBoundary.tsx` - Error boundary component
 - `admin/app/dashboard/loading.tsx` - Dashboard skeleton loader
 - `app/src/hooks/useKeyboardVisible.ts` - Keyboard state hook
 
 ### Files Modified
-| File | Changes |
-| ---- | ------- |
-| `backend/src/app.js` | CORS whitelist, rate limiting, security headers |
-| `backend/src/server.js` | Socket.io CORS whitelist |
-| `backend/src/App/Notification/notification.routes.js` | Auth middleware added |
-| `backend/src/Admin/Question/question.controller.js` | Field whitelisting, aggregation pipeline, removed console.log |
-| `backend/src/Admin/Game/game.controller.js` | Field whitelisting, aggregation pipeline, pagination fix, removed console.log |
-| `backend/src/Admin/Campaign/campaign.controller.js` | Field whitelisting, fixed N+1 query, removed console.log |
-| `backend/src/Admin/Promotion/promotion.controller.js` | Field whitelisting, removed console.log |
-| `backend/src/Admin/Feature/feature.controller.js` | Field whitelisting, removed console.log |
-| `backend/src/App/Games/games.controller.js` | Aggregation pipeline, removed console.log |
-| `backend/src/App/Home/dailyQuestion.controller.js` | Used `.distinct()`, removed console.log |
-| `backend/src/App/Auth/auth.controller.js` | Removed console.log |
-| `backend/src/App/Middleware/auth.middleware.js` | Removed console.error |
-| `backend/src/Admin/Middleware/auth.middleware.js` | Removed console.error |
-| `admin/app/login/page.tsx` | Removed hardcoded credentials, fixed `any` type |
-| `admin/app/dashboard/layout.tsx` | Wrapped children with ErrorBoundary |
-| `admin/app/dashboard/page.tsx` | Added typed interfaces, error state |
-| `admin/app/dashboard/users/page.tsx` | Added UserRecord interface, error state |
-| `admin/app/dashboard/couples/page.tsx` | Added error state and UI |
-| `admin/app/dashboard/questions/page.tsx` | Added error state and UI |
-| `admin/app/dashboard/games/page.tsx` | Added error state and UI |
-| `admin/app/dashboard/notifications/page.tsx` | Added error state and UI |
-| `admin/app/dashboard/features/page.tsx` | Added error state and UI |
-| `admin/app/dashboard/campaigns/page.tsx` | Added error state and UI |
-| `admin/app/dashboard/promotions/page.tsx` | Added error state and UI |
-| `admin/contexts/AuthContext.tsx` | Added Admin interface |
-| `admin/lib/api.ts` | Fixed `any` types, removed console.log |
-| `app/src/constants/config.ts` | Switched to PRE_PROD |
-| `app/src/hooks/useKeyboardAnimation.ts` | Fixed `config as any` |
-| `backend/package.json` | Added `express-rate-limit` dependency |
+
+| File                                                  | Changes                                                                       |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `backend/src/app.js`                                  | CORS whitelist, rate limiting, security headers                               |
+| `backend/src/server.js`                               | Socket.io CORS whitelist                                                      |
+| `backend/src/App/Notification/notification.routes.js` | Auth middleware added                                                         |
+| `backend/src/Admin/Question/question.controller.js`   | Field whitelisting, aggregation pipeline, removed console.log                 |
+| `backend/src/Admin/Game/game.controller.js`           | Field whitelisting, aggregation pipeline, pagination fix, removed console.log |
+| `backend/src/Admin/Campaign/campaign.controller.js`   | Field whitelisting, fixed N+1 query, removed console.log                      |
+| `backend/src/Admin/Promotion/promotion.controller.js` | Field whitelisting, removed console.log                                       |
+| `backend/src/Admin/Feature/feature.controller.js`     | Field whitelisting, removed console.log                                       |
+| `backend/src/App/Games/games.controller.js`           | Aggregation pipeline, removed console.log                                     |
+| `backend/src/App/Home/dailyQuestion.controller.js`    | Used `.distinct()`, removed console.log                                       |
+| `backend/src/App/Auth/auth.controller.js`             | Removed console.log                                                           |
+| `backend/src/App/Middleware/auth.middleware.js`       | Removed console.error                                                         |
+| `backend/src/Admin/Middleware/auth.middleware.js`     | Removed console.error                                                         |
+| `admin/app/login/page.tsx`                            | Removed hardcoded credentials, fixed `any` type                               |
+| `admin/app/dashboard/layout.tsx`                      | Wrapped children with ErrorBoundary                                           |
+| `admin/app/dashboard/page.tsx`                        | Added typed interfaces, error state                                           |
+| `admin/app/dashboard/users/page.tsx`                  | Added UserRecord interface, error state                                       |
+| `admin/app/dashboard/couples/page.tsx`                | Added error state and UI                                                      |
+| `admin/app/dashboard/questions/page.tsx`              | Added error state and UI                                                      |
+| `admin/app/dashboard/games/page.tsx`                  | Added error state and UI                                                      |
+| `admin/app/dashboard/notifications/page.tsx`          | Added error state and UI                                                      |
+| `admin/app/dashboard/features/page.tsx`               | Added error state and UI                                                      |
+| `admin/app/dashboard/campaigns/page.tsx`              | Added error state and UI                                                      |
+| `admin/app/dashboard/promotions/page.tsx`             | Added error state and UI                                                      |
+| `admin/contexts/AuthContext.tsx`                      | Added Admin interface                                                         |
+| `admin/lib/api.ts`                                    | Fixed `any` types, removed console.log                                        |
+| `app/src/constants/config.ts`                         | Switched to PRE_PROD                                                          |
+| `app/src/hooks/useKeyboardAnimation.ts`               | Fixed `config as any`                                                         |
+| `backend/package.json`                                | Added `express-rate-limit` dependency                                         |
 
 ### Packages Installed
+
 - `express-rate-limit@^8.3.1` (backend)
 
 ---
 
 ## Remaining Work
 
-| Item | Effort | Notes |
-| ---- | ------ | ----- |
-| Rotate all secrets | Manual | Cannot be automated - must be done by operator |
-| Auth tokens in URL params (#6) | Medium | Requires deep link scheme + mobile app changes |
-| Split large components (#15) | Large | 14 components over 400 lines need refactoring |
-| Navigation `any` types | Medium | Requires React Navigation type setup across all screens |
-| SWR/React Query for admin | Medium | Replace manual fetch + useState patterns |
-| Redis caching layer | Medium | Add server-side caching for frequently accessed data |
-| Consolidate API clients | Small | Both admin (fetch) and app (axios) could share patterns |
-| TODO comments (#21) | Small | 3 deferred feature implementations |
+| Item                           | Effort | Notes                                                   |
+| ------------------------------ | ------ | ------------------------------------------------------- |
+| Rotate all secrets             | Manual | Cannot be automated - must be done by operator          |
+| Auth tokens in URL params (#6) | Medium | Requires deep link scheme + mobile app changes          |
+| Split large components (#15)   | Large  | 14 components over 400 lines need refactoring           |
+| Navigation `any` types         | Medium | Requires React Navigation type setup across all screens |
+| SWR/React Query for admin      | Medium | Replace manual fetch + useState patterns                |
+| Redis caching layer            | Medium | Add server-side caching for frequently accessed data    |
+| Consolidate API clients        | Small  | Both admin (fetch) and app (axios) could share patterns |
+| TODO comments (#21)            | Small  | 3 deferred feature implementations                      |

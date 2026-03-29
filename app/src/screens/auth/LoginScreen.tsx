@@ -7,7 +7,11 @@ import THEME from '../../constants/theme';
 import { useAuthStore } from '../../store/authStore';
 import { getErrorMessage } from '../../utils/errorHandler';
 
-export const LoginScreen = ({ navigation }: { navigation: { replace: (screen: string) => void; goBack: () => void } }) => {
+export const LoginScreen = ({
+  navigation,
+}: {
+  navigation: { replace: (screen: string) => void; goBack: () => void };
+}) => {
   const [loading, setLoading] = useState(false);
   const login = useAuthStore(state => state.login);
   const user = useAuthStore(state => state.user);
