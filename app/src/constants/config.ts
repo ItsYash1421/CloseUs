@@ -8,8 +8,8 @@ export const ENV_CONFIG = {
 
 // Current API Configuration
 // Change this to switch environments: ENV_CONFIG.PROD | ENV_CONFIG.PRE_PROD | ENV_CONFIG.REMOTE_DEV
-export const API_BASE_URL = ENV_CONFIG.REMOTE_DEV;
-export const SOCKET_URL = ENV_CONFIG.REMOTE_DEV;
+export const API_BASE_URL = ENV_CONFIG.PRE_PROD;
+export const SOCKET_URL = ENV_CONFIG.PRE_PROD;
 
 // Google OAuth - Web Client ID from Firebase Console
 // This is used for both iOS and Android (client_type: 3 from google-services.json)

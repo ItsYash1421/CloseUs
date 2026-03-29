@@ -62,7 +62,6 @@ const googleMobileLogin = async (req, res) => {
             )
         );
     } catch (error) {
-        console.error('Mobile auth error:', error);
         res.status(500).json(errorResponse('Authentication failed'));
     }
 };
@@ -81,7 +80,6 @@ const googleCallback = async (req, res) => {
 
         res.redirect(redirectUrl);
     } catch (error) {
-        console.error('Auth callback error:', error);
         res.status(500).json(errorResponse('Authentication failed'));
     }
 };
@@ -111,7 +109,6 @@ const refreshAccessToken = async (req, res) => {
             return res.status(401).json(errorResponse('Invalid refresh token', 401));
         }
     } catch (error) {
-        console.error('Refresh token error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };

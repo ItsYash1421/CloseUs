@@ -39,6 +39,7 @@ export default function PromotionsPage() {
     const { token } = useAuth();
     const [promotions, setPromotions] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
 
     const [promotionForm, setPromotionForm] = useState({
@@ -61,12 +62,14 @@ export default function PromotionsPage() {
 
     const fetchPromotions = async () => {
         try {
+            setError(null);
             const response = await apiClient.get('/admin/promotions', token!);
             if (response.success) {
                 setPromotions(response.data.promotions || []);
             }
-        } catch (error) {
+        } catch (err) {
             toast.error('Failed to fetch promotions');
+            setError('Failed to load data. Please try again.');
         }
     };
 
@@ -96,8 +99,8 @@ export default function PromotionsPage() {
                 });
                 fetchPromotions();
             }
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to create promotion');
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : 'Failed to create promotion');
         } finally {
             setLoading(false);
         }
@@ -145,6 +148,13 @@ export default function PromotionsPage() {
 
     return (
         <div className="space-y-6">
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-center rounded-lg py-8 mb-6">
+                    <p className="text-red-600 mb-4">{error}</p>
+                    <button onClick={fetchPromotions} className="btn-primary">Retry</button>
+                </div>
+            )}
+
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold">Promotions</h1>

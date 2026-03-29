@@ -22,7 +22,7 @@ import { COLORS } from '../../constants/colors';
 import { FONTS } from '../../constants/text';
 import { getErrorMessage } from '../../utils/errorHandler';
 
-export const EnterKeyScreen = ({ navigation }: any) => {
+export const EnterKeyScreen = ({ navigation }: { navigation: { replace: (screen: string) => void; navigate: (screen: string) => void; reset: (state: { index: number; routes: { name: string }[] }) => void } }) => {
   const [key, setKey] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { pairWithPartner } = useCoupleStore();
@@ -73,7 +73,7 @@ export const EnterKeyScreen = ({ navigation }: any) => {
       setTimeout(() => {
         navigation.replace('PairingSuccess');
       }, 1000);
-    } catch (error: any) {
+    } catch (error) {
       Toast.show({
         type: 'error',
         text1: 'Pairing Failed',
@@ -97,7 +97,7 @@ export const EnterKeyScreen = ({ navigation }: any) => {
         index: 0,
         routes: [{ name: 'MainTabs' }],
       });
-    } catch (error: any) {
+    } catch (error) {
       Toast.show({
         type: 'error',
         text1: 'Dev Pairing Failed',

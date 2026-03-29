@@ -18,7 +18,6 @@ const createCategory = async (req, res) => {
 
         res.status(201).json(successResponse(category, 'Category created'));
     } catch (error) {
-        console.error('Create category error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
@@ -28,17 +27,23 @@ const createCategory = async (req, res) => {
 // ------------------------------------------------------------------
 const getCategories = async (req, res) => {
     try {
-        const categories = await QuestionCategory.find().sort({ order: 1, createdAt: -1 });
-
-        const categoriesWithCount = await Promise.all(
-            categories.map(async (cat) => {
-                const questionCount = await Question.countDocuments({ categoryId: cat._id });
-                return {
-                    ...cat.toObject(),
-                    questionCount,
-                };
-            })
-        );
+        const categoriesWithCount = await QuestionCategory.aggregate([
+            { $sort: { order: 1, createdAt: -1 } },
+            {
+                $lookup: {
+                    from: 'questions',
+                    localField: '_id',
+                    foreignField: 'categoryId',
+                    as: 'questions',
+                },
+            },
+            {
+                $addFields: {
+                    questionCount: { $size: '$questions' },
+                },
+            },
+            { $project: { questions: 0 } },
+        ]);
 
         res.json(successResponse(categoriesWithCount));
     } catch (error) {
@@ -52,7 +57,11 @@ const getCategories = async (req, res) => {
 const updateCategory = async (req, res) => {
     try {
         const { id } = req.params;
-        const updates = req.body;
+        const allowedFields = ['name', 'description', 'emoji', 'color', 'order'];
+        const updates = {};
+        for (const key of allowedFields) {
+            if (req.body[key] !== undefined) updates[key] = req.body[key];
+        }
 
         const category = await QuestionCategory.findByIdAndUpdate(id, updates, { new: true });
         if (!category) {
@@ -115,7 +124,6 @@ const getAllQuestions = async (req, res) => {
             })
         );
     } catch (error) {
-        console.error('Get all questions error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
@@ -135,7 +143,6 @@ const createQuestion = async (req, res) => {
 
         res.status(201).json(successResponse(question, 'Question created'));
     } catch (error) {
-        console.error('Create question error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
@@ -163,7 +170,11 @@ const getQuestionsByCategory = async (req, res) => {
 const updateQuestion = async (req, res) => {
     try {
         const { id } = req.params;
-        const updates = req.body;
+        const allowedFields = ['text', 'categoryId', 'isDaily', 'isActive', 'order'];
+        const updates = {};
+        for (const key of allowedFields) {
+            if (req.body[key] !== undefined) updates[key] = req.body[key];
+        }
 
         const question = await Question.findByIdAndUpdate(id, updates, { new: true });
         if (!question) {

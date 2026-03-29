@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
     const pathname = usePathname();
@@ -68,7 +69,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
             {/* Main Content */}
             <main className="flex-1 overflow-y-auto bg-gray-50">
-                <div className="p-8">{children}</div>
+                <div className="p-8">
+                    <ErrorBoundary>{children}</ErrorBoundary>
+                </div>
             </main>
         </div>
     );

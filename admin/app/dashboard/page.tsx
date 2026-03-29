@@ -15,10 +15,18 @@ import {
     Bar,
 } from 'recharts';
 
+interface DashboardStats {
+    users?: { total: number; recent: number };
+    couples?: { total: number; active: number; paired: number; unpaired: number };
+    messages?: { total: number };
+    questions?: { total: number };
+}
+
 export default function DashboardPage() {
     const { token } = useAuth();
-    const [stats, setStats] = useState<any>(null);
+    const [stats, setStats] = useState<DashboardStats | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (token) {
@@ -28,6 +36,7 @@ export default function DashboardPage() {
 
     const fetchStats = async () => {
         try {
+            setError(null);
             const [overviewRes, analyticsRes] = await Promise.all([
                 apiClient.get('/admin/dashboard/stats', token!),
                 apiClient.get('/admin/analytics/stats', token!),
@@ -37,14 +46,23 @@ export default function DashboardPage() {
                 ...overviewRes.data,
                 ...analyticsRes.data,
             });
-        } catch (error) {
-            console.error('Failed to fetch dashboard stats:', error);
+        } catch (err) {
+            setError('Failed to load dashboard stats. Please try again.');
         } finally {
             setIsLoading(false);
         }
     };
 
     if (isLoading) return <div className="p-8 text-center text-gray-500">Loading dashboard...</div>;
+
+    if (error) {
+        return (
+            <div className="p-8 text-center">
+                <p className="text-red-600 mb-4">{error}</p>
+                <button onClick={fetchStats} className="btn-primary">Retry</button>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -146,8 +164,16 @@ export default function DashboardPage() {
     );
 }
 
-function StatCard({ title, value, icon, color, subtitle }: any) {
-    const colors: any = {
+interface StatCardProps {
+    title: string;
+    value: number;
+    icon: string;
+    color: 'blue' | 'red' | 'green' | 'purple';
+    subtitle?: string;
+}
+
+function StatCard({ title, value, icon, color, subtitle }: StatCardProps) {
+    const colors: Record<string, string> = {
         blue: 'bg-blue-100 text-blue-600',
         red: 'bg-red-100 text-red-600',
         green: 'bg-green-100 text-green-600',

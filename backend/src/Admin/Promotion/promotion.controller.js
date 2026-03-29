@@ -6,8 +6,17 @@ const { successResponse, errorResponse } = require('../../Shared/Utils');
 // ------------------------------------------------------------------
 exports.createPromotion = async (req, res) => {
     try {
+        const { title, description, code, type, value, usageLimit, startDate, endDate, applicableTo } = req.body;
         const promotion = new Promotion({
-            ...req.body,
+            title,
+            description,
+            code,
+            type,
+            value,
+            usageLimit,
+            startDate,
+            endDate,
+            applicableTo,
             createdBy: req.adminId,
         });
 
@@ -15,7 +24,6 @@ exports.createPromotion = async (req, res) => {
 
         res.status(201).json(successResponse(promotion, 'Promotion created'));
     } catch (error) {
-        console.error('Error creating promotion:', error);
         if (error.code === 11000) {
             return res.status(400).json(errorResponse('Promotion code already exists'));
         }
@@ -54,7 +62,6 @@ exports.getPromotions = async (req, res) => {
             })
         );
     } catch (error) {
-        console.error('Error fetching promotions:', error);
         res.status(500).json(errorResponse('Failed to fetch promotions'));
     }
 };
@@ -64,7 +71,13 @@ exports.getPromotions = async (req, res) => {
 // ------------------------------------------------------------------
 exports.updatePromotion = async (req, res) => {
     try {
-        const promotion = await Promotion.findByIdAndUpdate(req.params.id, req.body, {
+        const allowedFields = ['title', 'description', 'code', 'type', 'value', 'usageLimit', 'startDate', 'endDate', 'isActive', 'applicableTo'];
+        const updates = {};
+        for (const key of allowedFields) {
+            if (req.body[key] !== undefined) updates[key] = req.body[key];
+        }
+
+        const promotion = await Promotion.findByIdAndUpdate(req.params.id, updates, {
             new: true,
             runValidators: true,
         });
@@ -75,7 +88,6 @@ exports.updatePromotion = async (req, res) => {
 
         res.json(successResponse(promotion, 'Promotion updated'));
     } catch (error) {
-        console.error('Error updating promotion:', error);
         res.status(500).json(errorResponse('Failed to update promotion'));
     }
 };
@@ -93,7 +105,6 @@ exports.deletePromotion = async (req, res) => {
 
         res.json(successResponse(null, 'Promotion deleted'));
     } catch (error) {
-        console.error('Error deleting promotion:', error);
         res.status(500).json(errorResponse('Failed to delete promotion'));
     }
 };
@@ -126,7 +137,6 @@ exports.getPromotionUsage = async (req, res) => {
             })
         );
     } catch (error) {
-        console.error('Error fetching promotion usage:', error);
         res.status(500).json(errorResponse('Failed to fetch usage stats'));
     }
 };
@@ -176,7 +186,6 @@ exports.redeemPromotion = async (req, res) => {
             )
         );
     } catch (error) {
-        console.error('Error redeeming promotion:', error);
         res.status(500).json(errorResponse('Failed to redeem promotion'));
     }
 };

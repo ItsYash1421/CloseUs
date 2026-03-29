@@ -35,7 +35,7 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: true, error: null });
           const { user, tokens } = await authService.googleSignIn();
           set({ user, isAuthenticated: true, isLoading: false });
-        } catch (error: any) {
+        } catch (error) {
           set({ isLoading: false, error: getErrorMessage(error) });
           throw error;
         }
@@ -51,7 +51,7 @@ export const useAuthStore = create<AuthState>()(
             await authService.logout();
             // NOTE: We do NOT clear couple data on logout
             // User remains paired even after logout, they just need to login again
-          } catch (error: any) {
+          } catch (error) {
             console.error('Logout cleanup error:', error);
           }
         })();
@@ -92,11 +92,11 @@ export const useAuthStore = create<AuthState>()(
           console.log('[AuthStore] checkAuth - Current user:', currentUser);
 
           // Fix double-nested user data
-          if (currentUser && (currentUser as any).user) {
+          if (currentUser && 'user' in currentUser && (currentUser as Record<string, unknown>).user) {
             console.log(
               '[AuthStore] Detected double-nested user, unwrapping...',
             );
-            const unwrappedUser = (currentUser as any).user;
+            const unwrappedUser = (currentUser as Record<string, unknown>).user as User;
             set({
               user: unwrappedUser,
               isAuthenticated: true,
@@ -110,7 +110,7 @@ export const useAuthStore = create<AuthState>()(
             // User exists in storage, verify with backend
             try {
               const apiClient = (await import('../services/apiClient')).default;
-              const response: any = await apiClient.get('/api/users/me');
+              const response = await apiClient.get<{ data: User }>('/api/users/me') as { data: User };
               console.log('[AuthStore] Backend verification successful');
               set({
                 user: response.data,
@@ -127,10 +127,10 @@ export const useAuthStore = create<AuthState>()(
             console.log('[AuthStore] No user in storage');
             set({ isAuthenticated: false, isLoading: false });
           }
-        } catch (error: any) {
+        } catch (error) {
           console.error('[AuthStore] checkAuth error:', error);
           set({
-            error: error.message,
+            error: error instanceof Error ? error.message : 'Authentication check failed',
             isLoading: false,
             isAuthenticated: false,
           });
@@ -174,7 +174,7 @@ export const useAuthStore = create<AuthState>()(
       name: 'auth-storage',
       storage: createJSONStorage(() => AsyncStorage),
       version: 1, // Increment to clear old corrupted data
-      migrate: (persistedState: any, version: number) => {
+      migrate: (persistedState: unknown, version: number) => {
         console.log('[AuthStore] Migrating from version', version);
         // If old version, clear everything and start fresh
         if (version < 1) {

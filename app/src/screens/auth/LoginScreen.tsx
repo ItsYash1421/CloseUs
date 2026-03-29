@@ -7,7 +7,7 @@ import THEME from '../../constants/theme';
 import { useAuthStore } from '../../store/authStore';
 import { getErrorMessage } from '../../utils/errorHandler';
 
-export const LoginScreen = ({ navigation }: any) => {
+export const LoginScreen = ({ navigation }: { navigation: { replace: (screen: string) => void; goBack: () => void } }) => {
   const [loading, setLoading] = useState(false);
   const login = useAuthStore(state => state.login);
   const user = useAuthStore(state => state.user);
@@ -31,7 +31,7 @@ export const LoginScreen = ({ navigation }: any) => {
         // Fully set up user - go to main app
         navigation.replace('MainTabs');
       }
-    } catch (error: any) {
+    } catch (error) {
       setLoading(false);
       Alert.alert('Login Failed', getErrorMessage(error));
     }

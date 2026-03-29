@@ -24,7 +24,6 @@ exports.createCampaign = async (req, res) => {
 
         res.status(201).json(successResponse(campaign, 'Campaign created successfully'));
     } catch (error) {
-        console.error('Error creating campaign:', error);
         res.status(500).json(errorResponse('Failed to create campaign'));
     }
 };
@@ -60,7 +59,6 @@ exports.getCampaigns = async (req, res) => {
             })
         );
     } catch (error) {
-        console.error('Error fetching campaigns:', error);
         res.status(500).json(errorResponse('Failed to fetch campaigns'));
     }
 };
@@ -78,7 +76,6 @@ exports.getCampaignById = async (req, res) => {
 
         res.json(successResponse(campaign));
     } catch (error) {
-        console.error('Error fetching campaign:', error);
         res.status(500).json(errorResponse('Failed to fetch campaign'));
     }
 };
@@ -88,7 +85,13 @@ exports.getCampaignById = async (req, res) => {
 // ------------------------------------------------------------------
 exports.updateCampaign = async (req, res) => {
     try {
-        const campaign = await Campaign.findByIdAndUpdate(req.params.id, req.body, {
+        const allowedFields = ['name', 'description', 'type', 'status', 'targetAudience', 'content', 'startDate', 'endDate'];
+        const updates = {};
+        for (const key of allowedFields) {
+            if (req.body[key] !== undefined) updates[key] = req.body[key];
+        }
+
+        const campaign = await Campaign.findByIdAndUpdate(req.params.id, updates, {
             new: true,
             runValidators: true,
         });
@@ -99,7 +102,6 @@ exports.updateCampaign = async (req, res) => {
 
         res.json(successResponse(campaign, 'Campaign updated successfully'));
     } catch (error) {
-        console.error('Error updating campaign:', error);
         res.status(500).json(errorResponse('Failed to update campaign'));
     }
 };
@@ -117,7 +119,6 @@ exports.deleteCampaign = async (req, res) => {
 
         res.json(successResponse(null, 'Campaign deleted successfully'));
     } catch (error) {
-        console.error('Error deleting campaign:', error);
         res.status(500).json(errorResponse('Failed to delete campaign'));
     }
 };
@@ -136,20 +137,26 @@ exports.launchCampaign = async (req, res) => {
         // ------------------------------------------------------------------
         // Identify Target Audience
         // ------------------------------------------------------------------
-        const targetQuery = {};
+        let targetUsers;
 
-        if (!campaign.targetAudience.allUsers) {
-            if (campaign.targetAudience.coupleStatus !== 'all') {
-                const isPaired = campaign.targetAudience.coupleStatus === 'paired';
-                const users = await User.find().populate('coupleId');
-                const filteredUserIds = users
-                    .filter((u) => (isPaired ? u.coupleId?.isPaired : !u.coupleId?.isPaired))
-                    .map((u) => u._id);
-                targetQuery._id = { $in: filteredUserIds };
+        if (campaign.targetAudience.allUsers || campaign.targetAudience.coupleStatus === 'all') {
+            targetUsers = await User.find();
+        } else {
+            const isPaired = campaign.targetAudience.coupleStatus === 'paired';
+            const pairedCoupleIds = await Couple.find({ isPaired: true }).distinct('_id');
+
+            if (isPaired) {
+                targetUsers = await User.find({ coupleId: { $in: pairedCoupleIds } });
+            } else {
+                targetUsers = await User.find({
+                    $or: [
+                        { coupleId: { $exists: false } },
+                        { coupleId: null },
+                        { coupleId: { $nin: pairedCoupleIds } },
+                    ],
+                });
             }
         }
-
-        const targetUsers = await User.find(targetQuery);
 
         // ------------------------------------------------------------------
         // Update Metrics
@@ -162,7 +169,6 @@ exports.launchCampaign = async (req, res) => {
 
         res.json(successResponse(campaign, 'Campaign launched successfully'));
     } catch (error) {
-        console.error('Error launching campaign:', error);
         res.status(500).json(errorResponse('Failed to launch campaign'));
     }
 };
@@ -184,7 +190,6 @@ exports.pauseCampaign = async (req, res) => {
 
         res.json(successResponse(campaign, 'Campaign paused successfully'));
     } catch (error) {
-        console.error('Error pausing campaign:', error);
         res.status(500).json(errorResponse('Failed to pause campaign'));
     }
 };
@@ -221,7 +226,6 @@ exports.getCampaignMetrics = async (req, res) => {
 
         res.json(successResponse(metrics));
     } catch (error) {
-        console.error('Error fetching campaign metrics:', error);
         res.status(500).json(errorResponse('Failed to fetch metrics'));
     }
 };

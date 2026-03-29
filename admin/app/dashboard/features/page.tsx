@@ -32,6 +32,7 @@ export default function FeaturesPage() {
     const { token } = useAuth();
     const [features, setFeatures] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [editingFeature, setEditingFeature] = useState<any>(null);
 
@@ -50,12 +51,14 @@ export default function FeaturesPage() {
 
     const fetchFeatures = async () => {
         try {
+            setError(null);
             const response = await apiClient.get('/admin/features', token!);
             if (response.success) {
                 setFeatures(response.data || []);
             }
-        } catch (error) {
+        } catch (err) {
             toast.error('Failed to fetch features');
+            setError('Failed to load data. Please try again.');
         }
     };
 
@@ -88,8 +91,8 @@ export default function FeaturesPage() {
                 rolloutPercentage: 100,
             });
             fetchFeatures();
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to save feature');
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : 'Failed to save feature');
         } finally {
             setLoading(false);
         }
@@ -204,6 +207,13 @@ export default function FeaturesPage() {
 
     return (
         <div className="space-y-6">
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-center rounded-lg py-8 mb-6">
+                    <p className="text-red-600 mb-4">{error}</p>
+                    <button onClick={fetchFeatures} className="btn-primary">Retry</button>
+                </div>
+            )}
+
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold">Feature Flags</h1>

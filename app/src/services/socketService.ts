@@ -60,7 +60,7 @@ class SocketService {
       this.typingCallbacks.forEach(callback => callback(false));
     });
 
-    this.socket.on('error', (error: any) => {
+    this.socket.on('error', (error: unknown) => {
       console.error('Socket error:', error);
     });
   }
@@ -72,7 +72,7 @@ class SocketService {
     }
   }
 
-  sendMessage(type: string, content: string, metadata?: any) {
+  sendMessage(type: string, content: string, metadata?: Record<string, unknown>) {
     if (!this.socket?.connected) {
       throw new Error('Socket not connected');
     }

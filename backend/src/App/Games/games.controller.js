@@ -8,29 +8,32 @@ const { successResponse, errorResponse } = require('../../Shared/Utils');
 // ------------------------------------------------------------------
 const getGameCategories = async (req, res) => {
     try {
-        const categories = await GameCategory.find({ isActive: true })
-            .sort({ order: 1, totalPlayed: -1 })
-            .select('-__v');
-
-        // ------------------------------------------------------------------
-        // Count Questions Per Category
-        // ------------------------------------------------------------------
-        const categoriesWithCount = await Promise.all(
-            categories.map(async (cat) => {
-                const questionCount = await GameQuestion.countDocuments({
-                    categoryId: cat._id,
-                    isActive: true,
-                });
-                return {
-                    ...cat.toObject(),
-                    questionCount,
-                };
-            })
-        );
+        const categoriesWithCount = await GameCategory.aggregate([
+            { $match: { isActive: true } },
+            { $sort: { order: 1, totalPlayed: -1 } },
+            {
+                $lookup: {
+                    from: 'gamequestions',
+                    let: { catId: '$_id' },
+                    pipeline: [
+                        { $match: { $expr: { $and: [{ $eq: ['$categoryId', '$$catId'] }, { $eq: ['$isActive', true] }] } } },
+                        { $count: 'count' },
+                    ],
+                    as: 'questionStats',
+                },
+            },
+            {
+                $addFields: {
+                    questionCount: {
+                        $ifNull: [{ $arrayElemAt: ['$questionStats.count', 0] }, 0],
+                    },
+                },
+            },
+            { $project: { questionStats: 0, __v: 0 } },
+        ]);
 
         res.json(successResponse(categoriesWithCount));
     } catch (error) {
-        console.error('Get game categories error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
@@ -137,7 +140,6 @@ const getQuestionsByCategory = async (req, res) => {
             })
         );
     } catch (error) {
-        console.error('Get questions by category error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
@@ -207,7 +209,6 @@ const getRandomGame = async (req, res) => {
             })
         );
     } catch (error) {
-        console.error('Get random game error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
@@ -312,17 +313,12 @@ const saveAnswer = async (req, res) => {
                             userId: partnerId,
                             text: randomAnswer,
                         });
-                        console.log(
-                            `[DevMode] Auto-answered question ${questionId} for partner ${partnerId}`
-                        );
                     }
                 } catch (err) {
-                    console.error('[DevMode] Auto-answer error:', err);
                 }
             }, 120000);
         }
     } catch (error) {
-        console.error('Save game answer error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
@@ -346,7 +342,6 @@ const getUserAnswers = async (req, res) => {
             })
         );
     } catch (error) {
-        console.error('Get user answers error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
@@ -431,7 +426,6 @@ const getQuestionWithAnswers = async (req, res) => {
             })
         );
     } catch (error) {
-        console.error('Get question with answers error:', error);
         res.status(500).json(errorResponse('Internal server error'));
     }
 };
