@@ -229,7 +229,9 @@ export const useChatStore = create<ChatState>()(
 
           // Listen for message deletions
           socketService.onMessageDeleted(messageId => {
-            const messages = get().messages.filter(msg => msg._id !== messageId);
+            const messages = get().messages.filter(
+              msg => msg._id !== messageId,
+            );
             set({ messages });
           });
 

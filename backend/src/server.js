@@ -103,17 +103,16 @@ io.on('connection', async (socket) => {
                                 try {
                                     await Message.findByIdAndUpdate(message._id, {
                                         isRead: true,
-                                        readAt: new Date()
+                                        readAt: new Date(),
                                     });
                                     io.to(`couple_${socket.coupleId}`).emit('message_read', {
-                                        messageId: message._id.toString()
+                                        messageId: message._id.toString(),
                                     });
                                 } catch (err) {
                                     console.error('Dev partner mark as read error:', err);
                                 }
                             }, 500);
 
-                           
                             setTimeout(async () => {
                                 try {
                                     const reply = await Message.create({
@@ -168,7 +167,7 @@ io.on('connection', async (socket) => {
                 { isRead: true, readAt: new Date() },
                 { new: true }
             );
-            
+
             if (message && socket.coupleId) {
                 // Notify partner that message was read (no deletion yet)
                 socket.to(`couple_${socket.coupleId}`).emit('message_read', { messageId });
@@ -186,13 +185,15 @@ io.on('connection', async (socket) => {
                 // Delete ALL old messages (regardless of read status) when chat opens
                 // This clears any messages from previous modes (12-hour mode etc)
                 const result = await Message.deleteMany({
-                    coupleId: socket.coupleId
+                    coupleId: socket.coupleId,
                 });
-                
+
                 if (result.deletedCount > 0) {
                     // Notify both users to clear all messages
                     io.to(`couple_${socket.coupleId}`).emit('clear_chat');
-                    console.log(`Deleted ${result.deletedCount} old messages on chat open (delete after seen mode)`);
+                    console.log(
+                        `Deleted ${result.deletedCount} old messages on chat open (delete after seen mode)`
+                    );
                 }
             }
         } catch (error) {
@@ -203,20 +204,20 @@ io.on('connection', async (socket) => {
     socket.on('chat_closed', async () => {
         try {
             if (!socket.coupleId) return;
-            
-           
+
             const couple = await Couple.findById(socket.coupleId);
             if (couple && couple.chatSettings && couple.chatSettings.deleteAfterSeen) {
-                
                 setTimeout(async () => {
                     try {
                         const result = await Message.deleteMany({
                             coupleId: socket.coupleId,
-                            isRead: true
+                            isRead: true,
                         });
-                       
+
                         io.to(`couple_${socket.coupleId}`).emit('clear_read_messages');
-                        console.log(`Deleted ${result.deletedCount} read messages after chat closed`);
+                        console.log(
+                            `Deleted ${result.deletedCount} read messages after chat closed`
+                        );
                     } catch (err) {
                         console.error('Failed to delete messages after chat closed:', err);
                     }
@@ -249,13 +250,13 @@ const startServer = async () => {
         // Start Message Cleanup Cron Job (runs every hour)
         const cleanupOldMessages = require('./Shared/messageCronJob');
         const cron = require('node-cron');
-        
+
         // Run every hour
         cron.schedule('0 * * * *', () => {
             console.log('Running message cleanup cron job...');
             cleanupOldMessages();
         });
-        
+
         // Run once on startup
         cleanupOldMessages();
 

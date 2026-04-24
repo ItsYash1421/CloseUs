@@ -9,7 +9,6 @@ const cleanupOldMessages = async () => {
     try {
         console.log('Starting 12-hour message cleanup...');
 
-      
         const couplesWithAutoDelete = await Couple.find({
             'chatSettings.deleteAfter12Hours': true,
             isPaired: true,
@@ -21,12 +20,10 @@ const cleanupOldMessages = async () => {
             return;
         }
 
-        const coupleIds = couplesWithAutoDelete.map(c => c._id);
+        const coupleIds = couplesWithAutoDelete.map((c) => c._id);
 
-       
         const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
 
-      
         const result = await Message.deleteMany({
             coupleId: { $in: coupleIds },
             createdAt: { $lt: twelveHoursAgo },

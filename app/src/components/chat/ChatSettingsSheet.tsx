@@ -44,11 +44,14 @@ export const ChatSettingsSheet: React.FC<ChatSettingsSheetProps> = ({
 
     const previousValue = deleteAfterSeen;
     setDeleteAfterSeen(value);
-    
+
     try {
       // If turning on, turn off the other setting
       if (value) {
-        await updateChatSettings({ deleteAfterSeen: true, deleteAfter12Hours: false });
+        await updateChatSettings({
+          deleteAfterSeen: true,
+          deleteAfter12Hours: false,
+        });
         setDeleteAfter12Hours(false);
       } else {
         await updateChatSettings({ deleteAfterSeen: false });
@@ -67,11 +70,14 @@ export const ChatSettingsSheet: React.FC<ChatSettingsSheetProps> = ({
 
     const previousValue = deleteAfter12Hours;
     setDeleteAfter12Hours(value);
-    
+
     try {
       // If turning on, turn off the other setting
       if (value) {
-        await updateChatSettings({ deleteAfter12Hours: true, deleteAfterSeen: false });
+        await updateChatSettings({
+          deleteAfter12Hours: true,
+          deleteAfterSeen: false,
+        });
         setDeleteAfterSeen(false);
       } else {
         await updateChatSettings({ deleteAfter12Hours: false });

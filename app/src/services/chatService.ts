@@ -94,9 +94,10 @@ class ChatService {
     deleteAfterSeen: boolean;
     deleteAfter12Hours: boolean;
   }> {
-    const response = await apiClient.get<
-      ApiResponse<{ deleteAfterSeen: boolean; deleteAfter12Hours: boolean }>
-    >('/api/chat/settings');
+    const response =
+      await apiClient.get<
+        ApiResponse<{ deleteAfterSeen: boolean; deleteAfter12Hours: boolean }>
+      >('/api/chat/settings');
     return response.data!;
   }
 

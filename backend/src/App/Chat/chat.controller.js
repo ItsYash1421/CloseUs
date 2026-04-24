@@ -122,7 +122,11 @@ const markAsRead = async (req, res) => {
         const { messageId } = req.params;
         const userId = req.userId;
 
-        const message = await Message.findByIdAndUpdate(messageId, { isRead: true, readAt: new Date() }, { new: true });
+        const message = await Message.findByIdAndUpdate(
+            messageId,
+            { isRead: true, readAt: new Date() },
+            { new: true }
+        );
 
         if (!message) {
             return res.status(404).json(errorResponse('Message not found', 404));
@@ -166,8 +170,14 @@ const updateChatSettings = async (req, res) => {
         }
 
         couple.chatSettings = {
-            deleteAfterSeen: deleteAfterSeen !== undefined ? deleteAfterSeen : couple.chatSettings?.deleteAfterSeen || false,
-            deleteAfter12Hours: deleteAfter12Hours !== undefined ? deleteAfter12Hours : couple.chatSettings?.deleteAfter12Hours || false,
+            deleteAfterSeen:
+                deleteAfterSeen !== undefined
+                    ? deleteAfterSeen
+                    : couple.chatSettings?.deleteAfterSeen || false,
+            deleteAfter12Hours:
+                deleteAfter12Hours !== undefined
+                    ? deleteAfter12Hours
+                    : couple.chatSettings?.deleteAfter12Hours || false,
         };
 
         await couple.save();

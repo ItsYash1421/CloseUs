@@ -1,5 +1,14 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, Platform, ImageBackground, Image, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Platform,
+  ImageBackground,
+  Image,
+  Dimensions,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GradientBackground } from '../../components/common';
 import { ChatHeader } from '../../components/chat/ChatHeader';
@@ -23,7 +32,7 @@ const SunsetChat = require('../../assets/images/Sunset-Chat.png');
 // Get background image based on current time
 const getTimeBasedBackground = () => {
   const hour = new Date().getHours();
-  
+
   // Morning/Day: 6 AM - 5 PM
   if (hour >= 6 && hour < 17) {
     return DayChat;
@@ -60,7 +69,7 @@ export const ChatScreen = () => {
 
   // Get time-based background image (memoized to avoid recalculating on every render)
   const backgroundImage = useMemo(() => getTimeBasedBackground(), []);
-  
+
   // Calculate header height dynamically (insets.top + paddingTop + paddingBottom + content)
   const headerHeight = insets.top + 0 + 0 + 70; // matches ChatHeader padding and content + extra space
 
@@ -74,9 +83,11 @@ export const ChatScreen = () => {
     connectSocket();
 
     // Notify backend that chat is opened (to delete old read messages)
-    import('../../services/socketService').then(({ default: socketService }) => {
-      socketService.notifyChatOpened();
-    });
+    import('../../services/socketService').then(
+      ({ default: socketService }) => {
+        socketService.notifyChatOpened();
+      },
+    );
 
     // Clear badge and cancel inactivity reminder when viewing chat
     notificationService.clearBadge();
@@ -86,9 +97,11 @@ export const ChatScreen = () => {
     return () => {
       setKeyboardMode('adjustPan');
       // Notify backend that chat screen is closed
-      import('../../services/socketService').then(({ default: socketService }) => {
-        socketService.notifyChatClosed();
-      });
+      import('../../services/socketService').then(
+        ({ default: socketService }) => {
+          socketService.notifyChatClosed();
+        },
+      );
     };
   }, []);
 
@@ -149,10 +162,10 @@ export const ChatScreen = () => {
       (typeof prevMessage.senderId === 'string'
         ? prevMessage.senderId
         : (prevMessage.senderId as any)?._id ||
-        (prevMessage.senderId as any)?.id) !== senderId ||
+          (prevMessage.senderId as any)?.id) !== senderId ||
       new Date(item.createdAt).getTime() -
-      new Date(prevMessage.createdAt).getTime() >
-      60000;
+        new Date(prevMessage.createdAt).getTime() >
+        60000;
 
     return (
       <MessageBubble
